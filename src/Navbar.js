@@ -1,6 +1,5 @@
 import React from "react";
 import NavItem from "./NavItem";
-import TitleDivider from "./TitleDivider";
 
 function Navbar() {
   return (

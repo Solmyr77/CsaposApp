@@ -1,6 +1,7 @@
 import Header from "./Header";
 import Navbar from "./Navbar";
 import TitleDivider from "./TitleDivider";
+import HighlightedCard from "./HighlightedCard";
 
 function App() {
   return (
@@ -8,6 +9,7 @@ function App() {
       <Header></Header>
       <Navbar></Navbar>
       <TitleDivider></TitleDivider>
+      <HighlightedCard></HighlightedCard>
     </div>
   );
 }

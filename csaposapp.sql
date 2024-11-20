@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 19, 2024 at 02:32 PM
+-- Generation Time: Nov 20, 2024 at 09:57 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -53,7 +53,8 @@ CREATE TABLE `events` (
   `location_id` varchar(36) DEFAULT NULL,
   `name` varchar(50) NOT NULL,
   `timefrom` datetime NOT NULL,
-  `timeto` datetime NOT NULL
+  `timeto` datetime NOT NULL,
+  `img_url` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
@@ -82,7 +83,8 @@ CREATE TABLE `locations` (
   `rating` tinyint(4) DEFAULT NULL,
   `is_highlighted` tinyint(1) NOT NULL DEFAULT 0,
   `is_open` tinyint(1) NOT NULL DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `img_url` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
@@ -126,7 +128,8 @@ CREATE TABLE `products` (
   `category` varchar(50) NOT NULL,
   `price` int(11) NOT NULL,
   `stock_quantity` int(11) DEFAULT 0,
-  `is_active` tinyint(1) DEFAULT 1
+  `is_active` tinyint(1) DEFAULT 1,
+  `img_url` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
@@ -166,7 +169,8 @@ CREATE TABLE `users` (
   `legal_name` varchar(50) NOT NULL,
   `age` tinyint(4) NOT NULL,
   `role` enum('guest','waiter','admin') NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `img_url` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --

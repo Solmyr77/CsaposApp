@@ -1,7 +1,7 @@
 import Header from "./Header";
 import Navbar from "./Navbar";
 import TitleDivider from "./TitleDivider";
-import HighlightedCard from "./HighlightedCard";
+import StyledSwiper from "./StyledSwiper";
 
 function App() {
   return (
@@ -9,7 +9,7 @@ function App() {
       <Header></Header>
       <Navbar></Navbar>
       <TitleDivider></TitleDivider>
-      <HighlightedCard></HighlightedCard>
+      <StyledSwiper/>
     </div>
   );
 }

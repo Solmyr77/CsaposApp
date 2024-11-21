@@ -11,7 +11,7 @@ function StyledSwiper() {
     background-color: white;
     } `
   return (
-    <StyledSwiper autoplay={{delay: 5000}} speed={1000} pagination={true} modules={[Pagination, Autoplay]} className="mySwiper">
+    <StyledSwiper autoplay={{delay: 5000}} speed={1000} pagination={true} modules={[Pagination, Autoplay]} className="mySwiper mb-3">
         <SwiperSlide><HighlightedCard/></SwiperSlide>
         <SwiperSlide><HighlightedCard/></SwiperSlide>
         <SwiperSlide><HighlightedCard/></SwiperSlide>

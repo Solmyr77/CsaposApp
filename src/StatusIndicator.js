@@ -3,11 +3,11 @@ import React from "react";
 function StatusIndicator({status}) {
     const statusStyles = {
         open: {
-            color: "bg-green-500",
+            color: "bg-[rgb(8,228,0)]",
             text: "Nyitva"
         },
         closed: {
-            color: "bg-red-500",
+            color: "bg-[rgb(222,0,0)]",
             text: "Zárva"
         }
     };

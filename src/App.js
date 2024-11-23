@@ -13,14 +13,14 @@ function App() {
       <StyledSwiper/>
       <TitleDivider title={"Összes"}/>
       <div className="flex gap-4 justify-between flex-wrap">
-        <Card status={"open"}/>
-        <Card status={"open"}/>
-        <Card status={"open"}/>
-        <Card status={"open"}/>
-        <Card status={"closed"}/>
-        <Card status={"closed"}/>
+        <Card status={"open"} title={"Félidő söröző"}/>
+        <Card status={"open"} title={"City Pub"}/>
+        <Card status={"open"} title={"Félidő söröző"}/>
+        <Card status={"open"} title={"Félidő söröző"}/>
+        <Card status={"closed"} title={"Félidő söröző"}/>
+        <Card status={"closed"} title={"Félidő söröző"}/>
       </div>
-      
+
     </div>
   );
 }

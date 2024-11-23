@@ -2,7 +2,7 @@ import React from "react";
 import img1 from "./img/pub.jpg";
 import StatusIndicator from "./StatusIndicator";
 
-function Card({status}) {
+function Card({status, title}) {
 
   return (
     <div className="basis-[30%] aspect-square relative drop-shadow-[0_4px_4px_rgba(0,0,0,0.25)]">
@@ -11,7 +11,7 @@ function Card({status}) {
             <div className="h-1/4 flex items-center px-2">
                 <StatusIndicator status={status}/>
             </div>
-            <p className="font-normal text-wrap text-md text-center leading-tight absolute top-1/2 -translate-y-1/2 w-full">Félidő söröző</p>
+            <p className="font-normal text-wrap text-md text-center leading-tight absolute top-1/2 -translate-y-1/2 w-full">{title}</p>
         </div>
     </div>
   )

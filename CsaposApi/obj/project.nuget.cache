@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "jHX3v0AwHEopW3YOCrLAOqP6Z511GTIooy9v6bVd4gugVwZqEeBs+kDHl3gb9i5eBwOmKebLJ1VO4rmsEd7DMg==",
+  "dgSpecHash": "UzpAo2pCJHjwaUfOkvvQN7KACdAG/Lv2zy0ht6UwHMAiSgdyBaE83f5e8+eAUqJnUrWFjPWay/xTY5HUCQ928w==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Solmyr\\Desktop\\CsaposApi\\CsaposApi\\CsaposApi\\CsaposApi.csproj",
+  "projectFilePath": "C:\\Users\\Solmyr\\Desktop\\CsaposApp\\CsaposApi\\CsaposApi.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Solmyr\\.nuget\\packages\\bouncycastle.cryptography\\2.3.1\\bouncycastle.cryptography.2.3.1.nupkg.sha512",
     "C:\\Users\\Solmyr\\.nuget\\packages\\google.protobuf\\3.26.1\\google.protobuf.3.26.1.nupkg.sha512",

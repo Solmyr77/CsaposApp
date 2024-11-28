@@ -10,6 +10,8 @@ namespace CsaposApi
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddDbContext<CsaposappContext>(options => options.UseMySQL(builder.Configuration.GetConnectionString("MySql")));
+
             // Add services to the container.
 
             builder.Services.AddControllers();

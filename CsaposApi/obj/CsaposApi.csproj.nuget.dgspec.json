@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Solmyr\\Desktop\\CsaposApi\\CsaposApi\\CsaposApi\\CsaposApi.csproj": {}
+    "C:\\Users\\Solmyr\\Desktop\\CsaposApp\\CsaposApi\\CsaposApi.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Solmyr\\Desktop\\CsaposApi\\CsaposApi\\CsaposApi\\CsaposApi.csproj": {
+    "C:\\Users\\Solmyr\\Desktop\\CsaposApp\\CsaposApi\\CsaposApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Solmyr\\Desktop\\CsaposApi\\CsaposApi\\CsaposApi\\CsaposApi.csproj",
+        "projectUniqueName": "C:\\Users\\Solmyr\\Desktop\\CsaposApp\\CsaposApi\\CsaposApi.csproj",
         "projectName": "CsaposApi",
-        "projectPath": "C:\\Users\\Solmyr\\Desktop\\CsaposApi\\CsaposApi\\CsaposApi\\CsaposApi.csproj",
+        "projectPath": "C:\\Users\\Solmyr\\Desktop\\CsaposApp\\CsaposApi\\CsaposApi.csproj",
         "packagesPath": "C:\\Users\\Solmyr\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Solmyr\\Desktop\\CsaposApi\\CsaposApi\\CsaposApi\\obj\\",
+        "outputPath": "C:\\Users\\Solmyr\\Desktop\\CsaposApp\\CsaposApi\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34701.34
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsaposApi", "CsaposApi\CsaposApi.csproj", "{214EB2FC-19FB-4E54-BB9F-EF193913E7AE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution items", "Solution items", "{E782394D-BEA5-4B62-B287-723F46886D4F}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{214EB2FC-19FB-4E54-BB9F-EF193913E7AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{214EB2FC-19FB-4E54-BB9F-EF193913E7AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{214EB2FC-19FB-4E54-BB9F-EF193913E7AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{214EB2FC-19FB-4E54-BB9F-EF193913E7AE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BB94036D-EEC0-402D-B60F-436986A25C92}
+	EndGlobalSection
+EndGlobal

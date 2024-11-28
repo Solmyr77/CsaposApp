@@ -1,0 +1,17 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace CsaposApi.Models;
+
+public partial class Table
+{
+    public string Id { get; set; } = null!;
+
+    public int Number { get; set; }
+
+    public sbyte Capacity { get; set; }
+
+    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+
+    public virtual ICollection<TableGuest> TableGuests { get; set; } = new List<TableGuest>();
+}

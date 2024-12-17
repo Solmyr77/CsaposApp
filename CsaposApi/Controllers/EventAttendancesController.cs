@@ -24,7 +24,7 @@ namespace CsaposApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EventAttendance>>> GetEventAttendances()
         {
-            return await _context.EventAttendances.ToListAsync();
+            return Ok(await _context.EventAttendances.ToListAsync());
         }
 
         // GET: api/EventAttendances/5
@@ -38,7 +38,7 @@ namespace CsaposApi.Controllers
                 return NotFound();
             }
 
-            return eventAttendance;
+            return Ok(eventAttendance);
         }
 
         // PUT: api/EventAttendances/5

@@ -24,7 +24,7 @@ namespace CsaposApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
         {
-            return await _context.Orders.ToListAsync();
+            return Ok(await _context.Orders.ToListAsync());
         }
 
         // GET: api/Orders/5
@@ -38,7 +38,7 @@ namespace CsaposApi.Controllers
                 return NotFound();
             }
 
-            return order;
+            return Ok(order);
         }
 
         // PUT: api/Orders/5

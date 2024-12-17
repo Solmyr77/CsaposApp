@@ -24,7 +24,7 @@ namespace CsaposApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Location>>> GetLocations()
         {
-            return await _context.Locations.ToListAsync();
+            return Ok(await _context.Locations.ToListAsync());
         }
 
         // GET: api/Locations/5
@@ -38,7 +38,7 @@ namespace CsaposApi.Controllers
                 return NotFound();
             }
 
-            return location;
+            return Ok(location);
         }
 
         // PUT: api/Locations/5

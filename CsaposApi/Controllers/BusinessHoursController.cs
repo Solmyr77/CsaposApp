@@ -24,7 +24,7 @@ namespace CsaposApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BusinessHour>>> GetBusinessHours()
         {
-            return await _context.BusinessHours.ToListAsync();
+            return Ok(await _context.BusinessHours.ToListAsync());
         }
 
         // GET: api/BusinessHours/5
@@ -38,7 +38,7 @@ namespace CsaposApi.Controllers
                 return NotFound();
             }
 
-            return businessHour;
+            return Ok(businessHour);
         }
 
         // PUT: api/BusinessHours/5

@@ -24,21 +24,21 @@ namespace CsaposApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Event>>> GetEvents()
         {
-            return await _context.Events.ToListAsync();
+            return Ok(await _context.Events.ToListAsync());
         }
 
         // GET: api/Events/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Event>> GetEvent(string id)
         {
-            var @event = await _context.Events.FindAsync(id);
+            var _event = await _context.Events.FindAsync(id);
 
-            if (@event == null)
+            if (_event == null)
             {
                 return NotFound();
             }
 
-            return @event;
+            return Ok(_event);
         }
 
         // PUT: api/Events/5
@@ -75,16 +75,16 @@ namespace CsaposApi.Controllers
         // POST: api/Events
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Event>> PostEvent(Event @event)
+        public async Task<ActionResult<Event>> PostEvent(Event _event)
         {
-            _context.Events.Add(@event);
+            _context.Events.Add(_event);
             try
             {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
-                if (EventExists(@event.Id))
+                if (EventExists(_event.Id))
                 {
                     return Conflict();
                 }
@@ -94,20 +94,20 @@ namespace CsaposApi.Controllers
                 }
             }
 
-            return CreatedAtAction("GetEvent", new { id = @event.Id }, @event);
+            return CreatedAtAction("GetEvent", new { id = _event.Id }, _event);
         }
 
         // DELETE: api/Events/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEvent(string id)
         {
-            var @event = await _context.Events.FindAsync(id);
-            if (@event == null)
+            var _event = await _context.Events.FindAsync(id);
+            if (_event == null)
             {
                 return NotFound();
             }
 
-            _context.Events.Remove(@event);
+            _context.Events.Remove(_event);
             await _context.SaveChangesAsync();
 
             return NoContent();

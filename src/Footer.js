@@ -6,7 +6,7 @@ import { UserCircleIcon } from "@heroicons/react/24/outline";
 
 function Footer({mainActive, searchActive, profileActive}) {
   return (
-    <div className="w-full h-[10vh] fixed bottom-0 flex justify-evenly items-center font-normal bg-dark-grey pb-2">
+    <div className="w-full h-[10vh] fixed bottom-0 flex justify-evenly items-center font-normal bg-dark-grey pb-2 font-play">
         <Link to="/" className="basis-1/3">
           <div className={`flex flex-col justify-center items-center ${mainActive ? "text-blue" : "text-white"}`}>
               <GlobeAltIcon className=" h-6"/>

@@ -1,8 +1,6 @@
 import React from "react";
-import Header from "./Header";
 import TitleDivider from "./TitleDivider";
 import SearchBar from "./SearchBar";
-import Footer from "./Footer";
 import CardContainer from "./CardContainer";
 import records from "./records";
 
@@ -12,7 +10,7 @@ function Search() {
         <div className="px-4">
             <SearchBar/>
             <TitleDivider title={"Legutóbbi"}/>
-            <CardContainer records={records.slice(1, 3)}/>
+            <CardContainer records={records.slice(1, 3)} cardsToShow={"Összes"}/>
         </div>
     </div>
   )

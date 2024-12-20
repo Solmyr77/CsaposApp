@@ -2,20 +2,25 @@ import React from "react";
 import Card from "./Card";
 
 function CardContainer({records, cardsToShow}) {
+  let recordsToDisplay = [];
 
-    return (
-    <div className="flex gap-4 justify-left flex-wrap">
+  switch (cardsToShow) {
+    case "Összes":
+      recordsToDisplay = records;
+      break;
+    case "Nyitva":
+      recordsToDisplay = records.filter(record => record.status != "closed");
+      break;
+    case "Kedvencek":
+      recordsToDisplay = records;
+      break;
+  }
+  return (
+    <div className={`flex justify-between flex-wrap`}>
+      {recordsToDisplay.map(record=> <Card status={record.status} title={record.name}/>)}
       {
-        cardsToShow == "Összes" &&
-        records.map(record => <Card title={record.name} status={record.status}/>)
-      }
-      {
-        cardsToShow == "Nyitva" &&
-        records.filter(record => record.status != "closed").map(record => <Card title={record.name} status={record.status}/>)
-      }
-      {
-        cardsToShow == "Kedvencek" &&
-        <h1>Nincsenek kedvenceid!</h1>
+        recordsToDisplay.length % 3 == 0 ? null
+        : <div className="basis-[30%] opacity-100 aspect-square"></div> 
       }
     </div>
   );

@@ -2,6 +2,7 @@ import React from 'react';
 import Main from './Main';
 import Search from './Search';
 import Layout from './Layout';
+import Profile from './Profile';
 import Provider from './Provider';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
@@ -14,6 +15,7 @@ function App() {
             <Route index element={<Main />} />
             <Route path="/search" element={<Search />} />
           </Route>
+          <Route path="/profile" element={<Profile />}/>
         </Routes>
       </BrowserRouter>
     </Provider>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 20, 2024 at 09:57 PM
+-- Generation Time: Dec 21, 2024 at 08:07 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -30,7 +30,7 @@ USE `csaposapp`;
 --
 
 CREATE TABLE `business_hours` (
-  `id` varchar(36) NOT NULL,
+  `id` char(36) NOT NULL,
   `monday` time NOT NULL,
   `tuesday` time NOT NULL,
   `wednesday` time NOT NULL,
@@ -38,7 +38,7 @@ CREATE TABLE `business_hours` (
   `friday` time NOT NULL,
   `saturday` time NOT NULL,
   `sunday` time NOT NULL,
-  `location_id` varchar(36) NOT NULL,
+  `location_id` char(36) NOT NULL,
   `name` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
@@ -49,8 +49,8 @@ CREATE TABLE `business_hours` (
 --
 
 CREATE TABLE `events` (
-  `id` varchar(36) NOT NULL,
-  `location_id` varchar(36) DEFAULT NULL,
+  `id` char(36) NOT NULL,
+  `location_id` char(36) DEFAULT NULL,
   `name` varchar(50) NOT NULL,
   `timefrom` datetime NOT NULL,
   `timeto` datetime NOT NULL,
@@ -64,9 +64,9 @@ CREATE TABLE `events` (
 --
 
 CREATE TABLE `event_attendance` (
-  `id` varchar(36) NOT NULL,
-  `user_id` varchar(36) DEFAULT NULL,
-  `event_id` varchar(36) DEFAULT NULL
+  `id` char(36) NOT NULL,
+  `user_id` char(36) DEFAULT NULL,
+  `event_id` char(36) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
@@ -76,7 +76,7 @@ CREATE TABLE `event_attendance` (
 --
 
 CREATE TABLE `locations` (
-  `id` varchar(36) NOT NULL,
+  `id` char(36) NOT NULL,
   `name` varchar(100) NOT NULL,
   `capacity` int(11) NOT NULL,
   `number_of_tables` int(11) NOT NULL,
@@ -94,9 +94,9 @@ CREATE TABLE `locations` (
 --
 
 CREATE TABLE `orders` (
-  `id` varchar(36) NOT NULL,
-  `user_id` varchar(36) NOT NULL,
-  `table_id` varchar(36) NOT NULL,
+  `id` char(36) NOT NULL,
+  `user_id` char(36) NOT NULL,
+  `table_id` char(36) NOT NULL,
   `order_status` enum('pending','accepted','completed','paid','rejected') DEFAULT 'pending',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
@@ -109,9 +109,9 @@ CREATE TABLE `orders` (
 --
 
 CREATE TABLE `order_items` (
-  `id` varchar(36) NOT NULL,
-  `order_id` varchar(36) NOT NULL,
-  `product_id` varchar(36) NOT NULL,
+  `id` char(36) NOT NULL,
+  `order_id` char(36) NOT NULL,
+  `product_id` char(36) NOT NULL,
   `unit_price` int(11) NOT NULL,
   `quantity` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
@@ -123,12 +123,12 @@ CREATE TABLE `order_items` (
 --
 
 CREATE TABLE `products` (
-  `id` varchar(36) NOT NULL,
+  `id` char(36) NOT NULL,
   `name` varchar(100) NOT NULL,
   `category` varchar(50) NOT NULL,
   `price` int(11) NOT NULL,
   `stock_quantity` int(11) DEFAULT 0,
-  `is_active` tinyint(1) DEFAULT 1,
+  `is_active` tinyint(1) DEFAULT 0,
   `img_url` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
@@ -139,7 +139,7 @@ CREATE TABLE `products` (
 --
 
 CREATE TABLE `tables` (
-  `id` varchar(36) NOT NULL,
+  `id` char(36) NOT NULL,
   `number` int(11) NOT NULL,
   `capacity` tinyint(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
@@ -151,9 +151,9 @@ CREATE TABLE `tables` (
 --
 
 CREATE TABLE `table_guests` (
-  `id` varchar(36) NOT NULL,
-  `user_id` varchar(36) DEFAULT NULL,
-  `table_id` varchar(36) DEFAULT NULL
+  `id` char(36) NOT NULL,
+  `user_id` char(36) DEFAULT NULL,
+  `table_id` char(36) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
@@ -163,7 +163,7 @@ CREATE TABLE `table_guests` (
 --
 
 CREATE TABLE `users` (
-  `id` varchar(36) NOT NULL,
+  `id` char(36) NOT NULL,
   `username` varchar(20) NOT NULL,
   `password_hash` varchar(255) NOT NULL,
   `legal_name` varchar(50) NOT NULL,
@@ -182,7 +182,7 @@ CREATE TABLE `users` (
 --
 ALTER TABLE `business_hours`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_location_hours` (`location_id`);
+  ADD KEY `location_id` (`location_id`);
 
 --
 -- Indexes for table `events`
@@ -196,8 +196,8 @@ ALTER TABLE `events`
 --
 ALTER TABLE `event_attendance`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`),
-  ADD KEY `event_id` (`event_id`);
+  ADD KEY `event_id` (`event_id`),
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `locations`
@@ -210,8 +210,8 @@ ALTER TABLE `locations`
 --
 ALTER TABLE `orders`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`),
-  ADD KEY `fk_order_table` (`table_id`);
+  ADD KEY `table_id` (`table_id`),
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `order_items`
@@ -255,7 +255,7 @@ ALTER TABLE `users`
 -- Constraints for table `business_hours`
 --
 ALTER TABLE `business_hours`
-  ADD CONSTRAINT `fk_location_hours` FOREIGN KEY (`location_id`) REFERENCES `locations` (`id`);
+  ADD CONSTRAINT `business_hours_ibfk_1` FOREIGN KEY (`location_id`) REFERENCES `locations` (`id`);
 
 --
 -- Constraints for table `events`
@@ -267,15 +267,15 @@ ALTER TABLE `events`
 -- Constraints for table `event_attendance`
 --
 ALTER TABLE `event_attendance`
-  ADD CONSTRAINT `event_attendance_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-  ADD CONSTRAINT `event_attendance_ibfk_2` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`);
+  ADD CONSTRAINT `event_attendance_ibfk_2` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`),
+  ADD CONSTRAINT `event_attendance_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
 -- Constraints for table `orders`
 --
 ALTER TABLE `orders`
-  ADD CONSTRAINT `fk_order_table` FOREIGN KEY (`table_id`) REFERENCES `tables` (`id`),
-  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+  ADD CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`table_id`) REFERENCES `tables` (`id`),
+  ADD CONSTRAINT `orders_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
 -- Constraints for table `order_items`

@@ -22,10 +22,12 @@ function Footer() {
               Keresés
           </div>
         </Link>
-        <div className={`flex flex-col justify-center items-center basis-1/3 ${menuState === "Profile" ? "text-blue" : "text-white"}`}>
-            <UserCircleIcon className="text-white h-6"/>
-            Profil
-        </div>
+        <Link to="/profile" className="basis-1/3" onClick={() => setMenuState("Profile")}>
+          <div className={`flex flex-col justify-center items-center basis-1/3 ${menuState === "Profile" ? "text-blue" : "text-white"}`}>
+              <UserCircleIcon className="h-6"/>
+              Profil
+          </div>
+        </Link>
     </div>
   )
 }

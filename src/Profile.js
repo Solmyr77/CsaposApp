@@ -3,6 +3,7 @@ import userAvatar from "./img/avatar.png";
 import TitleDivider from "./TitleDivider";
 import Footer from "./Footer";
 import Friend from "./Friend";
+import Badge from "./Badge";
 
 function Profile() {
   return (
@@ -10,12 +11,16 @@ function Profile() {
         <h1 className="text-center w-full pt-16 text-2xl mb-2">Lajos</h1>
         <img src={userAvatar} alt="avatar" className="w-28 h-28 rounded-full mb-8"/>
         <TitleDivider title={"Barátok"}/>
-        <div className="flex flex-row w-full overflow-x-scroll gap-6">
+        <div className="flex flex-row w-full overflow-x-scroll gap-6 mb-8">
             <Friend image={userAvatar} name={"Feribókozolegésznaptekutya"}/>
             <Friend image={userAvatar} name={"valami"}/>
             <Friend image={userAvatar} name={"valami"}/>
             <Friend image={userAvatar} name={"valami"}/>
             <Friend image={userAvatar} name={"valami"}/>
+        </div>
+        <TitleDivider title={"Eredmények"}/>
+        <div className="flex flex-row w-full overflow-x-scroll gap-6 mb-8">
+          <Badge />
         </div>
         <Footer/>
     </div>

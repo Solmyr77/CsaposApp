@@ -15,12 +15,14 @@ function CardContainer({records, cardsToShow}) {
       recordsToDisplay = records;
       break;
   }
+  
   return (
     <div className={`flex justify-between flex-wrap`}>
       {recordsToDisplay.map(record=> <Card status={record.status} title={record.name}/>)}
       {
-        recordsToDisplay.length % 3 == 0 ? null
-        : <div className="basis-[30%] opacity-100 aspect-square"></div> 
+        recordsToDisplay.length % 2 == 0 && recordsToDisplay.length % 3 != 0 ? 
+        <div className="basis-[30%] opacity-100 aspect-square"></div> 
+        : null
       }
     </div>
   );

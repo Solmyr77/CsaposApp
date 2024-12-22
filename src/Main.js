@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import Navbar from "./Navbar";
 import TitleDivider from "./TitleDivider";
 import StyledSwiper from "./StyledSwiper";
@@ -8,6 +8,10 @@ import Context from "./Context";
 
 function Main() {
   const [navState, setNavState, menuState, setMenuState] = useContext(Context);
+
+  useEffect(() => {
+    setMenuState("Main");
+  }, []);
 
   return (
     <div className="bg-grey text-white w-screen font-play font-bold">

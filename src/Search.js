@@ -3,10 +3,16 @@ import TitleDivider from "./TitleDivider";
 import SearchBar from "./SearchBar";
 import CardContainer from "./CardContainer";
 import records from "./records";
-import { useState } from "react";
+import Context from "./Context";
+import { useContext, useState, useEffect } from "react";
 
 function Search() {
+  const [navState, setNavState, menuState, setMenuState] = useContext(Context);
   const [recordsToDisplay, setRecordsToDisplay] = useState(records);
+
+  useEffect(() => {
+    setMenuState("Search");
+  }, []);
 
   return (
     <div className="bg-grey w-screen font-play font-bold text-white">

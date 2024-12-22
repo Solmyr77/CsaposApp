@@ -10,19 +10,19 @@ function Footer() {
 
   return (
     <div className="w-full h-[10vh] fixed bottom-0 flex justify-evenly items-center font-normal bg-dark-grey pb-2 font-play">
-        <Link to="/" className="basis-1/3" onClick={() => setMenuState("Main")}>
+        <Link to="/" className="basis-1/3">
           <div className={`flex flex-col justify-center items-center ${menuState === "Main" ? "text-blue" : "text-white"}`}>
               <GlobeAltIcon className=" h-6"/>
               Felfedezés
           </div>
         </Link>
-        <Link to="/search" className="basis-1/3" onClick={() => setMenuState("Search")}>
+        <Link to="/search" className="basis-1/3">
           <div className={`flex flex-col justify-center items-center basis-1/3 ${menuState === "Search" ? "text-blue" : "text-white"}`}>
               <MagnifyingGlassIcon className="h-6"/>
               Keresés
           </div>
         </Link>
-        <Link to="/profile" className="basis-1/3" onClick={() => setMenuState("Profile")}>
+        <Link to="/profile" className="basis-1/3">
           <div className={`flex flex-col justify-center items-center basis-1/3 ${menuState === "Profile" ? "text-blue" : "text-white"}`}>
               <UserCircleIcon className="h-6"/>
               Profil

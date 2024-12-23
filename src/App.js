@@ -5,6 +5,7 @@ import Layout from './Layout';
 import Profile from './Profile';
 import Provider from './Provider';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Pub from './Pub';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
             <Route path="/search" element={<Search />} />
           </Route>
           <Route path="/profile" element={<Profile />}/>
+          <Route path="/pub" element={<Pub />}/>
         </Routes>
       </BrowserRouter>
     </Provider>

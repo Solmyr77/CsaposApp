@@ -5,7 +5,7 @@ namespace CsaposApi.Models;
 
 public partial class Table
 {
-    public string Id { get; set; } = null!;
+    public Guid Id { get; set; }
 
     public int Number { get; set; }
 

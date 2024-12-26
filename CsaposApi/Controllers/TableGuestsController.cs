@@ -44,7 +44,7 @@ namespace CsaposApi.Controllers
         // PUT: api/TableGuests/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTableGuest(string id, TableGuest tableGuest)
+        public async Task<IActionResult> PutTableGuest(Guid id, TableGuest tableGuest)
         {
             if (id != tableGuest.Id)
             {
@@ -113,7 +113,7 @@ namespace CsaposApi.Controllers
             return NoContent();
         }
 
-        private bool TableGuestExists(string id)
+        private bool TableGuestExists(Guid id)
         {
             return _context.TableGuests.Any(e => e.Id == id);
         }

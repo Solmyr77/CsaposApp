@@ -5,11 +5,11 @@ namespace CsaposApi.Models;
 
 public partial class EventAttendance
 {
-    public string Id { get; set; } = null!;
+    public Guid Id { get; set; }
 
-    public string? UserId { get; set; }
+    public Guid? UserId { get; set; }
 
-    public string? EventId { get; set; }
+    public Guid? EventId { get; set; }
 
     public virtual Event? Event { get; set; }
 

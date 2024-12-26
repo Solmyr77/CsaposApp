@@ -44,7 +44,7 @@ namespace CsaposApi.Controllers
         // PUT: api/BusinessHours/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutBusinessHour(string id, BusinessHour businessHour)
+        public async Task<IActionResult> PutBusinessHour(Guid id, BusinessHour businessHour)
         {
             if (id != businessHour.Id)
             {
@@ -113,7 +113,7 @@ namespace CsaposApi.Controllers
             return NoContent();
         }
 
-        private bool BusinessHourExists(string id)
+        private bool BusinessHourExists(Guid id)
         {
             return _context.BusinessHours.Any(e => e.Id == id);
         }

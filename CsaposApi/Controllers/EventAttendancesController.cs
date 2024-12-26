@@ -44,7 +44,7 @@ namespace CsaposApi.Controllers
         // PUT: api/EventAttendances/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEventAttendance(string id, EventAttendance eventAttendance)
+        public async Task<IActionResult> PutEventAttendance(Guid id, EventAttendance eventAttendance)
         {
             if (id != eventAttendance.Id)
             {
@@ -113,7 +113,7 @@ namespace CsaposApi.Controllers
             return NoContent();
         }
 
-        private bool EventAttendanceExists(string id)
+        private bool EventAttendanceExists(Guid id)
         {
             return _context.EventAttendances.Any(e => e.Id == id);
         }

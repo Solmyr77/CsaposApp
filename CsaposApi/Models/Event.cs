@@ -5,9 +5,9 @@ namespace CsaposApi.Models;
 
 public partial class Event
 {
-    public string Id { get; set; } = null!;
+    public Guid Id { get; set; }
 
-    public string? LocationId { get; set; }
+    public Guid? LocationId { get; set; }
 
     public string Name { get; set; } = null!;
 

@@ -5,7 +5,7 @@ namespace CsaposApi.Models;
 
 public partial class BusinessHour
 {
-    public string Id { get; set; } = null!;
+    public Guid Id { get; set; }
 
     public TimeSpan Monday { get; set; }
 
@@ -21,7 +21,7 @@ public partial class BusinessHour
 
     public TimeSpan Sunday { get; set; }
 
-    public string LocationId { get; set; } = null!;
+    public Guid LocationId { get; set; }
 
     public string Name { get; set; } = null!;
 

@@ -44,7 +44,7 @@ namespace CsaposApi.Controllers
         // PUT: api/Locations/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutLocation(string id, Location location)
+        public async Task<IActionResult> PutLocation(Guid id, Location location)
         {
             if (id != location.Id)
             {
@@ -113,7 +113,7 @@ namespace CsaposApi.Controllers
             return NoContent();
         }
 
-        private bool LocationExists(string id)
+        private bool LocationExists(Guid id)
         {
             return _context.Locations.Any(e => e.Id == id);
         }

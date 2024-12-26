@@ -5,11 +5,11 @@ namespace CsaposApi.Models;
 
 public partial class TableGuest
 {
-    public string Id { get; set; } = null!;
+    public Guid Id { get; set; }
 
-    public string? UserId { get; set; }
+    public Guid? UserId { get; set; }
 
-    public string? TableId { get; set; }
+    public Guid? TableId { get; set; }
 
     public virtual Table? Table { get; set; }
 

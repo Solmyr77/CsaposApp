@@ -5,11 +5,11 @@ namespace CsaposApi.Models;
 
 public partial class OrderItem
 {
-    public string Id { get; set; } = null!;
+    public Guid Id { get; set; }
 
-    public string OrderId { get; set; } = null!;
+    public Guid OrderId { get; set; }
 
-    public string ProductId { get; set; } = null!;
+    public Guid ProductId { get; set; }
 
     public int UnitPrice { get; set; }
 

@@ -6,6 +6,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CsaposApi.Models;
+using static CsaposApi.Models.DTOs.ProductDTO;
+using static CsaposApi.Models.DTOs.UserDTO;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace CsaposApi.Controllers
 {
@@ -44,7 +48,7 @@ namespace CsaposApi.Controllers
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(string id, User user)
+        public async Task<IActionResult> PutUser(Guid id, User user)
         {
             if (id != user.Id)
             {
@@ -72,29 +76,78 @@ namespace CsaposApi.Controllers
             return NoContent();
         }
 
-        // POST: api/Users
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+        // Registration endpoint
+        [HttpPost("register")]
+        public async Task<ActionResult<User>> Register(RegisterUserDTO registerUserDTO)
         {
-            _context.Users.Add(user);
-            try
+            if (await _context.Users.AnyAsync(u => u.Username == registerUserDTO.Username))
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (UserExists(user.Id))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
+                return Conflict("Username is already taken.");
             }
 
+            var salt = GenerateSalt();
+
+            var passwordHash = HashPassword(registerUserDTO.Password, salt);
+
+            User user = new User
+            {
+                Id = Guid.NewGuid(),
+                Username = registerUserDTO.Username,
+                PasswordHash = passwordHash,
+                Salt = salt,
+                LegalName = registerUserDTO.LegalName,
+                BirthDate = registerUserDTO.BirthDate,
+                Role = "guest",
+                CreatedAt = DateTime.UtcNow,
+                ImgUrl = registerUserDTO.ImgUrl
+            };
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
             return CreatedAtAction("GetUser", new { id = user.Id }, user);
+        }
+
+        // Login endpoint
+        [HttpPost("login")]
+        public async Task<ActionResult<string>> Login(LoginUserDTO loginUserDTO)
+        {
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.Username == loginUserDTO.Username);
+
+            if (user == null)
+            {
+                return Unauthorized("Invalid username or password.");
+            }
+
+            var passwordHash = HashPassword(loginUserDTO.Password, user.Salt);
+
+            if (passwordHash != user.PasswordHash)
+            {
+                return Unauthorized("Invalid username or password.");
+            }
+
+            // TODO: Return session token
+            return Ok("Login successful.");
+        }
+
+        private string GenerateSalt()
+        {
+            var saltBytes = new byte[16];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(saltBytes);
+            }
+            return Convert.ToBase64String(saltBytes);
+        }
+
+        private string HashPassword(string password, string salt)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                var saltedPassword = password + salt;
+                var hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(saltedPassword));
+                return Convert.ToBase64String(hashBytes);
+            }
         }
 
         // DELETE: api/Users/5
@@ -113,7 +166,7 @@ namespace CsaposApi.Controllers
             return NoContent();
         }
 
-        private bool UserExists(string id)
+        private bool UserExists(Guid id)
         {
             return _context.Users.Any(e => e.Id == id);
         }

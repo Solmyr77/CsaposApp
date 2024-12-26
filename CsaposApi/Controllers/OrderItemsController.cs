@@ -44,7 +44,7 @@ namespace CsaposApi.Controllers
         // PUT: api/OrderItems/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutOrderItem(string id, OrderItem orderItem)
+        public async Task<IActionResult> PutOrderItem(Guid id, OrderItem orderItem)
         {
             if (id != orderItem.Id)
             {
@@ -113,7 +113,7 @@ namespace CsaposApi.Controllers
             return NoContent();
         }
 
-        private bool OrderItemExists(string id)
+        private bool OrderItemExists(Guid id)
         {
             return _context.OrderItems.Any(e => e.Id == id);
         }

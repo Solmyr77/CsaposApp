@@ -43,17 +43,13 @@ public partial class CsaposappContext : DbContext
 
             entity.ToTable("business_hours");
 
-            entity.HasIndex(e => e.LocationId, "fk_location_hours");
+            entity.HasIndex(e => e.LocationId, "location_id");
 
-            entity.Property(e => e.Id)
-                .HasMaxLength(36)
-                .HasColumnName("id");
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Friday)
                 .HasColumnType("time")
                 .HasColumnName("friday");
-            entity.Property(e => e.LocationId)
-                .HasMaxLength(36)
-                .HasColumnName("location_id");
+            entity.Property(e => e.LocationId).HasColumnName("location_id");
             entity.Property(e => e.Monday)
                 .HasColumnType("time")
                 .HasColumnName("monday");
@@ -79,7 +75,7 @@ public partial class CsaposappContext : DbContext
             entity.HasOne(d => d.Location).WithMany(p => p.BusinessHours)
                 .HasForeignKey(d => d.LocationId)
                 .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("fk_location_hours");
+                .HasConstraintName("business_hours_ibfk_1");
         });
 
         modelBuilder.Entity<Event>(entity =>
@@ -90,15 +86,12 @@ public partial class CsaposappContext : DbContext
 
             entity.HasIndex(e => e.LocationId, "location_id");
 
-            entity.Property(e => e.Id)
-                .HasMaxLength(36)
-                .HasColumnName("id");
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.ImgUrl)
                 .HasMaxLength(255)
                 .HasDefaultValueSql("'NULL'")
                 .HasColumnName("img_url");
             entity.Property(e => e.LocationId)
-                .HasMaxLength(36)
                 .HasDefaultValueSql("'NULL'")
                 .HasColumnName("location_id");
             entity.Property(e => e.Name)
@@ -127,15 +120,11 @@ public partial class CsaposappContext : DbContext
 
             entity.HasIndex(e => e.UserId, "user_id");
 
-            entity.Property(e => e.Id)
-                .HasMaxLength(36)
-                .HasColumnName("id");
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.EventId)
-                .HasMaxLength(36)
                 .HasDefaultValueSql("'NULL'")
                 .HasColumnName("event_id");
             entity.Property(e => e.UserId)
-                .HasMaxLength(36)
                 .HasDefaultValueSql("'NULL'")
                 .HasColumnName("user_id");
 
@@ -147,7 +136,7 @@ public partial class CsaposappContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.EventAttendances)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("event_attendance_ibfk_1");
+                .HasConstraintName("event_attendance_ibfk_3");
         });
 
         modelBuilder.Entity<Location>(entity =>
@@ -156,9 +145,7 @@ public partial class CsaposappContext : DbContext
 
             entity.ToTable("locations");
 
-            entity.Property(e => e.Id)
-                .HasMaxLength(36)
-                .HasColumnName("id");
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Capacity)
                 .HasColumnType("int(11)")
                 .HasColumnName("capacity");
@@ -190,13 +177,11 @@ public partial class CsaposappContext : DbContext
 
             entity.ToTable("orders");
 
-            entity.HasIndex(e => e.TableId, "fk_order_table");
+            entity.HasIndex(e => e.TableId, "table_id");
 
             entity.HasIndex(e => e.UserId, "user_id");
 
-            entity.Property(e => e.Id)
-                .HasMaxLength(36)
-                .HasColumnName("id");
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("'current_timestamp()'")
                 .HasColumnType("timestamp")
@@ -205,27 +190,23 @@ public partial class CsaposappContext : DbContext
                 .HasDefaultValueSql("'''pending'''")
                 .HasColumnType("enum('pending','accepted','completed','paid','rejected')")
                 .HasColumnName("order_status");
-            entity.Property(e => e.TableId)
-                .HasMaxLength(36)
-                .HasColumnName("table_id");
+            entity.Property(e => e.TableId).HasColumnName("table_id");
             entity.Property(e => e.UpdatedAt)
                 .ValueGeneratedOnAddOrUpdate()
                 .HasDefaultValueSql("'current_timestamp()'")
                 .HasColumnType("timestamp")
                 .HasColumnName("updated_at");
-            entity.Property(e => e.UserId)
-                .HasMaxLength(36)
-                .HasColumnName("user_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
 
             entity.HasOne(d => d.Table).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.TableId)
                 .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("fk_order_table");
+                .HasConstraintName("orders_ibfk_2");
 
             entity.HasOne(d => d.User).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("orders_ibfk_1");
+                .HasConstraintName("orders_ibfk_3");
         });
 
         modelBuilder.Entity<OrderItem>(entity =>
@@ -238,15 +219,9 @@ public partial class CsaposappContext : DbContext
 
             entity.HasIndex(e => e.ProductId, "product_id");
 
-            entity.Property(e => e.Id)
-                .HasMaxLength(36)
-                .HasColumnName("id");
-            entity.Property(e => e.OrderId)
-                .HasMaxLength(36)
-                .HasColumnName("order_id");
-            entity.Property(e => e.ProductId)
-                .HasMaxLength(36)
-                .HasColumnName("product_id");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.OrderId).HasColumnName("order_id");
+            entity.Property(e => e.ProductId).HasColumnName("product_id");
             entity.Property(e => e.Quantity)
                 .HasColumnType("int(11)")
                 .HasColumnName("quantity");
@@ -271,9 +246,7 @@ public partial class CsaposappContext : DbContext
 
             entity.ToTable("products");
 
-            entity.Property(e => e.Id)
-                .HasMaxLength(36)
-                .HasColumnName("id");
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Category)
                 .HasMaxLength(50)
                 .HasColumnName("category");
@@ -282,7 +255,7 @@ public partial class CsaposappContext : DbContext
                 .HasDefaultValueSql("'NULL'")
                 .HasColumnName("img_url");
             entity.Property(e => e.IsActive)
-                .HasDefaultValueSql("'1'")
+                .HasDefaultValueSql("'0'")
                 .HasColumnName("is_active");
             entity.Property(e => e.Name)
                 .HasMaxLength(100)
@@ -302,9 +275,7 @@ public partial class CsaposappContext : DbContext
 
             entity.ToTable("tables");
 
-            entity.Property(e => e.Id)
-                .HasMaxLength(36)
-                .HasColumnName("id");
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Capacity)
                 .HasColumnType("tinyint(4)")
                 .HasColumnName("capacity");
@@ -323,15 +294,11 @@ public partial class CsaposappContext : DbContext
 
             entity.HasIndex(e => e.UserId, "user_id");
 
-            entity.Property(e => e.Id)
-                .HasMaxLength(36)
-                .HasColumnName("id");
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.TableId)
-                .HasMaxLength(36)
                 .HasDefaultValueSql("'NULL'")
                 .HasColumnName("table_id");
             entity.Property(e => e.UserId)
-                .HasMaxLength(36)
                 .HasDefaultValueSql("'NULL'")
                 .HasColumnName("user_id");
 
@@ -352,12 +319,10 @@ public partial class CsaposappContext : DbContext
 
             entity.ToTable("users");
 
-            entity.Property(e => e.Id)
-                .HasMaxLength(36)
-                .HasColumnName("id");
-            entity.Property(e => e.Age)
-                .HasColumnType("tinyint(4)")
-                .HasColumnName("age");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.BirthDate)
+                .HasColumnType("date")
+                .HasColumnName("birth_date");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("'current_timestamp()'")
                 .HasColumnType("timestamp")
@@ -375,6 +340,9 @@ public partial class CsaposappContext : DbContext
             entity.Property(e => e.Role)
                 .HasColumnType("enum('guest','waiter','admin')")
                 .HasColumnName("role");
+            entity.Property(e => e.Salt)
+                .HasMaxLength(255)
+                .HasColumnName("salt");
             entity.Property(e => e.Username)
                 .HasMaxLength(20)
                 .HasColumnName("username");

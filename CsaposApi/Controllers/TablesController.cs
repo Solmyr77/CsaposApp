@@ -44,7 +44,7 @@ namespace CsaposApi.Controllers
         // PUT: api/Tables/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTable(string id, Table table)
+        public async Task<IActionResult> PutTable(Guid id, Table table)
         {
             if (id != table.Id)
             {
@@ -113,7 +113,7 @@ namespace CsaposApi.Controllers
             return NoContent();
         }
 
-        private bool TableExists(string id)
+        private bool TableExists(Guid id)
         {
             return _context.Tables.Any(e => e.Id == id);
         }

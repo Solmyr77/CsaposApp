@@ -4,11 +4,11 @@
     {
         public class CreateProductDTO
         {
-            public string name;
-            public string category;
-            public int price;
-            public int stockQuantity;
-            public string imgUrl;
+            public string name { get; set; }
+            public string category { get; set; }
+            public int price { get; set; }
+            public int stockQuantity { get; set; }
+            public string imgUrl { get; set; }
         }
     }
 }

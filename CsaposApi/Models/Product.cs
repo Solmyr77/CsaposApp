@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace CsaposApi.Models;
 
@@ -19,5 +20,6 @@ public partial class Product
 
     public string? ImgUrl { get; set; }
 
+    [JsonIgnore]
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 }

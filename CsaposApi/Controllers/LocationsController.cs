@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CsaposApi.Models;
+using static CsaposApi.Models.DTOs.LocationDTO;
 
 namespace CsaposApi.Controllers
 {
@@ -75,9 +76,23 @@ namespace CsaposApi.Controllers
         // POST: api/Locations
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Location>> PostLocation(Location location)
+        public async Task<ActionResult<Location>> PostLocation(CreateLocationDTO createLocationDTO)
         {
+            Location location = new Location
+            {
+                Id = Guid.NewGuid(),
+                Name = createLocationDTO.name,
+                Capacity = createLocationDTO.capacity,
+                NumberOfTables = createLocationDTO.numberOfTables,
+                Rating = -1,
+                IsHighlighted = false,
+                IsOpen = true,
+                CreatedAt = DateTime.UtcNow,
+                ImgUrl = createLocationDTO.imgUrl
+            };
+
             _context.Locations.Add(location);
+
             try
             {
                 await _context.SaveChangesAsync();

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 21, 2024 at 08:07 PM
+-- Generation Time: Dec 26, 2024 at 05:37 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -87,6 +87,16 @@ CREATE TABLE `locations` (
   `img_url` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
+--
+-- Dumping data for table `locations`
+--
+
+INSERT INTO `locations` (`id`, `name`, `capacity`, `number_of_tables`, `rating`, `is_highlighted`, `is_open`, `created_at`, `img_url`) VALUES
+('5ecdf8ff-8bf5-4cc1-98eb-c8af87faf4cd', 'City Pub', 80, 16, -1, 0, 1, '2024-12-26 03:20:59', 'string'),
+('9c458b82-7eb9-4fc9-a198-784245d13425', 'Sörpatika', 60, 12, -1, 0, 1, '2024-12-26 03:21:10', 'string'),
+('c6276e02-67f8-45e1-ba7a-6271a93bea02', 'Alt lány hely', 20, 4, -1, 0, 1, '2024-12-26 03:21:45', 'string'),
+('cbdd928f-5abb-4a0b-9023-0866107cfa9a', 'Félidő Söröző', 40, 8, -1, 0, 1, '2024-12-26 03:20:38', 'string');
+
 -- --------------------------------------------------------
 
 --
@@ -132,6 +142,15 @@ CREATE TABLE `products` (
   `img_url` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
+--
+-- Dumping data for table `products`
+--
+
+INSERT INTO `products` (`id`, `name`, `category`, `price`, `stock_quantity`, `is_active`, `img_url`) VALUES
+('875695ab-a760-486a-a801-9b052c8738b7', 'Ez egy teszt termék', 'drink', 1000, 10, 1, 'drink/875695ab-a760-486a-a801-9b052c8738b7.webp'),
+('ac107756-f63c-4538-b4cc-91fc0cad6d82', 'Finom ital', 'drink', 2660, 24, 1, 'drink/ac107756-f63c-4538-b4cc-91fc0cad6d82.webp'),
+('c5d2b92e-c78f-4bf0-8504-154f033a8898', 'Finom burger', 'food', 1299, 100, 1, 'food/c5d2b92e-c78f-4bf0-8504-154f033a8898.webp');
+
 -- --------------------------------------------------------
 
 --
@@ -143,6 +162,13 @@ CREATE TABLE `tables` (
   `number` int(11) NOT NULL,
   `capacity` tinyint(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+--
+-- Dumping data for table `tables`
+--
+
+INSERT INTO `tables` (`id`, `number`, `capacity`) VALUES
+('24639fdb-a474-486b-9432-4c7136ff0d10', 1, 8);
 
 -- --------------------------------------------------------
 
@@ -166,12 +192,20 @@ CREATE TABLE `users` (
   `id` char(36) NOT NULL,
   `username` varchar(20) NOT NULL,
   `password_hash` varchar(255) NOT NULL,
+  `salt` varchar(255) NOT NULL,
   `legal_name` varchar(50) NOT NULL,
-  `age` tinyint(4) NOT NULL,
+  `birth_date` date NOT NULL,
   `role` enum('guest','waiter','admin') NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `img_url` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `username`, `password_hash`, `salt`, `legal_name`, `birth_date`, `role`, `created_at`, `img_url`) VALUES
+('58f00932-8e85-4b6c-8bd2-89f48ebda754', 'mintajanko', 'uEaazwYbZ4A1cN0rBQrlClKw9GECRJykExEK6NlFTxY=', 'pOoGuecy/d4/aekh2Rq2Iw==', 'Minta János', '2024-12-26', 'guest', '2024-12-26 03:09:25', 'string');
 
 --
 -- Indexes for dumped tables

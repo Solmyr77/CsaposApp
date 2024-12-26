@@ -89,9 +89,11 @@ namespace CsaposApi.Controllers
 
             var passwordHash = HashPassword(registerUserDTO.Password, salt);
 
+            Guid currentGuid = Guid.NewGuid();
+
             User user = new User
             {
-                Id = Guid.NewGuid(),
+                Id = currentGuid,
                 Username = registerUserDTO.Username,
                 PasswordHash = passwordHash,
                 Salt = salt,
@@ -99,7 +101,7 @@ namespace CsaposApi.Controllers
                 BirthDate = registerUserDTO.BirthDate,
                 Role = "guest",
                 CreatedAt = DateTime.UtcNow,
-                ImgUrl = registerUserDTO.ImgUrl
+                ImgUrl = $"{currentGuid}.webp"
             };
 
             _context.Users.Add(user);

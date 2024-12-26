@@ -78,15 +78,17 @@ namespace CsaposApi.Controllers
         [HttpPost]
         public async Task<ActionResult<Product>> PostProduct(CreateProductDTO createProductDTO)
         {
+            Guid currentGuid = Guid.NewGuid();
+
             Product product = new Product
             {
-                Id = Guid.NewGuid(),
+                Id = currentGuid,
                 Name = createProductDTO.name,
                 Category = createProductDTO.category,
                 Price = createProductDTO.price,
                 StockQuantity = createProductDTO.stockQuantity,
                 IsActive = true,
-                ImgUrl = createProductDTO.imgUrl
+                ImgUrl = $"{createProductDTO.category}/{currentGuid}.webp"
             };
 
             _context.Products.Add(product);

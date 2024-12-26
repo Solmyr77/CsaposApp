@@ -84,7 +84,7 @@ namespace CsaposApi.Controllers
                 Name = createLocationDTO.name,
                 Capacity = createLocationDTO.capacity,
                 NumberOfTables = createLocationDTO.numberOfTables,
-                Rating = -1,
+                Rating = -1, // Unrated
                 IsHighlighted = false,
                 IsOpen = true,
                 CreatedAt = DateTime.UtcNow,

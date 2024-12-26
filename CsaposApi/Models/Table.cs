@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace CsaposApi.Models;
 
@@ -11,7 +12,9 @@ public partial class Table
 
     public sbyte Capacity { get; set; }
 
+    [JsonIgnore]
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
+    [JsonIgnore]
     public virtual ICollection<TableGuest> TableGuests { get; set; } = new List<TableGuest>();
 }

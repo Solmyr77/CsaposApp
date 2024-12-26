@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CsaposApi.Models;
+using static CsaposApi.Models.DTOs.TableDTO;
 
 namespace CsaposApi.Controllers
 {
@@ -75,8 +76,15 @@ namespace CsaposApi.Controllers
         // POST: api/Tables
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Table>> PostTable(Table table)
+        public async Task<ActionResult<Table>> PostTable(CreateTableDTO createTableDTO)
         {
+            Table table = new Table
+            {
+                Id = Guid.NewGuid(),
+                Number = createTableDTO.number,
+                Capacity = createTableDTO.capacity,
+            };
+
             _context.Tables.Add(table);
             try
             {

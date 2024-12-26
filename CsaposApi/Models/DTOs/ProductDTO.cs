@@ -8,7 +8,6 @@
             public string category { get; set; }
             public int price { get; set; }
             public int stockQuantity { get; set; }
-            public string imgUrl { get; set; }
         }
     }
 }

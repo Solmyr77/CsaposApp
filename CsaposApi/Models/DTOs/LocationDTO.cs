@@ -7,7 +7,6 @@
             public string name { get; set; }
             public int capacity { get; set; }
             public int numberOfTables { get; set; }
-            public string imgUrl { get; set; }
         }
     }
 }

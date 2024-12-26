@@ -78,9 +78,11 @@ namespace CsaposApi.Controllers
         [HttpPost]
         public async Task<ActionResult<Location>> PostLocation(CreateLocationDTO createLocationDTO)
         {
+            Guid currentGuid = Guid.NewGuid();
+
             Location location = new Location
             {
-                Id = Guid.NewGuid(),
+                Id = currentGuid,
                 Name = createLocationDTO.name,
                 Capacity = createLocationDTO.capacity,
                 NumberOfTables = createLocationDTO.numberOfTables,
@@ -88,7 +90,7 @@ namespace CsaposApi.Controllers
                 IsHighlighted = false,
                 IsOpen = true,
                 CreatedAt = DateTime.UtcNow,
-                ImgUrl = createLocationDTO.imgUrl
+                ImgUrl = $"{currentGuid}.webp"
             };
 
             _context.Locations.Add(location);

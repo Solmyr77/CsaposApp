@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 30, 2024 at 04:57 AM
+-- Generation Time: Dec 30, 2024 at 05:30 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -101,10 +101,10 @@ CREATE TABLE `locations` (
 --
 
 INSERT INTO `locations` (`id`, `name`, `description`, `capacity`, `number_of_tables`, `rating`, `is_highlighted`, `is_open`, `created_at`, `img_url`) VALUES
-('5ecdf8ff-8bf5-4cc1-98eb-c8af87faf4cd', 'City Pub', '', 80, 16, -1, 0, 1, '2024-12-26 03:20:59', 'string'),
-('9c458b82-7eb9-4fc9-a198-784245d13425', 'Sörpatika', '', 60, 12, -1, 0, 1, '2024-12-26 03:21:10', 'string'),
-('c6276e02-67f8-45e1-ba7a-6271a93bea02', 'Alt lány hely', '', 20, 4, -1, 0, 1, '2024-12-26 03:21:45', 'string'),
-('cbdd928f-5abb-4a0b-9023-0866107cfa9a', 'Félidő Söröző', '', 40, 8, -1, 0, 1, '2024-12-26 03:20:38', 'string');
+('5ecdf8ff-8bf5-4cc1-98eb-c8af87faf4cd', 'City Pub', 'Egy kocsma a város szívében', 80, 16, -1, 0, 1, '2024-12-26 03:20:59', 'string'),
+('9c458b82-7eb9-4fc9-a198-784245d13425', 'Sörpatika', 'Egy kulturáltabb kocsma a városban', 60, 12, -1, 0, 1, '2024-12-26 03:21:10', 'string'),
+('c6276e02-67f8-45e1-ba7a-6271a93bea02', 'Alt lány hely', 'Mi mást kell mondani?', 20, 4, -1, 0, 1, '2024-12-26 03:21:45', 'string'),
+('cbdd928f-5abb-4a0b-9023-0866107cfa9a', 'Félidő Söröző', 'Egy csendes kocsma egy csendes faluban', 40, 8, -1, 0, 1, '2024-12-26 03:20:38', 'string');
 
 -- --------------------------------------------------------
 
@@ -144,6 +144,7 @@ CREATE TABLE `order_items` (
 
 CREATE TABLE `products` (
   `id` char(36) NOT NULL,
+  `location_id` char(36) NOT NULL,
   `name` varchar(100) NOT NULL,
   `category` varchar(50) NOT NULL,
   `price` int(11) NOT NULL,
@@ -157,10 +158,10 @@ CREATE TABLE `products` (
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`id`, `name`, `category`, `price`, `discount_percentage`, `stock_quantity`, `is_active`, `img_url`) VALUES
-('875695ab-a760-486a-a801-9b052c8738b7', 'Ez egy teszt termék', 'drink', 1000, 0, 10, 1, 'drink/875695ab-a760-486a-a801-9b052c8738b7.webp'),
-('ac107756-f63c-4538-b4cc-91fc0cad6d82', 'Finom ital', 'drink', 2660, 0, 24, 1, 'drink/ac107756-f63c-4538-b4cc-91fc0cad6d82.webp'),
-('c5d2b92e-c78f-4bf0-8504-154f033a8898', 'Finom burger', 'food', 1299, 0, 100, 1, 'food/c5d2b92e-c78f-4bf0-8504-154f033a8898.webp');
+INSERT INTO `products` (`id`, `location_id`, `name`, `category`, `price`, `discount_percentage`, `stock_quantity`, `is_active`, `img_url`) VALUES
+('875695ab-a760-486a-a801-9b052c8738b7', 'cbdd928f-5abb-4a0b-9023-0866107cfa9a', 'Ez egy teszt termék', 'drink', 1000, 0, 10, 1, 'drink/875695ab-a760-486a-a801-9b052c8738b7.webp'),
+('ac107756-f63c-4538-b4cc-91fc0cad6d82', 'cbdd928f-5abb-4a0b-9023-0866107cfa9a', 'Finom ital', 'drink', 2660, 0, 24, 1, 'drink/ac107756-f63c-4538-b4cc-91fc0cad6d82.webp'),
+('c5d2b92e-c78f-4bf0-8504-154f033a8898', '5ecdf8ff-8bf5-4cc1-98eb-c8af87faf4cd', 'Finom burger', 'food', 1299, 0, 100, 1, 'food/c5d2b92e-c78f-4bf0-8504-154f033a8898.webp');
 
 -- --------------------------------------------------------
 
@@ -269,7 +270,8 @@ ALTER TABLE `order_items`
 -- Indexes for table `products`
 --
 ALTER TABLE `products`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `location_id` (`location_id`);
 
 --
 -- Indexes for table `tables`
@@ -330,6 +332,12 @@ ALTER TABLE `orders`
 ALTER TABLE `order_items`
   ADD CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`),
   ADD CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`);
+
+--
+-- Constraints for table `products`
+--
+ALTER TABLE `products`
+  ADD CONSTRAINT `products_ibfk_1` FOREIGN KEY (`location_id`) REFERENCES `locations` (`id`);
 
 --
 -- Constraints for table `tables`

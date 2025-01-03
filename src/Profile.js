@@ -6,7 +6,7 @@ import Friend from "./Friend";
 import Badge from "./Badge";
 import img1 from "./img/beeremoji.png";
 import Context from "./Context";
-import SettingsOption from "./SettingsOption";
+import ListItem from "./ListItem";
 
 function Profile() {
   const [navState, setNavState, menuState, setMenuState] = useContext(Context);
@@ -33,8 +33,8 @@ function Profile() {
           <Badge image={img1} title={"Nagy ivó"}/>
         </div>
         <TitleDivider title={"Beállítások"} isNormal={true}/>
-        <SettingsOption title={"Fiókom"}/>
-        <SettingsOption title={"Barát hozzáadása"}/>
+        <ListItem title={"Fiókom"}/>
+        <ListItem title={"Barát hozzáadása"}/>
         <div className="h-[12vh]"></div>
         <Footer/>
     </div>

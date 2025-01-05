@@ -6,7 +6,7 @@ import { UserCircleIcon } from "@heroicons/react/24/outline";
 import Context from "./Context";
 
 function Footer() {
-  const [navState, setNavState, menuState, setMenuState] = useContext(Context);
+  const { menuState } = useContext(Context);
 
   return (
     <div className="w-full h-[10vh] fixed bottom-0 flex justify-evenly items-center font-normal bg-dark-grey pb-2 font-play">

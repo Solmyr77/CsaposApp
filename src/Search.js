@@ -7,7 +7,7 @@ import Context from "./Context";
 import { useContext, useState, useEffect } from "react";
 
 function Search() {
-  const [navState, setNavState, menuState, setMenuState] = useContext(Context);
+  const { setMenuState } = useContext(Context);
   const [recordsToDisplay, setRecordsToDisplay] = useState(records);
 
   useEffect(() => {

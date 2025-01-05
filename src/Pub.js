@@ -9,7 +9,7 @@ import { Rating } from "@mui/material";
 
 function Pub() {
   const location = useLocation();
-  const { record } = location.state || {};
+  const { record } = location.state || {name : "" };
 
   return (
     <div className="min-h-screen w-screen bg-grey px-4 pt-16 text-white">

@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 function Card({ record }) {
   return (
     <div className="basis-[30%]">
-      <Link to={"/pub"} state={{record : record}}>
+      <Link to={"/pub/"} state={{record : record}}>
         <div className="aspect-square relative drop-shadow-[0_4px_4px_rgba(0,0,0,0.25)]">
             <img src={img1} alt="pub" className="h-full object-cover rounded-md"/>
             <div className={`w-full h-full bg-black absolute inset-0 ${record.status == "open" ? "bg-opacity-70" : "bg-opacity-85"} flex flex-col rounded-md text-wrap`}>

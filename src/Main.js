@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import Navbar from "./Navbar";
 import TitleDivider from "./TitleDivider";
 import StyledSwiper from "./StyledSwiper";
@@ -7,7 +7,7 @@ import records from "./records";
 import Context from "./Context";
 
 function Main() {
-  const [navState, setNavState, menuState, setMenuState] = useContext(Context);
+  const { navState, setMenuState } = useContext(Context);
 
   useEffect(() => {
     setMenuState("Main");

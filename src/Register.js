@@ -12,7 +12,7 @@ function Register() {
     if (date.getFullYear() - 18 > Number(birthDateValue.slice(0, 4))) {
       return true;
     }
-    else if (date.getFullYear() - 18 == Number(birthDateValue.slice(0, 4)) && date.getMonth() + 1 >= Number(birthDateValue.slice(5, 7)) && date.getDate() >= Number(birthDateValue.slice(8, 10))) {
+    else if (date.getFullYear() - 18 === Number(birthDateValue.slice(0, 4)) && date.getMonth() + 1 >= Number(birthDateValue.slice(5, 7)) && date.getDate() >= Number(birthDateValue.slice(8, 10))) {
       return true;
     }
     return false;
@@ -20,7 +20,7 @@ function Register() {
 
   function validateInput() {
     let flag = true;
-    document.querySelectorAll("input[type='text']").forEach(input => { if(input.value.trim() == "") flag = false; })
+    document.querySelectorAll("input[type='text']").forEach(input => { if(input.value.trim() === "") flag = false; })
     return flag;
   }
 
@@ -39,7 +39,7 @@ function Register() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-grey text-white px-4 pt-16">
+    <div className="min-h-screen w-full bg-grey text-white px-4 pt-16 pb-8">
       <Link to={"/login"}><BackButton/></Link>
       <div className="flex items-center flex-col">
         <h1 className="font-bold text-3xl">Regisztráció</h1>
@@ -56,7 +56,7 @@ function Register() {
           <input type="text" className="w-full bg-dark-grey px-5 py-2 rounded-md font-normal focus:outline-none mt-0.5 mb-4" required/>
           <label className="text-left w-full">Jelszó</label>
           <input type="password" className="w-full bg-dark-grey px-5 py-2 rounded-md font-normal focus:outline-none mt-0.5 mb-4" required/>
-          <p id="errorText" className="text-center text-red-500 invisible text-wrap max-w-56" style={{"visibility" : `${errorMessage != "" ? "visible" : "hidden"}`}}>{errorMessage}</p>
+          <p id="errorText" className="text-center text-red-500 invisible text-wrap max-w-56" style={{"visibility" : `${errorMessage !== "" ? "visible" : "hidden"}`}}>{errorMessage}</p>
           <button type="submit" className="w-full h-16 bg-blue rounded font-bold text-lg mt-4">Regisztráció</button>
         </form>
       </div>

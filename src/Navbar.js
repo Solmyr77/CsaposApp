@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import NavItem from "./NavItem";
 
 function Navbar() {

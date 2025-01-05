@@ -1,7 +1,7 @@
 import { React, useState} from "react";
 import Context from "./Context";
 
-function Provider( {children} ) {
+function Provider( { children } ) {
   const [navState, setNavState] = useState("Összes");
   const [menuState, setMenuState] = useState("Main")
 

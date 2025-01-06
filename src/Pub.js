@@ -1,18 +1,30 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Footer from "./Footer";
 import TitleDivider from "./TitleDivider";
 import ListItem from "./ListItem";
 import BackButton from "./BackButton";
-import { Link, useLocation } from "react-router-dom";
-import img1 from "./img/pub.jpg"
+import { Link, useParams } from "react-router-dom";
+import img1 from "./img/pub.webp"
 import { Rating } from "@mui/material";
+import records from "./records";
 
 function Pub() {
-  const location = useLocation();
-  const { record } = location.state || {name : "" };
+  const { name } = useParams();
+  const [rating, setRating] = useState(null);
+  const record = records.find(record => record.name === name);
+
+  useEffect(() => {
+    try {
+        setRating(localStorage.getItem(`${record.name}-rating`));
+    } 
+    catch (error) {
+        console.log(error);
+    }
+  }, []);
+  
 
   return (
-    <div className="min-h-screen w-screen bg-grey px-4 pt-16 text-white">
+    <div className="min-h-screen w-screen bg-grey px-4 pt-8 text-white">
         <Link to={"/"}>
             <BackButton/>
         </Link>
@@ -27,8 +39,11 @@ function Pub() {
         <ListItem title={"Vasárnap"} openingHours={"10:00 - 21:00"}/>
         <TitleDivider title={"Értékelés"} />
         <div className="flex flex-row justify-between w-full">
-            <Rating defaultValue={5} precision={1}/>
-            <p>4 értékelés</p>
+            <Rating precision={0.5} value={rating} onChange={(event) => {
+                setRating(event.target.value);
+                localStorage.setItem(`${record.name}-rating`, event.target.value);
+                }}/>
+            <p>{rating > 0 ? "1 értékelés" : "0 értékelés"}</p>
         </div>
         <div className="absolute bottom-10 left-[50%] -translate-x-[50%]">
             <div className="w-64 h-20 bg-blue rounded flex justify-center items-center">

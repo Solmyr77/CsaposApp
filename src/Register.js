@@ -39,7 +39,7 @@ function Register() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-grey text-white px-4 pt-16 pb-8">
+    <div className="min-h-screen w-full bg-grey text-white px-4 pt-8 pb-8">
       <Link to={"/login"}><BackButton/></Link>
       <div className="flex items-center flex-col">
         <h1 className="font-bold text-3xl">Regisztráció</h1>

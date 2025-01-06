@@ -6,10 +6,7 @@ function ListItem({ title, openingHours }) {
     <div className="w-full">
         <div className="flex flex-row justify-between items-center">
             <p className="font-normal text-md">{title}</p>
-            { openingHours ?
-              <p>{openingHours}</p> :
-              <ChevronRightIcon className="font-bold h-6"/> 
-            }
+            <p>{openingHours}</p>
         </div>
         <hr className="w-full bg-white my-2 opacity-80"/>
     </div>

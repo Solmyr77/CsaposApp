@@ -24,7 +24,7 @@ function Login() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-grey text-white px-4 pt-16 flex items-center flex-col mb-2">
+    <div className="min-h-screen w-full bg-grey text-white px-4 pt-24 flex items-center flex-col">
         <h1 className="font-bold text-3xl">Bejelentkezés</h1>
         <form className="flex flex-col mt-8 justify-evenly items-center" onSubmit={(event) => handleLogin(event)}>
             <label className="text-left w-full">Felhasználónév</label>

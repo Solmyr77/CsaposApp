@@ -12,7 +12,7 @@ function SearchBar({ setRecordsToDisplay }) {
   }
   
   return (
-    <div className="w-full mb-8">
+    <div className="w-full mb-8 drop-shadow-[0_4px_4px_rgba(0,0,0,.5)]">
         <h1 className="pt-4 mb-2 text-xl">Keresés</h1>
         <div className="relative">
             {

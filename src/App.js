@@ -1,4 +1,3 @@
-import React, { useContext } from 'react';
 import Main from './Main';
 import Search from './Search';
 import Layout from './Layout';
@@ -15,14 +14,35 @@ function App() {
     <Provider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-            <Route index element={<ProtectedRoute><Main /></ProtectedRoute>}/>
-            <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>}/>
+          <Route path="/" element={
+            <ProtectedRoute isProtected={true}>
+              <Layout />
+            </ProtectedRoute>}>
+            <Route index element={
+              <ProtectedRoute isProtected={true}>
+                <Main />
+              </ProtectedRoute>}/>
+            <Route path="/search" element={
+              <ProtectedRoute isProtected={true}>
+                <Search />
+              </ProtectedRoute>}/>
           </Route>
-          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>}/>
-          <Route path="/pub/" element={<ProtectedRoute><Pub /></ProtectedRoute>}/>
-          <Route path="/register" element={<Register />}/>
-          <Route path="/login" element={<Login />}/>
+          <Route path="/profile" element={
+            <ProtectedRoute isProtected={true}>
+              <Profile />
+            </ProtectedRoute>}/>
+          <Route path="/pub/:name" element={
+            <ProtectedRoute isProtected={true}>
+              <Pub />
+            </ProtectedRoute>}/>
+          <Route path="/register" element={
+            <ProtectedRoute>
+              <Register />
+            </ProtectedRoute>}/>
+          <Route path="/login" element={
+            <ProtectedRoute>
+              <Login />
+            </ProtectedRoute>}/>
           <Route path="*" element={<Navigate to="/login"/>}/>
         </Routes>
       </BrowserRouter>

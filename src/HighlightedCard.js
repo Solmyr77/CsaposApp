@@ -1,6 +1,6 @@
 import React from "react";
 import { Rating } from '@mui/material';
-import img1 from "./img/pub.jpg";
+import img1 from "./img/pub.webp";
 import StatusIndicator from "./StatusIndicator";
 import { Link } from "react-router-dom";
 

@@ -31,7 +31,7 @@ function Login() {
             <input name="username" type="text" className="w-full bg-dark-grey px-5 py-2 rounded-md font-normal focus:outline-none mt-0.5 mb-4" required onChange={() => setErrorMessage("")}/>
             <label className="text-left w-full">Jelszó</label>
             <input name="password" type="password" className="w-full bg-dark-grey px-5 py-2 rounded-md font-normal focus:outline-none mt-0.5 mb-4" required onChange={() => setErrorMessage("")}/>
-            <p id="errorText" className="text-center text-red-500 text-wrap max-w-56" style={{"display" : `${errorMessage !== "" ? "flex" : "none"}`}}>{errorMessage}</p>
+            <p id="errorText" className={`text-center text-red-500 text-wrap max-w-56 ${errorMessage !== "" ? "visible" : "invisible"}`}>{errorMessage}</p>
             <button type="submit" className="w-full h-16 bg-blue rounded font-bold text-lg mt-4">Bejelentkezés</button>
         </form>
         <p className="mt-8">Még nincs fiókod?</p>

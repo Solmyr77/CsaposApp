@@ -39,10 +39,9 @@ function Pub() {
         <p className="max-w-full text-wrap mb-4">Üdvözlünk ez itt a {record.name}, ahol a jó hangulat sosem hagy cserben!
             Nálunk a csapolt sör hideg, a házi pálinka tüzes, és a barátságos légkör garantált. 
             Gyere be egy körre, maradj egy estére – itt minden történetnek helye van!
-            <div className="h-2"></div>
-            <div className="flex flex-row items-center">
+            <span className="flex flex-row items-center mtangol mt-2">
                 <MapPinIcon className="h-5 mr-1"/> 9999 Szentjákób, Sárkány utca 888.
-            </div>
+            </span>
         </p>
         <TitleDivider title={"Nyitvatartás"}/>
         <ListItem title={"Hétfő - Szombat"} openingHours={"13:30 - 22:00"}/>

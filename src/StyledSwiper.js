@@ -7,16 +7,17 @@ import records from "./records";
 import 'swiper/css';
 import 'swiper/css/pagination';
 
+const StyledSwipers = styled(Swiper)`.swiper-pagination-bullet-active{
+  background-color: white;
+  } `
+
 function StyledSwiper() {
-    const StyledSwiper = styled(Swiper)`.swiper-pagination-bullet-active{
-    background-color: white;
-    } `
   return (
-    <StyledSwiper autoplay={{delay: 5000}} speed={500} pagination={true} modules={[Pagination, Autoplay]} className="mySwiper mb-3 drop-shadow-[0_4px_4px_rgba(0,0,0,0.25)]">
+    <StyledSwipers autoplay={{delay: 5000}} speed={500} pagination={true} modules={[Pagination, Autoplay]} className="mySwiper mb-3 drop-shadow-[0_4px_4px_rgba(0,0,0,0.25)]">
         {
           records.map(record => <SwiperSlide><HighlightedCard record={record}/></SwiperSlide>)
         }
-    </StyledSwiper>
+    </StyledSwipers>
   )
 }
 

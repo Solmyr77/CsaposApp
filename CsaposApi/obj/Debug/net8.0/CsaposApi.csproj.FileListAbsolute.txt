@@ -491,3 +491,11 @@ C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\obj\Debug\net8.0\refint\CsaposApi.dl
 C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\obj\Debug\net8.0\CsaposApi.pdb
 C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\obj\Debug\net8.0\CsaposApi.genruntimeconfig.cache
 C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\obj\Debug\net8.0\ref\CsaposApi.dll
+C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
+C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll

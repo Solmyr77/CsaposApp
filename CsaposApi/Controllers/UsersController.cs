@@ -10,6 +10,12 @@ using static CsaposApi.Models.DTOs.ProductDTO;
 using static CsaposApi.Models.DTOs.UserDTO;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Configuration;
+using Microsoft.Extensions.Configuration;
+
 
 namespace CsaposApi.Controllers
 {
@@ -18,10 +24,12 @@ namespace CsaposApi.Controllers
     public class UsersController : ControllerBase
     {
         private readonly CsaposappContext _context;
+        private readonly IConfiguration _configuration;
 
-        public UsersController(CsaposappContext context)
+        public UsersController(CsaposappContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         // GET: api/Users
@@ -114,22 +122,25 @@ namespace CsaposApi.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<string>> Login(LoginUserDTO loginUserDTO)
         {
+            // 1) Check if user exists
             var user = await _context.Users.SingleOrDefaultAsync(u => u.Username == loginUserDTO.Username);
-
             if (user == null)
             {
                 return Unauthorized("Invalid username or password.");
             }
 
+            // 2) Validate password
             var passwordHash = HashPassword(loginUserDTO.Password, user.Salt);
-
             if (passwordHash != user.PasswordHash)
             {
                 return Unauthorized("Invalid username or password.");
             }
 
-            // TODO: Return session token
-            return Ok("Login successful.");
+            // 3) Generate JWT token
+            var token = GenerateJwtToken(user);
+
+            // 4) Return token
+            return Ok(new { token });
         }
 
         private string GenerateSalt()
@@ -171,6 +182,40 @@ namespace CsaposApi.Controllers
         private bool UserExists(Guid id)
         {
             return _context.Users.Any(e => e.Id == id);
+        }
+
+        // Example of a method to generate a JWT token
+        private string GenerateJwtToken(User user)
+        {
+            // Get values from appsettings or environment
+            var key = _configuration["Jwt:Key"];       // or inject via constructor
+            var issuer = _configuration["Jwt:Issuer"];
+            var audience = _configuration["Jwt:Audience"];
+
+            // Create a security key and credentials
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            // Create user-specific claims (you can add more if needed)
+            var claims = new[]
+            {
+        new Claim(JwtRegisteredClaimNames.Sub, user.Username),
+        new Claim("role", user.Role),
+        new Claim("userId", user.Id.ToString()),
+        // You can add additional claims as needed
+    };
+
+            // Create the token
+            var token = new JwtSecurityToken(
+                issuer: issuer,
+                audience: audience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(2), // or however long you want it valid
+                signingCredentials: credentials
+            );
+
+            // Return the signed JWT token string
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

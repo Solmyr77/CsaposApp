@@ -8,15 +8,15 @@ EXPOSE 443
 # Use the official .NET SDK to build the application
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY ["CsaposApi.csproj", "."]
+COPY ["CsaposApi/CsaposApi.csproj", "."]
 RUN dotnet restore "CsaposApi.csproj"
 
 COPY . .
-RUN dotnet build "CsaposApi.csproj" -c Release -o /app/build
+RUN dotnet build "CsaposApi/CsaposApi.csproj" -c Release -o /app/build
 
 # Publish the application
 FROM build AS publish
-RUN dotnet publish "CsaposApi.csproj" -c Release -o /app/publish
+RUN dotnet publish "CsaposApi/CsaposApi.csproj" -c Release -o /app/publish
 
 # Final stage: runtime image
 FROM base AS final

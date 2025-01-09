@@ -26,7 +26,7 @@ function Profile() {
   }
 
   return (
-    <div className="min-h-screen w-screen bg-grey flex px-4 text-white font-bold font play flex-col items-center relative">
+    <div className="min-h-screen h-full w-full max-w-full bg-grey flex px-4 text-white font-bold font play flex-col items-center relative">
         <h1 className="text-center w-full pt-8 text-2xl mb-2">{user.name}</h1>
         <img src={user.picture} alt="avatar" className="w-28 object-cover aspect-square rounded-full mb-8"/>
         <TitleDivider title={"Barátok"}/>

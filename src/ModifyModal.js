@@ -12,6 +12,7 @@ function ModifyModal({ title, isModalVisible, setIsModalVisible }) {
     if (isModalVisible) {
       document.getElementById("username").value = user.name;
       setNewUsername(user.name);
+      setErrorMessage("");
     }
   }, [isModalVisible])
   
@@ -47,8 +48,8 @@ function ModifyModal({ title, isModalVisible, setIsModalVisible }) {
   }
 
   return (
-    <div className={`w-screen min-h-screen h-full absolute top-0 left-0 bg-opacity-65 bg-black ${isModalVisible ? "visible" : "invisible"} flex justify-center items-center` }>
-      <div className={`w-[80vw] ${errorMessage !== "" ? "h-min" : "h-[80vw]"} aspect-square bg-grey rounded-xl flex flex-col justify-between relative`}>
+    <div className={`w-full min-h-screen h-full absolute top-0 left-0 bg-opacity-65 bg-black ${isModalVisible ? "flex" : "hidden"} justify-center items-center` }>
+      <div className={`w-80 h-80 aspect-square bg-grey rounded-xl flex flex-col justify-between relative`}>
         <XMarkIcon className="absolute left-0 top-0 w-9 text-red-500 font-bold bg-dark-grey p-1 rounded-tl-md rounded-tr-none rounded-bl-none rounded-br-md" onClick={() => setIsModalVisible(false)}/>
         <p className="text-md pt-4 text-center mb-6">{title}</p>
         <form className="flex flex-col justify-between h-full items-center px-2" onSubmit={(event) => handleSubmit(event)}>

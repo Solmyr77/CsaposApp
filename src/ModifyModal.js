@@ -53,7 +53,7 @@ function ModifyModal({ title, isModalVisible, setIsModalVisible }) {
         <XMarkIcon className="absolute left-0 top-0 w-9 text-red-500 font-bold bg-dark-grey p-1 rounded-tl-md rounded-tr-none rounded-bl-none rounded-br-md" onClick={() => setIsModalVisible(false)}/>
         <p className="text-md pt-4 text-center mb-6">{title}</p>
         <form className="flex flex-col justify-between h-full items-center px-2" onSubmit={(event) => handleSubmit(event)}>
-          <div className="relative" onClick={triggerFileInputClick}>
+          <div className="relative select-none" onClick={triggerFileInputClick}>
             <img src={profilePicture} className="rounded-full object-cover aspect-square w-24 opacity-50"/>
             <PencilSquareIcon className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-12"/>
             <input id="fileInput" type="file" style={{"display" : "none"}} onChange={(event) => handleImageUpload(event)}/>

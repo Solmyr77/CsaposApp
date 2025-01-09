@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Context from "./Context";
 
@@ -7,6 +7,18 @@ function Login() {
   const [errorMessage, setErrorMessage] = useState("");
   const { setIsAuthenticated } = useContext(Context);
 
+  // async function getUsers() {
+  //   const response = await fetch("https://backend.csaposapp.hu/api/users/");
+  //   if (response.ok) {
+  //     const data =  await response.json();
+  //     console.log(data);
+  //   }
+  // }
+
+  // useEffect(() => {
+  //   getUsers()
+  // }, []);
+  
   function handleLogin(event) {
     const username = event.target.username;
     const password = event.target.password;

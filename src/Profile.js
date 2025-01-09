@@ -56,15 +56,15 @@ function Profile() {
           <Badge image={img1} title={"Nagy ivó"}/>
         </div>
         <TitleDivider title={"Beállítások"} isNormal={true}/>
-        <div className="w-full h-10 font-normal bg-dark-grey rounded-md flex flex-row justify-between items-center px-2 drop-shadow-[0_2px_2px_rgba(0,0,0,.5)] mb-2" onClick={() => setIsModalVisible(true)}>
+        <div className="w-full h-10 font-normal bg-dark-grey rounded-md flex flex-row justify-between items-center px-2 drop-shadow-[0_2px_2px_rgba(0,0,0,.5)] mb-2 select-none" onClick={() => setIsModalVisible(true)}>
           Profil szerkesztése
           <PencilSquareIcon className="h-6"/>
         </div>
-        <div className="w-full h-10 font-normal bg-dark-grey rounded-md flex flex-row justify-between items-center px-2 drop-shadow-[0_2px_2px_rgba(0,0,0,.5)] mb-2">
+        <div className="w-full h-10 font-normal bg-dark-grey rounded-md flex flex-row justify-between items-center px-2 drop-shadow-[0_2px_2px_rgba(0,0,0,.5)] mb-2 select-none">
           Barát hozzáadása
           <UserPlusIcon className="h-6"/>
         </div>
-        <button className="w-1/2 bg-dark-grey text-red-500 py-2 px-4 rounded-md mt-2 drop-shadow-[0_4px_4px_rgba(0,0,0,.5)]" onClick={handleLogout}>Kijelentkezés</button>
+        <button className="w-1/2 bg-dark-grey text-red-500 py-2 px-4 rounded-md mt-2 drop-shadow-[0_4px_4px_rgba(0,0,0,.5)] select-none" onClick={handleLogout}>Kijelentkezés</button>
         <div className="h-[12vh]"></div>
         <ModifyModal title={"Profil szerkesztése"} isModalVisible={isModalVisible} setIsModalVisible={setIsModalVisible}/>
         <Footer/>

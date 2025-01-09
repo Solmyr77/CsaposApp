@@ -19,6 +19,7 @@ code {
 
 ::-webkit-scrollbar {
   width: 0.5rem;
+  height: 0.3rem;
 }
 
 ::-webkit-scrollbar-track {
@@ -26,10 +27,10 @@ code {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #18181b;
-  border-radius: 0.15rem;
+  background: #1C1C1C;
+  border-radius: 5rem;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #252a30;
+  background: #151515;
 }

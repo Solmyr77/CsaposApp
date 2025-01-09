@@ -45,7 +45,7 @@ function Profile() {
               return (
                 <div className="flex">
                   <Friend name={name} image={user.picture} />
-                  <div className="h-full w-[2px] rounded-md bg-dark-grey mx-3"></div>
+                  <div className="h-full w-[2px] rounded-md bg-dark-grey"></div>
                 </div>
               )
             })

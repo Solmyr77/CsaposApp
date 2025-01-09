@@ -44,10 +44,8 @@ function Register() {
       <div className="flex items-center flex-col">
         <h1 className="font-bold text-3xl">Regisztráció</h1>
         <form className="flex flex-col mt-8 justify-evenly items-center" onSubmit={(event) => validateForm(event)}>
-          <label className="text-left w-full">Vezetéknév</label>
+          <label className="text-left w-full">Teljes név</label>
           <input  type="text" className="w-full bg-dark-grey px-5 py-2 rounded-md font-normal focus:outline-none mt-0.5 mb-4" required/>
-          <label className="text-left w-full">Keresztnév</label>
-          <input type="text" className="w-full bg-dark-grey px-5 py-2 rounded-md font-normal focus:outline-none mt-0.5 mb-4" required/>
           <label className="text-left w-full">Születési idő</label>
           <input id="date" type="date" className="bg-dark-grey px-5 rounded-md py-2 text-white mt-0.5 mb-4 w-full focus:outline-none" max={date.getFullYear()} required/>
           <label className="text-left w-full">Email cím</label>
@@ -55,6 +53,8 @@ function Register() {
           <label className="text-left w-full">Felhasználónév</label>
           <input type="text" className="w-full bg-dark-grey px-5 py-2 rounded-md font-normal focus:outline-none mt-0.5 mb-4" required/>
           <label className="text-left w-full">Jelszó</label>
+          <input type="password" className="w-full bg-dark-grey px-5 py-2 rounded-md font-normal focus:outline-none mt-0.5 mb-4" required/>
+          <label className="text-left w-full">Jelszó újra</label>
           <input type="password" className="w-full bg-dark-grey px-5 py-2 rounded-md font-normal focus:outline-none mt-0.5 mb-4" required/>
           <p id="errorText" className="text-center text-red-500 invisible text-wrap max-w-56" style={{"visibility" : `${errorMessage !== "" ? "visible" : "hidden"}`}}>{errorMessage}</p>
           <button type="submit" className="w-full h-16 bg-blue rounded font-bold text-lg mt-4">Regisztráció</button>

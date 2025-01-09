@@ -60,6 +60,8 @@ namespace CsaposApi
 
             var app = builder.Build();
 
+            app.UseDeveloperExceptionPage();
+
             // Configure the HTTP request pipeline.
 
             // UNCOMMENT FOR PRODUCTION!!!!!

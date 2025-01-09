@@ -14,7 +14,7 @@ function Main() {
   }, []);
 
   return (
-    <div className="bg-grey text-white w-screen font-play font-bold">
+    <div className="bg-grey text-white font-play font-bold">
         <div className="px-4 overflow-auto pb-[12vh]">
           <Navbar/>
           <TitleDivider title={"Kiemelt"}/>

@@ -199,11 +199,11 @@ namespace CsaposApi.Controllers
             // Create user-specific claims (you can add more if needed)
             var claims = new[]
             {
-        new Claim(JwtRegisteredClaimNames.Sub, user.Username),
-        new Claim("role", user.Role),
-        new Claim("userId", user.Id.ToString()),
-        // You can add additional claims as needed
-    };
+                new Claim(JwtRegisteredClaimNames.Sub, user.Username),
+                new Claim("role", user.Role),
+                new Claim("userId", user.Id.ToString()),
+                // You can add additional claims as needed
+            };
 
             // Create the token
             var token = new JwtSecurityToken(

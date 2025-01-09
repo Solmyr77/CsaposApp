@@ -58,16 +58,6 @@ namespace CsaposApi
 
             builder.Services.AddCors(c => { c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()); });
 
-            builder.Services.AddCors(options =>
-            {
-                options.AddDefaultPolicy(builder =>
-                {
-                    builder.AllowAnyOrigin()
-                           .AllowAnyMethod()
-                           .AllowAnyHeader();
-                });
-            });
-
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -83,7 +73,7 @@ namespace CsaposApi
             app.UseSwaggerUI();
 
             // Use CORS
-            app.UseCors();
+            app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
             // app.UseHttpsRedirection();
 

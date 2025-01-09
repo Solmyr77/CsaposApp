@@ -83,6 +83,7 @@ namespace CsaposApi.Controllers
             Product product = new Product
             {
                 Id = currentGuid,
+                LocationId = createProductDTO.locationId,
                 Name = createProductDTO.name,
                 Category = createProductDTO.category,
                 Price = createProductDTO.price,

@@ -8,6 +8,7 @@
             public string category { get; set; }
             public int price { get; set; }
             public int stockQuantity { get; set; }
+            public Guid locationId { get; set; }
         }
     }
 }

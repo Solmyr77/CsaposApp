@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace CsaposApi.Models;
 
@@ -9,6 +8,8 @@ public partial class Location
     public Guid Id { get; set; }
 
     public string Name { get; set; } = null!;
+
+    public string Description { get; set; } = null!;
 
     public int Capacity { get; set; }
 
@@ -27,4 +28,10 @@ public partial class Location
     public virtual ICollection<BusinessHour> BusinessHours { get; set; } = new List<BusinessHour>();
 
     public virtual ICollection<Event> Events { get; set; } = new List<Event>();
+
+    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+
+    public virtual ICollection<Product> Products { get; set; } = new List<Product>();
+
+    public virtual ICollection<Table> Tables { get; set; } = new List<Table>();
 }

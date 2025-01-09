@@ -11,11 +11,15 @@ public partial class Order
 
     public Guid TableId { get; set; }
 
+    public Guid LocationId { get; set; }
+
     public string? OrderStatus { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }
+
+    public virtual Location Location { get; set; } = null!;
 
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 

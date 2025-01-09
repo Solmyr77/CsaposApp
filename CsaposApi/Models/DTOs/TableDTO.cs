@@ -6,6 +6,7 @@
         {
             public int number { get; set; }
             public sbyte capacity { get; set; }
+            public Guid locationId { get; set; }
         }
     }
 }

@@ -78,12 +78,15 @@ namespace CsaposApi.Controllers
         [HttpPost]
         public async Task<ActionResult<Location>> PostLocation(CreateLocationDTO createLocationDTO)
         {
+
+
             Guid currentGuid = Guid.NewGuid();
 
             Location location = new Location
             {
                 Id = currentGuid,
                 Name = createLocationDTO.name,
+                Description = createLocationDTO.description,
                 Capacity = createLocationDTO.capacity,
                 NumberOfTables = createLocationDTO.numberOfTables,
                 Rating = -1, // Unrated

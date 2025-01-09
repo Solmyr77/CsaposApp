@@ -11,6 +11,8 @@ public partial class Event
 
     public string Name { get; set; } = null!;
 
+    public string Description { get; set; } = null!;
+
     public DateTime Timefrom { get; set; }
 
     public DateTime Timeto { get; set; }

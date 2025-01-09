@@ -83,6 +83,7 @@ namespace CsaposApi.Controllers
                 Id = Guid.NewGuid(),
                 Number = createTableDTO.number,
                 Capacity = createTableDTO.capacity,
+                LocationId = createTableDTO.locationId
             };
 
             _context.Tables.Add(table);

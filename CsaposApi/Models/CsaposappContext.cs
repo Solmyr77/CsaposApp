@@ -46,31 +46,52 @@ public partial class CsaposappContext : DbContext
             entity.HasIndex(e => e.LocationId, "location_id");
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Friday)
+            entity.Property(e => e.FridayClose)
                 .HasColumnType("time")
-                .HasColumnName("friday");
+                .HasColumnName("friday_close");
+            entity.Property(e => e.FridayOpen)
+                .HasColumnType("time")
+                .HasColumnName("friday_open");
             entity.Property(e => e.LocationId).HasColumnName("location_id");
-            entity.Property(e => e.Monday)
+            entity.Property(e => e.MondayClose)
                 .HasColumnType("time")
-                .HasColumnName("monday");
+                .HasColumnName("monday_close");
+            entity.Property(e => e.MondayOpen)
+                .HasColumnType("time")
+                .HasColumnName("monday_open");
             entity.Property(e => e.Name)
                 .HasMaxLength(100)
                 .HasColumnName("name");
-            entity.Property(e => e.Saturday)
+            entity.Property(e => e.SaturdayClose)
                 .HasColumnType("time")
-                .HasColumnName("saturday");
-            entity.Property(e => e.Sunday)
+                .HasColumnName("saturday_close");
+            entity.Property(e => e.SaturdayOpen)
                 .HasColumnType("time")
-                .HasColumnName("sunday");
-            entity.Property(e => e.Thursday)
+                .HasColumnName("saturday_open");
+            entity.Property(e => e.SundayClose)
                 .HasColumnType("time")
-                .HasColumnName("thursday");
-            entity.Property(e => e.Tuesday)
+                .HasColumnName("sunday_close");
+            entity.Property(e => e.SundayOpen)
                 .HasColumnType("time")
-                .HasColumnName("tuesday");
-            entity.Property(e => e.Wednesday)
+                .HasColumnName("sunday_open");
+            entity.Property(e => e.ThursdayClose)
                 .HasColumnType("time")
-                .HasColumnName("wednesday");
+                .HasColumnName("thursday_close");
+            entity.Property(e => e.ThursdayOpen)
+                .HasColumnType("time")
+                .HasColumnName("thursday_open");
+            entity.Property(e => e.TuesdayClose)
+                .HasColumnType("time")
+                .HasColumnName("tuesday_close");
+            entity.Property(e => e.TuesdayOpen)
+                .HasColumnType("time")
+                .HasColumnName("tuesday_open");
+            entity.Property(e => e.WednesdayClose)
+                .HasColumnType("time")
+                .HasColumnName("wednesday_close");
+            entity.Property(e => e.WednesdayOpen)
+                .HasColumnType("time")
+                .HasColumnName("wednesday_open");
 
             entity.HasOne(d => d.Location).WithMany(p => p.BusinessHours)
                 .HasForeignKey(d => d.LocationId)
@@ -87,6 +108,9 @@ public partial class CsaposappContext : DbContext
             entity.HasIndex(e => e.LocationId, "location_id");
 
             entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Description)
+                .HasMaxLength(255)
+                .HasColumnName("description");
             entity.Property(e => e.ImgUrl)
                 .HasMaxLength(255)
                 .HasDefaultValueSql("'NULL'")
@@ -153,6 +177,9 @@ public partial class CsaposappContext : DbContext
                 .HasDefaultValueSql("'current_timestamp()'")
                 .HasColumnType("timestamp")
                 .HasColumnName("created_at");
+            entity.Property(e => e.Description)
+                .HasMaxLength(255)
+                .HasColumnName("description");
             entity.Property(e => e.ImgUrl)
                 .HasMaxLength(255)
                 .HasDefaultValueSql("'NULL'")
@@ -177,6 +204,8 @@ public partial class CsaposappContext : DbContext
 
             entity.ToTable("orders");
 
+            entity.HasIndex(e => e.LocationId, "location_id");
+
             entity.HasIndex(e => e.TableId, "table_id");
 
             entity.HasIndex(e => e.UserId, "user_id");
@@ -186,6 +215,7 @@ public partial class CsaposappContext : DbContext
                 .HasDefaultValueSql("'current_timestamp()'")
                 .HasColumnType("timestamp")
                 .HasColumnName("created_at");
+            entity.Property(e => e.LocationId).HasColumnName("location_id");
             entity.Property(e => e.OrderStatus)
                 .HasDefaultValueSql("'''pending'''")
                 .HasColumnType("enum('pending','accepted','completed','paid','rejected')")
@@ -197,6 +227,11 @@ public partial class CsaposappContext : DbContext
                 .HasColumnType("timestamp")
                 .HasColumnName("updated_at");
             entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.Location).WithMany(p => p.Orders)
+                .HasForeignKey(d => d.LocationId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("orders_ibfk_4");
 
             entity.HasOne(d => d.Table).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.TableId)
@@ -246,10 +281,15 @@ public partial class CsaposappContext : DbContext
 
             entity.ToTable("products");
 
+            entity.HasIndex(e => e.LocationId, "location_id");
+
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Category)
                 .HasMaxLength(50)
                 .HasColumnName("category");
+            entity.Property(e => e.DiscountPercentage)
+                .HasColumnType("int(11)")
+                .HasColumnName("discount_percentage");
             entity.Property(e => e.ImgUrl)
                 .HasMaxLength(255)
                 .HasDefaultValueSql("'NULL'")
@@ -257,6 +297,7 @@ public partial class CsaposappContext : DbContext
             entity.Property(e => e.IsActive)
                 .HasDefaultValueSql("'0'")
                 .HasColumnName("is_active");
+            entity.Property(e => e.LocationId).HasColumnName("location_id");
             entity.Property(e => e.Name)
                 .HasMaxLength(100)
                 .HasColumnName("name");
@@ -267,6 +308,11 @@ public partial class CsaposappContext : DbContext
                 .HasDefaultValueSql("'0'")
                 .HasColumnType("int(11)")
                 .HasColumnName("stock_quantity");
+
+            entity.HasOne(d => d.Location).WithMany(p => p.Products)
+                .HasForeignKey(d => d.LocationId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("products_ibfk_1");
         });
 
         modelBuilder.Entity<Table>(entity =>
@@ -275,13 +321,36 @@ public partial class CsaposappContext : DbContext
 
             entity.ToTable("tables");
 
+            entity.HasIndex(e => e.BookerId, "booker_id");
+
+            entity.HasIndex(e => e.LocationId, "location_id");
+
             entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.BookedFrom)
+                .HasColumnType("datetime")
+                .HasColumnName("booked_from");
+            entity.Property(e => e.BookedTo)
+                .HasColumnType("datetime")
+                .HasColumnName("booked_to");
+            entity.Property(e => e.BookerId).HasColumnName("booker_id");
             entity.Property(e => e.Capacity)
                 .HasColumnType("tinyint(4)")
                 .HasColumnName("capacity");
+            entity.Property(e => e.IsBooked).HasColumnName("is_booked");
+            entity.Property(e => e.LocationId).HasColumnName("location_id");
             entity.Property(e => e.Number)
                 .HasColumnType("int(11)")
                 .HasColumnName("number");
+
+            entity.HasOne(d => d.Booker).WithMany(p => p.Tables)
+                .HasForeignKey(d => d.BookerId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("tables_ibfk_1");
+
+            entity.HasOne(d => d.Location).WithMany(p => p.Tables)
+                .HasForeignKey(d => d.LocationId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("tables_ibfk_2");
         });
 
         modelBuilder.Entity<TableGuest>(entity =>

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { PencilSquareIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import Context from "./Context";
 
@@ -8,6 +8,14 @@ function ModifyModal({ title, isModalVisible, setIsModalVisible }) {
   const [profilePicture, setProfilePicture] = useState(user.picture);
   const [errorMessage, setErrorMessage] = useState("");
   
+  useEffect(() => {
+    if (isModalVisible) {
+      document.getElementById("username").value = user.name;
+      setNewUsername(user.name);
+    }
+  }, [isModalVisible])
+  
+
   function triggerFileInputClick() {
     document.getElementById("fileInput").click();
   }
@@ -51,7 +59,7 @@ function ModifyModal({ title, isModalVisible, setIsModalVisible }) {
           </div>
           <div className="flex flex-col items-center w-full">
             <label className="text-left w-full font-normal">Felhasználónév</label>
-            <input defaultValue={user.name} name="username" type="text" className="w-full bg-dark-grey px-5 py-2 rounded-md font-normal mt-0.5 focus:outline-none" onChange={(event) => {
+            <input defaultValue={user.name} id="username" name="username" type="text" className="w-full bg-dark-grey px-5 py-2 rounded-md font-normal mt-0.5 focus:outline-none" onChange={(event) => {
               setNewUsername(event.target.value.trim());
               setErrorMessage("");
               }} required/>

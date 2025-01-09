@@ -13,6 +13,7 @@ function Profile() {
   const navigate = useNavigate();
   const { setMenuState, setIsAuthenticated, user } = useContext(Context);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const friendNames = ["Barát1", "Barát2", "Barát3", "Barát4", "Barát5", "Barát6"]
 
   useEffect(() => {
     setMenuState("Profile");
@@ -29,12 +30,26 @@ function Profile() {
         <h1 className="text-center w-full pt-8 text-2xl mb-2">{user.name}</h1>
         <img src={user.picture} alt="avatar" className="w-28 object-cover aspect-square rounded-full mb-8"/>
         <TitleDivider title={"Barátok"}/>
-        <div className="flex flex-row w-full overflow-x-scroll gap-6 mb-8">
-            <Friend image={user.picture} name={"Feribókozolegésznaptekutya"}/>
-            <Friend image={user.picture} name={"Mekdánelcbekénemenni"}/>
-            <Friend image={user.picture} name={"Bigmeketkéneenni"}/>
-            <Friend image={user.picture} name={"Kéjefcéahhhoooohahahahah"}/>
-            <Friend image={user.picture} name={"Börgerkirály😎"}/>
+        <div className="flex flex-row w-full overflow-x-scroll mb-8">
+          {
+            friendNames.map(name =>
+            {
+              if(name === friendNames[friendNames.length-1]) {
+                return (
+                  <div className="flex">
+                    <Friend name={name} image={user.picture} />
+                  </div>
+                )
+              }
+
+              return (
+                <div className="flex">
+                  <Friend name={name} image={user.picture} />
+                  <div className="h-full w-[2px] rounded-md bg-dark-grey mx-3"></div>
+                </div>
+              )
+            })
+          }
         </div>
         <TitleDivider title={"Eredmények"}/>
         <div className="flex flex-row w-full overflow-x-scroll gap-6 mb-8">

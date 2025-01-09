@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 
 function HighlightedCard({ record }) {
   return (
-    <Link to={"/pub"} state={{record : record}}>
+    <Link to={`/pub/${record.name}`} state={{record : record}}>
       <div className="relative drop-shadow-sm">
         <img src={img1} alt="pub" className="h-full max-h-[12.7vh] w-full object-cover rounded-md"/>
         <div className={`absolute inset-0 ${record.status == 'open' ? 'bg-opacity-70' : 'bg-opacity-85'} bg-black flex flex-col rounded-md`}>

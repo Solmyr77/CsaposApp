@@ -8,7 +8,7 @@ function Header({ notification }) {
   return (
     <div className="w-full flex flex-row justify-between items-center pt-8 font-play font-bold px-4">
       <div className="flex flex-row items-center">
-          <img src={user.picture} alt="avatar" className="w-12 object-cover aspect-square rounded-full"/>
+          <img src={user.image} alt="avatar" className="w-12 object-cover aspect-square rounded-full"/>
           <p className="ml-3 text-lg text-white">Szia {user.name}!</p>
       </div>
       <div className="relative">

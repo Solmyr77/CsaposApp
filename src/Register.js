@@ -29,18 +29,32 @@ function Register() {
     return false;
   }
 
+  async function handleRegister(username, password, legalName, birthDate) {
+    const response = await fetch("https://backend.csaposapp.hu/api/users/register", {
+      method: "POST",
+      headers: {
+        "Content-Type" : "application/json"
+      },
+      body: JSON.stringify({
+        username: username,
+        password: password,
+        legalName: legalName,
+        birthDate: birthDate
+      })
+    });
+
+    response.ok && console.log("FASZA");
+  }
+
   function validateForm(event) {
     event.preventDefault();
     const password1 = event.target.password1;
     const password2 = event.target.password2;
     if (validateBirthDate() && validateInput() && checkPasswords(password1.value, password2.value)) {
       setErrorMessage("");
-      localStorage.setItem("newUser", JSON.stringify({
-        username: event.target.username.value,
-        legal_name: event.target.fullname.value,
-        birth_date: event.target.birthdate.value,
-      }))
-      //navigate("/");
+      handleRegister(event.target.username.value, event.target.password1.value, event.target.fullname.value, event.target.birthdate.value);
+      event.target.reset();
+      navigate("/login");
     }
     else if (!validateBirthDate()) {
       setErrorMessage("Legalább 18 évesnek kell lenned a regisztrációhoz!");

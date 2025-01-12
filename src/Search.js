@@ -15,9 +15,9 @@ function Search() {
   }, []);
 
   return (
-    <div className="bg-grey w-screen font-play font-bold text-white">
+    <div className="bg-grey font-play font-bold text-white">
         <div className="px-4">
-            <SearchBar setRecordsToDisplay={setRecordsToDisplay} />
+            <SearchBar displayTitle={true} setRecordsToDisplay={setRecordsToDisplay} />
             <TitleDivider title={"Legutóbbi"}/>
             <CardContainer records={recordsToDisplay} cardsToShow={"Összes"}/>
         </div>

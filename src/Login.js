@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Context from "./Context";
 
@@ -7,43 +7,53 @@ function Login() {
   const [errorMessage, setErrorMessage] = useState("");
   const { setIsAuthenticated } = useContext(Context);
 
-  // async function getUsers() {
-  //   const response = await fetch("https://backend.csaposapp.hu/api/users/");
-  //   if (response.ok) {
-  //     const data =  await response.json();
-  //     console.log(data);
-  //   }
-  // }
-
-  // useEffect(() => {
-  //   getUsers()
-  // }, []);
+  async function handleLogin(username, password) {
+    try {
+      const response = await fetch("https://backend.csaposapp.hu/api/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type" : "application/json"
+        },
+        body: JSON.stringify({
+          username: username,
+          password: password
+        })
+      });
+      if (response.ok) {
+        const data =  await response.json();
+        localStorage.setItem("token", JSON.stringify(data));
+        return true;
+      }
+      else {
+        setErrorMessage("Hibás felhasználónév vagy jelszó!");
+        return false;
+      }
+    } 
+    catch {
+      setErrorMessage("Hálózati hiba!");
+      return false;
+    }
+  }
   
-  function handleLogin(event) {
+  async function validateLogin(event) {
+    event.preventDefault();
     const username = event.target.username;
     const password = event.target.password;
-    if (username.value === "admin" && password.value === "admin") {
+    if (await handleLogin(username.value, password.value)) {
       setIsAuthenticated(true);
-      localStorage.setItem("auth", "true")
       navigate("/");
     }
-    else {
-      username.value = "";
-      password.value = "";
-      setErrorMessage("Hibás felhasználónév vagy jelszó!")
-    }
-    event.preventDefault();
   }
 
   return (
     <div className="min-h-screen w-full bg-grey text-white px-4 pt-24 flex items-center flex-col">
         <h1 className="font-bold text-3xl">Bejelentkezés</h1>
-        <form className="flex flex-col mt-8 justify-evenly items-center" onSubmit={(event) => handleLogin(event)}>
+        <form className="flex flex-col mt-8 justify-evenly items-center" onSubmit={(event) => validateLogin(event)}>
             <label className="text-left w-full">Felhasználónév</label>
             <input name="username" type="text" className="w-full bg-dark-grey px-5 py-2 rounded-md font-normal focus:outline-none mt-0.5 mb-4" required onChange={() => setErrorMessage("")}/>
             <label className="text-left w-full">Jelszó</label>
             <input name="password" type="password" className="w-full bg-dark-grey px-5 py-2 rounded-md font-normal focus:outline-none mt-0.5 mb-4" required onChange={() => setErrorMessage("")}/>
-            <p id="errorText" className={`text-center text-red-500 text-wrap max-w-56 ${errorMessage !== "" ? "visible" : "invisible"}`}>{errorMessage}</p>
+            <p id="errorText" className={`text-center text-red-500 text-wrap max-w-40 ${errorMessage !== "" ? "visible" : "invisible"}`}>{errorMessage}</p>
             <button type="submit" className="w-full h-16 bg-blue rounded font-bold text-lg mt-4">Bejelentkezés</button>
         </form>
         <p className="mt-8">Még nincs fiókod?</p>

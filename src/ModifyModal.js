@@ -2,19 +2,19 @@ import React, { useContext, useState, useEffect } from "react";
 import { PencilSquareIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import Context from "./Context";
 
-function ModifyModal({ title, isModalVisible, setIsModalVisible }) {
+function ModifyModal({ isModifyModalVisible, setIsModifyModalVisible }) {
   const { user, setUser } = useContext(Context);
   const [newUsername, setNewUsername] = useState(user.name);
-  const [profilePicture, setProfilePicture] = useState(user.picture);
+  const [profilePicture, setProfilePicture] = useState(user.image);
   const [errorMessage, setErrorMessage] = useState("");
   
   useEffect(() => {
-    if (isModalVisible) {
+    if (isModifyModalVisible) {
       document.getElementById("username").value = user.name;
       setNewUsername(user.name);
       setErrorMessage("");
     }
-  }, [isModalVisible])
+  }, [isModifyModalVisible])
   
 
   function triggerFileInputClick() {
@@ -36,9 +36,9 @@ function ModifyModal({ title, isModalVisible, setIsModalVisible }) {
   function handleSubmit(event) {
     event.preventDefault();
     if (event.target.username.value.trim() !== "") {
-      setUser({name: newUsername, picture: profilePicture});
-      localStorage.setItem("user", JSON.stringify({name: newUsername, picture: profilePicture}));
-      setIsModalVisible(false);
+      setUser({name: newUsername, image: profilePicture});
+      localStorage.setItem("user", JSON.stringify({name: newUsername, image: profilePicture}));
+      setIsModifyModalVisible(false);
     }
     else {
       setErrorMessage("Kötelező megadnod felhasználónevet!")
@@ -48,12 +48,12 @@ function ModifyModal({ title, isModalVisible, setIsModalVisible }) {
   }
 
   return (
-    <div className={`w-full min-h-screen h-full absolute top-0 left-0 bg-opacity-65 bg-black ${isModalVisible ? "flex" : "hidden"} justify-center items-center` }>
+    <div className={`w-full min-h-screen h-full absolute top-0 left-0 bg-opacity-65 bg-black ${isModifyModalVisible ? "flex" : "hidden"} justify-center items-center` }>
       <div className={`w-80 h-80 aspect-square bg-grey rounded-xl flex flex-col justify-between relative`}>
-        <XMarkIcon className="absolute left-0 top-0 w-9 text-red-500 font-bold bg-dark-grey p-1 rounded-tl-md rounded-tr-none rounded-bl-none rounded-br-md" onClick={() => setIsModalVisible(false)}/>
-        <p className="text-md pt-4 text-center mb-6">{title}</p>
+        <XMarkIcon className="absolute left-0 top-0 w-9 text-red-500 font-bold bg-dark-grey p-1 rounded-tl-md rounded-tr-none rounded-bl-none rounded-br-md hover:cursor-pointer" onClick={() => setIsModifyModalVisible(false)}/>
+        <p className="text-md pt-4 text-center mb-6">Profil szerkesztése</p>
         <form className="flex flex-col justify-between h-full items-center px-2" onSubmit={(event) => handleSubmit(event)}>
-          <div className="relative select-none" onClick={triggerFileInputClick}>
+          <div className="relative select-none hover:cursor-pointer" onClick={triggerFileInputClick}>
             <img src={profilePicture} className="rounded-full object-cover aspect-square w-24 opacity-50"/>
             <PencilSquareIcon className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-12"/>
             <input id="fileInput" type="file" style={{"display" : "none"}} onChange={(event) => handleImageUpload(event)}/>
@@ -65,7 +65,7 @@ function ModifyModal({ title, isModalVisible, setIsModalVisible }) {
               setErrorMessage("");
               }} required/>
             <p className={`text-red-500 text-center font-normal ${errorMessage !== "" ? "visible" : "invisible"}`}>{errorMessage}</p>
-            <input type="submit" value="Mentés" className="bg-dark-grey w-fit py-2 px-3 my-2 rounded-md text-blue drop-shadow-[0px_2px_2px_rgba(0,0,0,.5)]"/>
+            <input type="submit" value="Mentés" className="bg-dark-grey w-fit py-2 px-3 my-2 rounded-md text-blue drop-shadow-[0px_2px_2px_rgba(0,0,0,.5)] hover:cursor-pointer"/>
           </div>
         </form>
       </div>

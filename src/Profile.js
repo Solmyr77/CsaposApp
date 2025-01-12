@@ -8,12 +8,14 @@ import Context from "./Context";
 import { useNavigate } from "react-router-dom";
 import { PencilSquareIcon, UserPlusIcon } from "@heroicons/react/20/solid";
 import ModifyModal from "./ModifyModal";
+import AddFriendModal from "./AddFriendModal";
 
 function Profile() {
   const navigate = useNavigate();
   const { setMenuState, setIsAuthenticated, user } = useContext(Context);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const friendNames = ["Barát1", "Barát2", "Barát3", "Barát4", "Barát5", "Barát6"]
+  const [isModifyModalVisible, setIsModifyModalVisible] = useState(false);
+  const [isAddFriendModalVisible, setIsAddFriendModalVisible] = useState(false);
+  const friendNames = ["Barát1", "Barát2", "Barát3", "Barát4", "Barát5", "Barát6"];
 
   useEffect(() => {
     setMenuState("Profile");
@@ -21,14 +23,14 @@ function Profile() {
   
   function handleLogout() {
     setIsAuthenticated(false);
-    localStorage.removeItem("auth");
+    localStorage.removeItem("token");
     navigate("/login");
   }
 
   return (
     <div className="min-h-screen h-full w-full max-w-full bg-grey flex px-4 text-white font-bold font play flex-col items-center relative">
         <h1 className="text-center w-full pt-8 text-2xl mb-2">{user.name}</h1>
-        <img src={user.picture} alt="avatar" className="w-28 object-cover aspect-square rounded-full mb-8"/>
+        <img src={user.image} alt="avatar" className="w-28 object-cover aspect-square rounded-full mb-8"/>
         <TitleDivider title={"Barátok"}/>
         <div className="flex flex-row w-full overflow-x-scroll mb-8">
           {
@@ -37,36 +39,37 @@ function Profile() {
               if(name === friendNames[friendNames.length-1]) {
                 return (
                   <div className="flex">
-                    <Friend name={name} image={user.picture} />
+                    <Friend name={name} image={user.image} isVertical={true}/>
                   </div>
                 )
               }
 
               return (
-                <div className="flex">
-                  <Friend name={name} image={user.picture} />
-                  <div className="h-full w-[2px] rounded-md bg-dark-grey"></div>
+                <div className="flex items-center">
+                  <Friend name={name} image={user.image} isVertical={true}/>
+                  <div className="h-4/5 w-[2px] rounded-md bg-dark-grey"></div>
                 </div>
               )
             })
           }
         </div>
         <TitleDivider title={"Eredmények"}/>
-        <div className="flex flex-row w-full overflow-x-scroll gap-6 mb-8">
+        <div className="flex flex-row w-full overflow-x-scroll gap-4 mb-8">
           <Badge image={img1} title={"Nagy ivó"}/>
         </div>
         <TitleDivider title={"Beállítások"} isNormal={true}/>
-        <div className="w-full h-10 font-normal bg-dark-grey rounded-md flex flex-row justify-between items-center px-2 drop-shadow-[0_2px_2px_rgba(0,0,0,.5)] mb-2 select-none" onClick={() => setIsModalVisible(true)}>
+        <div className="w-full h-10 font-normal bg-dark-grey rounded-md flex flex-row justify-between items-center px-2 drop-shadow-[0_2px_2px_rgba(0,0,0,.5)] mb-2 select-none hover:cursor-pointer" onClick={() => setIsModifyModalVisible(true)}>
           Profil szerkesztése
           <PencilSquareIcon className="h-6"/>
         </div>
-        <div className="w-full h-10 font-normal bg-dark-grey rounded-md flex flex-row justify-between items-center px-2 drop-shadow-[0_2px_2px_rgba(0,0,0,.5)] mb-2 select-none">
+        <div className="w-full h-10 font-normal bg-dark-grey rounded-md flex flex-row justify-between items-center px-2 drop-shadow-[0_2px_2px_rgba(0,0,0,.5)] mb-2 select-none hover:cursor-pointer" onClick={() => setIsAddFriendModalVisible(true)}>
           Barát hozzáadása
           <UserPlusIcon className="h-6"/>
         </div>
         <button className="w-1/2 bg-dark-grey text-red-500 py-2 px-4 rounded-md mt-2 drop-shadow-[0_4px_4px_rgba(0,0,0,.5)] select-none" onClick={handleLogout}>Kijelentkezés</button>
         <div className="h-[12vh]"></div>
-        <ModifyModal title={"Profil szerkesztése"} isModalVisible={isModalVisible} setIsModalVisible={setIsModalVisible}/>
+        <ModifyModal isModifyModalVisible={isModifyModalVisible} setIsModifyModalVisible={setIsModifyModalVisible}/>
+        <AddFriendModal isAddFriendModalVisible={isAddFriendModalVisible} setIsAddFriendModalVisible={setIsAddFriendModalVisible}/>
         <Footer/>
     </div>
   )

@@ -10,6 +10,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-y: scroll;
 }
 
 code {
@@ -30,11 +31,11 @@ input[type=date] {
 }
 
 ::-webkit-scrollbar-track {
-  background: #27272A;
+  background: #262626;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1C1C1C;
+  background: #1c1c1c;
   border-radius: 5rem;
 }
 

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import records from "./records";
 
-function SearchBar({ setRecordsToDisplay }) {
+function SearchBar({ displayTitle, setRecordsToDisplay }) {
   const [searchValue, setSearchValue] = useState("");
 
   function handleSearch(event) {
@@ -13,7 +13,7 @@ function SearchBar({ setRecordsToDisplay }) {
   
   return (
     <div className="w-full mb-8 drop-shadow-[0_4px_4px_rgba(0,0,0,.5)]">
-        <h1 className="pt-4 mb-2 text-xl">Keresés</h1>
+        <h1 className={`pt-4 mb-2 text-xl ${displayTitle ? "block" : "hidden"}`}>Keresés</h1>
         <div className="relative">
             {
               searchValue.trim() == "" ? 

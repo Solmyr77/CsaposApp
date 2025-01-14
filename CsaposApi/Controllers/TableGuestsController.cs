@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CsaposApi.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CsaposApi.Controllers
 {
@@ -22,6 +23,7 @@ namespace CsaposApi.Controllers
 
         // GET: api/TableGuests
         [HttpGet]
+        [Authorize(Policy = "MustBeGuest")]
         public async Task<ActionResult<IEnumerable<TableGuest>>> GetTableGuests()
         {
             return Ok(await _context.TableGuests.ToListAsync());
@@ -29,6 +31,7 @@ namespace CsaposApi.Controllers
 
         // GET: api/TableGuests/5
         [HttpGet("{id}")]
+        [Authorize(Policy = "MustBeGuest")]
         public async Task<ActionResult<TableGuest>> GetTableGuest(string id)
         {
             var tableGuest = await _context.TableGuests.FindAsync(id);
@@ -44,6 +47,7 @@ namespace CsaposApi.Controllers
         // PUT: api/TableGuests/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Policy = "MustBeAdmin")]
         public async Task<IActionResult> PutTableGuest(Guid id, TableGuest tableGuest)
         {
             if (id != tableGuest.Id)
@@ -75,6 +79,7 @@ namespace CsaposApi.Controllers
         // POST: api/TableGuests
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Policy = "MustBeAdmin")]
         public async Task<ActionResult<TableGuest>> PostTableGuest(TableGuest tableGuest)
         {
             _context.TableGuests.Add(tableGuest);
@@ -99,6 +104,7 @@ namespace CsaposApi.Controllers
 
         // DELETE: api/TableGuests/5
         [HttpDelete("{id}")]
+        [Authorize(Policy = "MustBeAdmin")]
         public async Task<IActionResult> DeleteTableGuest(string id)
         {
             var tableGuest = await _context.TableGuests.FindAsync(id);

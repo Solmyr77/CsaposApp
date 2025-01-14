@@ -7,6 +7,9 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using CsaposApi.Services.IService;
+using CsaposApi.Services;
+using Microsoft.OpenApi.Models;
 
 namespace CsaposApi
 {
@@ -23,11 +26,67 @@ namespace CsaposApi
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            var jwtSettings = builder.Configuration.GetSection("Jwt");
-            var secretKey = jwtSettings["Key"];
-            var issuer = jwtSettings["Issuer"];
-            var audience = jwtSettings["Audience"];
+            builder.Services.AddSwaggerGen(c =>
+            {
+                // Basic OpenAPI info
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Csapos API",
+                    Version = "v1"
+                });
 
+                // 1. Add the Bearer security definition
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "JWT Authorization header. Example: \"Bearer {token}\""
+                });
+
+                // 2. Add a global security requirement
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+            });
+
+            // Authorization policy
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("MustBeGuest", policy =>
+                {
+                    policy.RequireRole("guest", "admin");
+                });
+
+                options.AddPolicy("MustBeAdmin", policy =>
+                {
+                    policy.RequireRole("admin");
+                });
+            });
+
+            // 1. Bind JwtSettings
+            var jwtSection = builder.Configuration.GetSection("JwtSettings");
+            builder.Services.Configure<JwtSettings>(jwtSection);
+            var jwtSettings = jwtSection.Get<JwtSettings>();
+
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IPasswordService, PasswordService>();
+
+            // 2. Register Authentication
+            var key = Encoding.UTF8.GetBytes(jwtSettings.SecretKey);
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -35,16 +94,17 @@ namespace CsaposApi
             })
             .AddJwtBearer(options =>
             {
-                // The key must match exactly what you use to generate the token
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = true,
                     ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = issuer,
-                    ValidAudience = audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+                    ValidIssuer = jwtSettings.Issuer,
+                    ValidAudience = jwtSettings.Audience,
+                    ClockSkew = TimeSpan.Zero
                 };
             });
 
@@ -79,8 +139,8 @@ namespace CsaposApi
 
             // app.UseHttpsRedirection();
 
-            app.UseAuthorization();
             app.UseAuthentication();
+            app.UseAuthorization();
 
             app.MapControllers();
 

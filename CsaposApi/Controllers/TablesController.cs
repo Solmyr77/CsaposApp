@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CsaposApi.Models;
 using static CsaposApi.Models.DTOs.TableDTO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CsaposApi.Controllers
 {
@@ -23,6 +24,7 @@ namespace CsaposApi.Controllers
 
         // GET: api/Tables
         [HttpGet]
+        [Authorize(Policy = "MustBeGuest")]
         public async Task<ActionResult<IEnumerable<Table>>> GetTables()
         {
             return Ok(await _context.Tables.ToListAsync());
@@ -30,6 +32,7 @@ namespace CsaposApi.Controllers
 
         // GET: api/Tables/5
         [HttpGet("{id}")]
+        [Authorize(Policy = "MustBeGuest")]
         public async Task<ActionResult<Table>> GetTable(string id)
         {
             var table = await _context.Tables.FindAsync(id);
@@ -45,6 +48,7 @@ namespace CsaposApi.Controllers
         // PUT: api/Tables/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Policy = "MustBeAdmin")]
         public async Task<IActionResult> PutTable(Guid id, Table table)
         {
             if (id != table.Id)
@@ -76,6 +80,7 @@ namespace CsaposApi.Controllers
         // POST: api/Tables
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Policy = "MustBeAdmin")]
         public async Task<ActionResult<Table>> PostTable(CreateTableDTO createTableDTO)
         {
             Table table = new Table
@@ -108,6 +113,7 @@ namespace CsaposApi.Controllers
 
         // DELETE: api/Tables/5
         [HttpDelete("{id}")]
+        [Authorize(Policy = "MustBeAdmin")]
         public async Task<IActionResult> DeleteTable(string id)
         {
             var table = await _context.Tables.FindAsync(id);

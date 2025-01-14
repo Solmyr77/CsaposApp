@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CsaposApi.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CsaposApi.Controllers
 {
@@ -22,6 +23,7 @@ namespace CsaposApi.Controllers
 
         // GET: api/EventAttendances
         [HttpGet]
+        [Authorize(Policy = "MustBeGuest")]
         public async Task<ActionResult<IEnumerable<EventAttendance>>> GetEventAttendances()
         {
             return Ok(await _context.EventAttendances.ToListAsync());
@@ -29,6 +31,7 @@ namespace CsaposApi.Controllers
 
         // GET: api/EventAttendances/5
         [HttpGet("{id}")]
+        [Authorize(Policy = "MustBeGuest")]
         public async Task<ActionResult<EventAttendance>> GetEventAttendance(string id)
         {
             var eventAttendance = await _context.EventAttendances.FindAsync(id);
@@ -44,6 +47,7 @@ namespace CsaposApi.Controllers
         // PUT: api/EventAttendances/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Policy = "MustBeAdmin")]
         public async Task<IActionResult> PutEventAttendance(Guid id, EventAttendance eventAttendance)
         {
             if (id != eventAttendance.Id)
@@ -75,6 +79,7 @@ namespace CsaposApi.Controllers
         // POST: api/EventAttendances
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Policy = "MustBeAdmin")]
         public async Task<ActionResult<EventAttendance>> PostEventAttendance(EventAttendance eventAttendance)
         {
             _context.EventAttendances.Add(eventAttendance);
@@ -99,6 +104,7 @@ namespace CsaposApi.Controllers
 
         // DELETE: api/EventAttendances/5
         [HttpDelete("{id}")]
+        [Authorize(Policy = "MustBeAdmin")]
         public async Task<IActionResult> DeleteEventAttendance(string id)
         {
             var eventAttendance = await _context.EventAttendances.FindAsync(id);

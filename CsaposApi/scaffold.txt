@@ -1,0 +1,1 @@
+Scaffold-DbContext "server=127.0.0.1;port=3307;database=csaposapp;user=csaposapi;password=ezazsql;sslmode=none;" mysql.entityframeworkcore -outputdir Models –f

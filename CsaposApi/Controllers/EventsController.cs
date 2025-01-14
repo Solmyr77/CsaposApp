@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CsaposApi.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CsaposApi.Controllers
 {
@@ -22,6 +23,7 @@ namespace CsaposApi.Controllers
 
         // GET: api/Events
         [HttpGet]
+        [Authorize(Policy = "MustBeGuest")]
         public async Task<ActionResult<IEnumerable<Event>>> GetEvents()
         {
             return Ok(await _context.Events.ToListAsync());
@@ -29,6 +31,7 @@ namespace CsaposApi.Controllers
 
         // GET: api/Events/5
         [HttpGet("{id}")]
+        [Authorize(Policy = "MustBeGuest")]
         public async Task<ActionResult<Event>> GetEvent(string id)
         {
             var _event = await _context.Events.FindAsync(id);
@@ -44,6 +47,7 @@ namespace CsaposApi.Controllers
         // PUT: api/Events/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Policy = "MustBeAdmin")]
         public async Task<IActionResult> PutEvent(Guid id, Event @event)
         {
             if (id != @event.Id)
@@ -75,6 +79,7 @@ namespace CsaposApi.Controllers
         // POST: api/Events
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Policy = "MustBeAdmin")]
         public async Task<ActionResult<Event>> PostEvent(Event _event)
         {
             _context.Events.Add(_event);
@@ -99,6 +104,7 @@ namespace CsaposApi.Controllers
 
         // DELETE: api/Events/5
         [HttpDelete("{id}")]
+        [Authorize(Policy = "MustBeAdmin")]
         public async Task<IActionResult> DeleteEvent(string id)
         {
             var _event = await _context.Events.FindAsync(id);

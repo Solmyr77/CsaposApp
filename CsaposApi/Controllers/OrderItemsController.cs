@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CsaposApi.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CsaposApi.Controllers
 {
@@ -22,6 +23,7 @@ namespace CsaposApi.Controllers
 
         // GET: api/OrderItems
         [HttpGet]
+        [Authorize(Policy = "MustBeGuest")]
         public async Task<ActionResult<IEnumerable<OrderItem>>> GetOrderItems()
         {
             return Ok(await _context.OrderItems.ToListAsync());
@@ -29,6 +31,7 @@ namespace CsaposApi.Controllers
 
         // GET: api/OrderItems/5
         [HttpGet("{id}")]
+        [Authorize(Policy = "MustBeGuest")]
         public async Task<ActionResult<OrderItem>> GetOrderItem(string id)
         {
             var orderItem = await _context.OrderItems.FindAsync(id);
@@ -44,6 +47,7 @@ namespace CsaposApi.Controllers
         // PUT: api/OrderItems/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Policy = "MustBeAdmin")]
         public async Task<IActionResult> PutOrderItem(Guid id, OrderItem orderItem)
         {
             if (id != orderItem.Id)
@@ -75,6 +79,7 @@ namespace CsaposApi.Controllers
         // POST: api/OrderItems
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Policy = "MustBeAdmin")]
         public async Task<ActionResult<OrderItem>> PostOrderItem(OrderItem orderItem)
         {
             _context.OrderItems.Add(orderItem);
@@ -99,6 +104,7 @@ namespace CsaposApi.Controllers
 
         // DELETE: api/OrderItems/5
         [HttpDelete("{id}")]
+        [Authorize(Policy = "MustBeAdmin")]
         public async Task<IActionResult> DeleteOrderItem(string id)
         {
             var orderItem = await _context.OrderItems.FindAsync(id);

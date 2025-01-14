@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CsaposApi.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CsaposApi.Controllers
 {
@@ -22,6 +23,7 @@ namespace CsaposApi.Controllers
 
         // GET: api/BusinessHours
         [HttpGet]
+        [Authorize(Policy = "MustBeGuest")]
         public async Task<ActionResult<IEnumerable<BusinessHour>>> GetBusinessHours()
         {
             return Ok(await _context.BusinessHours.ToListAsync());
@@ -29,6 +31,7 @@ namespace CsaposApi.Controllers
 
         // GET: api/BusinessHours/5
         [HttpGet("{id}")]
+        [Authorize(Policy = "MustBeGuest")]
         public async Task<ActionResult<BusinessHour>> GetBusinessHour(string id)
         {
             var businessHour = await _context.BusinessHours.FindAsync(id);
@@ -44,6 +47,7 @@ namespace CsaposApi.Controllers
         // PUT: api/BusinessHours/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Policy = "MustBeAdmin")]
         public async Task<IActionResult> PutBusinessHour(Guid id, BusinessHour businessHour)
         {
             if (id != businessHour.Id)
@@ -75,6 +79,7 @@ namespace CsaposApi.Controllers
         // POST: api/BusinessHours
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Policy = "MustBeAdmin")]
         public async Task<ActionResult<BusinessHour>> PostBusinessHour(BusinessHour businessHour)
         {
             _context.BusinessHours.Add(businessHour);
@@ -99,6 +104,7 @@ namespace CsaposApi.Controllers
 
         // DELETE: api/BusinessHours/5
         [HttpDelete("{id}")]
+        [Authorize(Policy = "MustBeAdmin")]
         public async Task<IActionResult> DeleteBusinessHour(string id)
         {
             var businessHour = await _context.BusinessHours.FindAsync(id);

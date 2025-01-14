@@ -29,6 +29,8 @@ public partial class CsaposappContext : DbContext
 
     public virtual DbSet<Product> Products { get; set; }
 
+    public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
+
     public virtual DbSet<Table> Tables { get; set; }
 
     public virtual DbSet<TableGuest> TableGuests { get; set; }
@@ -113,11 +115,8 @@ public partial class CsaposappContext : DbContext
                 .HasColumnName("description");
             entity.Property(e => e.ImgUrl)
                 .HasMaxLength(255)
-                .HasDefaultValueSql("'NULL'")
                 .HasColumnName("img_url");
-            entity.Property(e => e.LocationId)
-                .HasDefaultValueSql("'NULL'")
-                .HasColumnName("location_id");
+            entity.Property(e => e.LocationId).HasColumnName("location_id");
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
                 .HasColumnName("name");
@@ -145,12 +144,8 @@ public partial class CsaposappContext : DbContext
             entity.HasIndex(e => e.UserId, "user_id");
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.EventId)
-                .HasDefaultValueSql("'NULL'")
-                .HasColumnName("event_id");
-            entity.Property(e => e.UserId)
-                .HasDefaultValueSql("'NULL'")
-                .HasColumnName("user_id");
+            entity.Property(e => e.EventId).HasColumnName("event_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
 
             entity.HasOne(d => d.Event).WithMany(p => p.EventAttendances)
                 .HasForeignKey(d => d.EventId)
@@ -174,7 +169,7 @@ public partial class CsaposappContext : DbContext
                 .HasColumnType("int(11)")
                 .HasColumnName("capacity");
             entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("'current_timestamp()'")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("timestamp")
                 .HasColumnName("created_at");
             entity.Property(e => e.Description)
@@ -182,7 +177,6 @@ public partial class CsaposappContext : DbContext
                 .HasColumnName("description");
             entity.Property(e => e.ImgUrl)
                 .HasMaxLength(255)
-                .HasDefaultValueSql("'NULL'")
                 .HasColumnName("img_url");
             entity.Property(e => e.IsHighlighted).HasColumnName("is_highlighted");
             entity.Property(e => e.IsOpen).HasColumnName("is_open");
@@ -193,7 +187,6 @@ public partial class CsaposappContext : DbContext
                 .HasColumnType("int(11)")
                 .HasColumnName("number_of_tables");
             entity.Property(e => e.Rating)
-                .HasDefaultValueSql("'NULL'")
                 .HasColumnType("tinyint(4)")
                 .HasColumnName("rating");
         });
@@ -212,18 +205,18 @@ public partial class CsaposappContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("'current_timestamp()'")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("timestamp")
                 .HasColumnName("created_at");
             entity.Property(e => e.LocationId).HasColumnName("location_id");
             entity.Property(e => e.OrderStatus)
-                .HasDefaultValueSql("'''pending'''")
+                .HasDefaultValueSql("'pending'")
                 .HasColumnType("enum('pending','accepted','completed','paid','rejected')")
                 .HasColumnName("order_status");
             entity.Property(e => e.TableId).HasColumnName("table_id");
             entity.Property(e => e.UpdatedAt)
                 .ValueGeneratedOnAddOrUpdate()
-                .HasDefaultValueSql("'current_timestamp()'")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("timestamp")
                 .HasColumnName("updated_at");
             entity.Property(e => e.UserId).HasColumnName("user_id");
@@ -292,7 +285,6 @@ public partial class CsaposappContext : DbContext
                 .HasColumnName("discount_percentage");
             entity.Property(e => e.ImgUrl)
                 .HasMaxLength(255)
-                .HasDefaultValueSql("'NULL'")
                 .HasColumnName("img_url");
             entity.Property(e => e.IsActive)
                 .HasDefaultValueSql("'0'")
@@ -313,6 +305,29 @@ public partial class CsaposappContext : DbContext
                 .HasForeignKey(d => d.LocationId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("products_ibfk_1");
+        });
+
+        modelBuilder.Entity<RefreshToken>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("refresh_tokens");
+
+            entity.HasIndex(e => e.UserId, "FK_RefreshTokens_Users");
+
+            entity.HasIndex(e => e.Token, "IX_RefreshTokens_Token").IsUnique();
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Expiration)
+                .HasColumnType("datetime")
+                .HasColumnName("expiration");
+            entity.Property(e => e.IsRevoked).HasColumnName("is_revoked");
+            entity.Property(e => e.Token).HasColumnName("token");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.User).WithMany(p => p.RefreshTokens)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK_RefreshTokens_Users");
         });
 
         modelBuilder.Entity<Table>(entity =>
@@ -364,12 +379,8 @@ public partial class CsaposappContext : DbContext
             entity.HasIndex(e => e.UserId, "user_id");
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.TableId)
-                .HasDefaultValueSql("'NULL'")
-                .HasColumnName("table_id");
-            entity.Property(e => e.UserId)
-                .HasDefaultValueSql("'NULL'")
-                .HasColumnName("user_id");
+            entity.Property(e => e.TableId).HasColumnName("table_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
 
             entity.HasOne(d => d.Table).WithMany(p => p.TableGuests)
                 .HasForeignKey(d => d.TableId)
@@ -393,12 +404,11 @@ public partial class CsaposappContext : DbContext
                 .HasColumnType("date")
                 .HasColumnName("birth_date");
             entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("'current_timestamp()'")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("timestamp")
                 .HasColumnName("created_at");
             entity.Property(e => e.ImgUrl)
                 .HasMaxLength(255)
-                .HasDefaultValueSql("'NULL'")
                 .HasColumnName("img_url");
             entity.Property(e => e.LegalName)
                 .HasMaxLength(50)

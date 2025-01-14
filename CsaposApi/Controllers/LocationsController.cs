@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CsaposApi.Models;
 using static CsaposApi.Models.DTOs.LocationDTO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CsaposApi.Controllers
 {
@@ -23,6 +24,7 @@ namespace CsaposApi.Controllers
 
         // GET: api/Locations
         [HttpGet]
+        [Authorize(Policy = "MustBeGuest")]
         public async Task<ActionResult<IEnumerable<Location>>> GetLocations()
         {
             return Ok(await _context.Locations.ToListAsync());
@@ -30,6 +32,7 @@ namespace CsaposApi.Controllers
 
         // GET: api/Locations/5
         [HttpGet("{id}")]
+        [Authorize(Policy = "MustBeGuest")]
         public async Task<ActionResult<Location>> GetLocation(string id)
         {
             var location = await _context.Locations.FindAsync(id);
@@ -45,6 +48,7 @@ namespace CsaposApi.Controllers
         // PUT: api/Locations/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Policy = "MustBeAdmin")]
         public async Task<IActionResult> PutLocation(Guid id, Location location)
         {
             if (id != location.Id)
@@ -76,6 +80,7 @@ namespace CsaposApi.Controllers
         // POST: api/Locations
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Policy = "MustBeAdmin")]
         public async Task<ActionResult<Location>> PostLocation(CreateLocationDTO createLocationDTO)
         {
 
@@ -119,6 +124,7 @@ namespace CsaposApi.Controllers
 
         // DELETE: api/Locations/5
         [HttpDelete("{id}")]
+        [Authorize(Policy = "MustBeAdmin")]
         public async Task<IActionResult> DeleteLocation(string id)
         {
             var location = await _context.Locations.FindAsync(id);

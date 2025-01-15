@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import BackButton from "./BackButton";
 import { AtSymbolIcon } from "@heroicons/react/20/solid";
 import { UserIcon, PencilIcon, EyeIcon, LockClosedIcon } from "@heroicons/react/24/outline";
+import axios from "axios";
 
 function Register() {
   const navigate = useNavigate();
@@ -32,20 +33,15 @@ function Register() {
   }
 
   async function handleRegister(username, password, legalName, birthDate) {
-    const response = await fetch("https://backend.csaposapp.hu/api/auth/register", {
-      method: "POST",
-      headers: {
-        "Content-Type" : "application/json"
-      },
-      body: JSON.stringify({
+    const response = await axios.post("https://backend.csaposapp.hu/api/auth/register",
+      {
         username: username,
         password: password,
         legalName: legalName,
         birthDate: birthDate
       })
-    });
-
-    response.ok && console.log("FASZA");
+      
+    response.status === 200 && console.log("FASZA");
   }
 
   function validateForm(event) {

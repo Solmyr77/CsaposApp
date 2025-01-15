@@ -6,9 +6,9 @@ function Navbar() {
     <div className="w-full mb-8">
         <h1 className="pt-4 mb-2 text-xl">Felfedezés</h1>
         <div className="flex justify-between">
-            <NavItem title={"Összes"}></NavItem>
-            <NavItem title={"Nyitva"}></NavItem>
-            <NavItem title={"Kedvencek"}></NavItem>
+          <NavItem title={"Összes"}></NavItem>
+          <NavItem title={"Nyitva"}></NavItem>
+          <NavItem title={"Kedvencek"}></NavItem>
         </div>
     </div>
   )

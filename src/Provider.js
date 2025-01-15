@@ -7,9 +7,10 @@ function Provider( { children } ) {
   const [menuState, setMenuState] = useState("Main")
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || {name: "Lajos", image: img1});
+  const [locations, setLocations] = useState([]);
 
   return (
-    <Context.Provider value={{ navState, setNavState, menuState, setMenuState, isAuthenticated, setIsAuthenticated, user, setUser }}>
+    <Context.Provider value={{ navState, setNavState, menuState, setMenuState, isAuthenticated, setIsAuthenticated, user, setUser, locations, setLocations }}>
         {children}
     </Context.Provider>
   )

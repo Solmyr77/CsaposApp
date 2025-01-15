@@ -9,7 +9,7 @@ function CardContainer({records, cardsToShow}) {
       recordsToDisplay = records;
       break;
     case "Nyitva":
-      recordsToDisplay = records.filter(record => record.status != "closed");
+      recordsToDisplay = records.filter(record => record.isOpen);
       break;
     case "Kedvencek":
       recordsToDisplay = records;
@@ -22,7 +22,7 @@ function CardContainer({records, cardsToShow}) {
   
   
   return (
-    <div className={`flex justify-between flex-wrap`}>
+    <div className={`flex justify-between flex-wrap gap-y-10`}>
       {recordsToDisplay.map(record => <Card record={record}/>)}
       {
         recordsToDisplay.length % 2 == 0 && recordsToDisplay.length % 3 != 0 ? 

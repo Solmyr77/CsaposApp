@@ -1,7 +1,8 @@
 import React, { useContext, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { data, Link, useNavigate } from "react-router-dom";
 import Context from "./Context";
 import { UserCircleIcon, EyeIcon, LockClosedIcon } from "@heroicons/react/24/outline";
+import axios from "axios";
 
 function Login() {
   const navigate = useNavigate();
@@ -10,19 +11,11 @@ function Login() {
 
   async function handleLogin(username, password) {
     try {
-      const response = await fetch("https://backend.csaposapp.hu/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type" : "application/json"
-        },
-        body: JSON.stringify({
-          username: username,
-          password: password
-        })
-      });
-      if (response.ok) {
-        const data =  await response.json();
-        localStorage.setItem("token", JSON.stringify(data));
+      const response = await axios.post("https://backend.csaposapp.hu/api/auth/login", { username: username, password: password });
+      if (response.status === 200) {
+        const data = response.data;
+        localStorage.setItem("accessToken", JSON.stringify(data.accessToken));
+        localStorage.setItem("refreshToken", JSON.stringify(data.refreshToken));
         return true;
       }
       else {

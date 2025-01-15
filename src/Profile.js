@@ -23,7 +23,8 @@ function Profile() {
   
   function handleLogout() {
     setIsAuthenticated(false);
-    localStorage.removeItem("token");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
     navigate("/login");
   }
 

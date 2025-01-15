@@ -10,7 +10,7 @@ function Login() {
 
   async function handleLogin(username, password) {
     try {
-      const response = await fetch("https://backend.csaposapp.hu/api/users/login", {
+      const response = await fetch("https://backend.csaposapp.hu/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type" : "application/json"

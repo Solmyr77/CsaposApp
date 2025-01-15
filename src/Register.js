@@ -32,7 +32,7 @@ function Register() {
   }
 
   async function handleRegister(username, password, legalName, birthDate) {
-    const response = await fetch("https://backend.csaposapp.hu/api/users/register", {
+    const response = await fetch("https://backend.csaposapp.hu/api/auth/register", {
       method: "POST",
       headers: {
         "Content-Type" : "application/json"

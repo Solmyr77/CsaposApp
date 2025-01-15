@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using System.Text;
 using CsaposApi.Services.IService;
 using CsaposApi.Models;
+using Microsoft.EntityFrameworkCore;
 
 public class AuthService : IAuthService
 {
@@ -17,7 +18,7 @@ public class AuthService : IAuthService
         _context = context;
     }
 
-    public async Task<TokenResponse> GenerateTokenPair(Guid userId)
+    public async Task<TokenResponse> GenerateTokenPairAsync(Guid userId)
     {
         // 1. Generate Access Token
         var accessToken = GenerateAccessToken(userId);
@@ -47,9 +48,9 @@ public class AuthService : IAuthService
         };
     }
 
-    public string RefreshAccessToken(string refreshTokenValue)
+    public async Task<string> RefreshAccessTokenAsync(string refreshTokenValue)
     {
-        var refreshToken = _context.RefreshTokens.FirstOrDefault(x => x.Token == refreshTokenValue);
+        var refreshToken = await _context.RefreshTokens.FirstOrDefaultAsync(x => x.Token == refreshTokenValue);
 
         if (refreshToken == null || refreshToken.IsRevoked || refreshToken.Expiration < DateTime.UtcNow)
         {
@@ -59,6 +60,31 @@ public class AuthService : IAuthService
         var newToken = GenerateAccessToken(refreshToken.UserId);
 
         return newToken;
+    }
+
+    public async Task RevokeRefreshTokenAsync(string refreshToken)
+    {
+        // 1) Find the refresh token in the database
+        var storedToken = await _context.RefreshTokens
+            .SingleOrDefaultAsync(rt => rt.Token == refreshToken);
+
+        // 2) If not found or already revoked, you might want to do nothing or throw an exception
+        if (storedToken == null)
+        {
+            return;
+        }
+
+        if (storedToken.IsRevoked)
+        {
+            return;
+        }
+
+        // 3) Mark it as revoked
+        storedToken.IsRevoked = true;
+
+        // 4) Save changes
+        _context.RefreshTokens.Update(storedToken);
+        await _context.SaveChangesAsync();
     }
 
     private string GenerateAccessToken(Guid userId)

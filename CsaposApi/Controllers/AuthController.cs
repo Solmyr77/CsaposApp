@@ -3,6 +3,7 @@ using CsaposApi.Services.IService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 using System.Text;
 using static CsaposApi.Models.DTOs.UserDTO;
@@ -89,5 +90,46 @@ namespace CsaposApi.Controllers
             // Return the created response with the user object
             return CreatedAtAction(nameof(Register), new { id = user.Id }, user);
         }
+
+        [HttpPost("refresh-token")]
+        [AllowAnonymous]
+        public async Task<ActionResult<string>> RefreshAccessToken(string refreshToken)
+        {
+            if (string.IsNullOrEmpty(refreshToken))
+            {
+                return BadRequest(new
+                {
+                    error = "missing_token",
+                    message = "No refresh token was provided."
+                });
+            }
+
+            try
+            {
+                string accessToken = _authService.RefreshAccessToken(refreshToken);
+
+                return Ok(new
+                {
+                    accessToken
+                });
+            }
+            catch (SecurityTokenException ex)
+            {
+                return Unauthorized(new
+                {
+                    error = "invalid_token",
+                    message = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    error = "server_error",
+                    message = "An unexpected error occurred while refreshing the token."
+                });
+            }
+        }
+
     }
 }

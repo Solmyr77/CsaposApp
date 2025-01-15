@@ -49,7 +49,6 @@ public class AuthService : IAuthService
 
     public string RefreshAccessToken(string refreshTokenValue)
     {
-        // 1. Validate the refresh token from DB or store
         var refreshToken = _context.RefreshTokens.FirstOrDefault(x => x.Token == refreshTokenValue);
 
         if (refreshToken == null || refreshToken.IsRevoked || refreshToken.Expiration < DateTime.UtcNow)
@@ -57,9 +56,9 @@ public class AuthService : IAuthService
             throw new SecurityTokenException("Invalid or expired refresh token");
         }
 
-        var newTokenPair = GenerateAccessToken(refreshToken.UserId);
+        var newToken = GenerateAccessToken(refreshToken.UserId);
 
-        return newTokenPair;
+        return newToken;
     }
 
     private string GenerateAccessToken(Guid userId)

@@ -10,9 +10,9 @@ import axios from "axios";
 function Main() {
   const { navState, setMenuState, locations, setLocations } = useContext(Context);
 
-  async function getLocations(){
+  async function getLocations() {
     const config = {
-      headers: {Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`}
+      headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` }
     }
     const response = await axios.get("https://backend.csaposapp.hu/api/locations", config);
     const data = response.data;

@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Card from "./Card";
 
-function CardContainer({records, cardsToShow}) {
+function CardContainer({ records, cardsToShow }) {
   let recordsToDisplay = [];
 
   switch (cardsToShow) {
@@ -16,14 +16,11 @@ function CardContainer({records, cardsToShow}) {
       break;
   }
 
-  useEffect(() => {
-    
-  }, [recordsToDisplay]);
-  
+  recordsToDisplay.sort((a, b) => b.isOpen - a.isOpen === 0 ? a.name.localeCompare(b.name) : b.isOpen - a.isOpen);
   
   return (
-    <div className={`flex justify-between flex-wrap gap-y-10`}>
-      {recordsToDisplay.map(record => <Card record={record}/>)}
+    <div className={`grid grid-cols-3 gap-4`}>
+      {recordsToDisplay.map(record => <Card key={record.id} record={record}/>)}
       {
         recordsToDisplay.length % 2 == 0 && recordsToDisplay.length % 3 != 0 ? 
         <div id="emptyDiv" className="basis-[30%] aspect-square drop-shadow-none shadow-none invisible"></div> 

@@ -1,28 +1,31 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import TitleDivider from "./TitleDivider";
 import ListItem from "./ListItem";
 import BackButton from "./BackButton";
 import { Link, useParams } from "react-router-dom";
 import img1 from "./img/pub.webp"
 import { Rating } from "@mui/material";
-import records from "./records";
 import { MapPinIcon } from "@heroicons/react/20/solid";
 import MainButton from "./MainButton";
+import axios from "axios";
 
 function Pub() {
   const { name } = useParams();
-  const [rating, setRating] = useState(null);
-  const record = records.find(record => record.name === name);
+  const [record, setRecord] = useState({});
+
+  async function getLocations() {
+    const config = {
+      headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` }
+    }
+    const response = await axios.get("https://backend.csaposapp.hu/api/locations", config);
+    const data = response.data;
+    console.log(data);
+    setRecord(data.find(record => record.name === name));
+  }
 
   useEffect(() => {
-    try {
-        setRating(localStorage.getItem(`${record.name}-rating`));
-    } 
-    catch (error) {
-        console.log(error);
-    }
+    getLocations();
   }, []);
-  
 
   return (
     <div className="min-h-screen w-screen bg-grey px-4 pt-8 text-white">
@@ -36,10 +39,8 @@ function Pub() {
             </div>
         </div>
         <TitleDivider title={"Leírás"}/>
-        <p className="max-w-full text-wrap mb-4">Üdvözlünk ez itt a {record.name}, ahol a jó hangulat sosem hagy cserben!
-            Nálunk a csapolt sör hideg, a házi pálinka tüzes, és a barátságos légkör garantált. 
-            Gyere be egy körre, maradj egy estére – itt minden történetnek helye van!
-            <span className="flex flex-row items-center mtangol mt-2">
+        <p className="max-w-full text-wrap mb-4"> {record.description}
+            <span className="flex flex-row items-center mt-2">
                 <MapPinIcon className="h-5 mr-1"/> 9999 Szentjákób, Sárkány utca 888.
             </span>
         </p>
@@ -49,10 +50,7 @@ function Pub() {
         <div className="mb-4"></div>
         <TitleDivider title={"Értékelés"} />
         <div className="flex flex-row justify-between w-full">
-            <Rating readOnly precision={0.5} value={5} onChange={(event) => {/*{
-                setRating(event.target.value);
-                localStorage.setItem(`${record.name}-rating`, event.target.value);
-                }*/}}/>
+            <Rating readOnly precision={0.5} value={5} />
             <p>1 értékelés</p>
         </div>
         <div className="pt-10 pb-8 flex justify-center">

@@ -11,7 +11,7 @@ function SearchBar({ displayTitle, setRecordsToDisplay }) {
     const filteredRecords = locations.filter(record => record.name.toLowerCase().includes(event.target.value.toLowerCase()));
     setRecordsToDisplay(filteredRecords);
   }
-  
+
   return (
     <div className="w-full mb-8 drop-shadow-[0_4px_4px_rgba(0,0,0,.5)]">
         <h1 className={`pt-4 mb-2 text-xl ${displayTitle ? "block" : "hidden"}`}>Keresés</h1>

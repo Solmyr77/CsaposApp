@@ -25,7 +25,9 @@ function Pub() {
 
   useEffect(() => {
     getLocations();
+    console.log(record);
   }, []);
+
 
   return (
     <div className="min-h-screen w-screen bg-grey px-4 pt-8 text-white">
@@ -54,7 +56,7 @@ function Pub() {
             <p>1 értékelés</p>
         </div>
         <div className="pt-10 pb-8 flex justify-center">
-            <MainButton title={"FOGLALOK"} isActive={record.status === "open" ? true : false}/>
+            <MainButton title={"FOGLALOK"} isActive={record.isOpen ? true : false}/>
         </div>
     </div>
   );

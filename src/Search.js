@@ -7,8 +7,8 @@ import { useContext, useEffect } from "react";
 import axios from "axios";
 
 function Search() {
-  const { setMenuState, locations, setLocations } = useContext(Context);
-  const [recordsToDisplay, setRecordsToDisplay] = useState(locations);
+  const { setMenuState, setLocations } = useContext(Context);
+  const [recordsToDisplay, setRecordsToDisplay] = useState([]);
 
   async function getLocations() {
     const config = {
@@ -16,8 +16,8 @@ function Search() {
     }
     const response = await axios.get("https://backend.csaposapp.hu/api/locations", config);
     const data = response.data;
-    console.log(data);
     setLocations(data);
+    setRecordsToDisplay(data);
   }
 
   useEffect(() => {

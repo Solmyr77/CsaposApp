@@ -55,7 +55,7 @@ function Pub() {
 
 
   return (
-    <div className="min-h-screen w-screen bg-grey px-4 pt-8 text-white">
+    <div className="min-h-screen bg-grey px-4 pt-8 text-white">
         <Link to={"/"}>
             <BackButton/>
         </Link>

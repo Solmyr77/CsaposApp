@@ -5,29 +5,44 @@ import CardContainer from "./CardContainer";
 import Context from "./Context";
 import { useContext, useEffect } from "react";
 import axios from "axios";
+import getAccessToken from "./refreshToken";
 
 function Search() {
   const { setMenuState, setLocations } = useContext(Context);
   const [recordsToDisplay, setRecordsToDisplay] = useState([]);
 
   async function getLocations() {
-    const config = {
-      headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` }
+    try {
+      const config = {
+        headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` }
+      }
+      const response = await axios.get("https://backend.csaposapp.hu/api/locations", config);
+      const data = response.data;
+      setLocations(data);
+      setRecordsToDisplay(data);
+      return true;
     }
-    const response = await axios.get("https://backend.csaposapp.hu/api/locations", config);
-    const data = response.data;
-    setLocations(data);
-    setRecordsToDisplay(data);
+    catch (error) {
+      if (error.response?.status === 401) {
+        return false;
+      } 
+      else {
+        console.error("Error fetching locations:", error.message);
+        return false;
+      }
+    }
   }
 
   useEffect(() => {
     setMenuState("Search");
-    try {
-      getLocations();
-    } 
-    catch (error) {
-      console.log(error);
+    const fetchData = async () => {
+      let isSucceeded = await getLocations();
+      while (isSucceeded === false) {
+        await getAccessToken();
+        isSucceeded = await getLocations();
+      }
     }
+    fetchData();
   }, []);
 
   return (

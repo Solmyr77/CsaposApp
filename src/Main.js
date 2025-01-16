@@ -3,31 +3,52 @@ import Navbar from "./Navbar";
 import TitleDivider from "./TitleDivider";
 import StyledSwiper from "./StyledSwiper";
 import CardContainer from "./CardContainer";
-import records from "./records";
 import Context from "./Context";
 import axios from "axios";
+import getAccessToken from "./refreshToken";
 
 function Main() {
   const { navState, setMenuState, locations, setLocations } = useContext(Context);
 
   async function getLocations() {
-    const config = {
-      headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` }
+    try {
+      const config = {
+        headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` }
+      }
+      const response = await axios.get("https://backend.csaposapp.hu/api/locations", config);
+      const data = response.data;
+      setLocations(data);
+      return true;
     }
-    const response = await axios.get("https://backend.csaposapp.hu/api/locations", config);
-    const data = response.data;
-    console.log(data);
-    setLocations(data);
+    catch (error) {
+      if (error.response?.status === 401) {
+        return false;
+      } 
+      else {
+        console.error("Error fetching locations:", error.message);
+        return false;
+      }
+    }
   }
+
+  function decodeJWT(token) {
+    const payload = token.split('.')[1]; 
+    const decodedPayload = atob(payload);
+    return JSON.parse(decodedPayload);
+  }
+
+  console.log(decodeJWT(localStorage.getItem("accessToken")).sub);
 
   useEffect(() => {
     setMenuState("Main");
-    try {
-      getLocations();
-    } 
-    catch (error) {
-      console.log(error);
+    const fetchData = async () => {
+      let isSucceeded = await getLocations();
+      while (isSucceeded === false) {
+        await getAccessToken();
+        isSucceeded = await getLocations();
+      }
     }
+    fetchData();
   }, []);
 
   return (

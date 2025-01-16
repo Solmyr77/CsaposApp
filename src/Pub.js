@@ -8,24 +8,49 @@ import { Rating } from "@mui/material";
 import { MapPinIcon } from "@heroicons/react/20/solid";
 import MainButton from "./MainButton";
 import axios from "axios";
+import getAccessToken from "./refreshToken";
 
 function Pub() {
   const { name } = useParams();
   const [record, setRecord] = useState({});
 
   async function getLocations() {
-    const config = {
-      headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` }
+    try {
+      const config = {
+        headers: { Authorization: `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` },
+      };
+      const response = await axios.get("https://backend.csaposapp.hu/api/locations", config);
+      const data = response.data;
+      const record = data.find((record) => record.name === name);
+
+      if (record) {
+        setRecord(record);
+        return true;
+      } 
+      else {
+        return false;
+      }
     }
-    const response = await axios.get("https://backend.csaposapp.hu/api/locations", config);
-    const data = response.data;
-    console.log(data);
-    setRecord(data.find(record => record.name === name));
+    catch (error) {
+      if (error.response?.status === 401) {
+        return false;
+      } 
+      else {
+        console.error("Error fetching locations:", error.message);
+        return false;
+      }
+    }
   }
 
   useEffect(() => {
-    getLocations();
-    console.log(record);
+    const fetchData = async () => {
+      let isSucceeded = await getLocations();
+      while (isSucceeded === false) {
+        await getAccessToken();
+        isSucceeded = await getLocations();
+      }
+    }
+    fetchData();
   }, []);
 
 

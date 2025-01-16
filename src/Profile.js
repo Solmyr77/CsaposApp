@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { PencilSquareIcon, UserPlusIcon } from "@heroicons/react/20/solid";
 import ModifyModal from "./ModifyModal";
 import AddFriendModal from "./AddFriendModal";
+import axios from "axios";
 
 function Profile() {
   const navigate = useNavigate();
@@ -16,18 +17,24 @@ function Profile() {
   const [isModifyModalVisible, setIsModifyModalVisible] = useState(false);
   const [isAddFriendModalVisible, setIsAddFriendModalVisible] = useState(false);
   const friendNames = ["Barát1", "Barát2", "Barát3", "Barát4", "Barát5", "Barát6"];
+  
+  function handleLogout() {
+    const logout = async () => {
+      const response = await axios.post("https://backend.csaposapp.hu/api/auth/logout", {refreshToken : localStorage.getItem("refreshToken")});
+      if (response.status === 204) {
+        setIsAuthenticated(false);
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        navigate("/login");
+      }
+    }
+    logout();
+  }
 
   useEffect(() => {
     setMenuState("Profile");
   }, []);
   
-  function handleLogout() {
-    setIsAuthenticated(false);
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    navigate("/login");
-  }
-
   return (
     <div className="min-h-screen h-full w-full max-w-full bg-grey flex px-4 text-white font-bold font play flex-col items-center relative">
         <h1 className="text-center w-full pt-8 text-2xl mb-2">{user.name}</h1>

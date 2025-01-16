@@ -37,8 +37,6 @@ function Main() {
     return JSON.parse(decodedPayload);
   }
 
-  console.log(decodeJWT(localStorage.getItem("accessToken")).sub);
-
   useEffect(() => {
     setMenuState("Main");
     const fetchData = async () => {

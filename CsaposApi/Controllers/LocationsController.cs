@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using CsaposApi.Models;
 using static CsaposApi.Models.DTOs.LocationDTO;
 using Microsoft.AspNetCore.Authorization;
+using static CsaposApi.Models.DTOs.BookingDTO;
+using System.Net;
 
 namespace CsaposApi.Controllers
 {
@@ -45,98 +47,52 @@ namespace CsaposApi.Controllers
             return Ok(location);
         }
 
-        // PUT: api/Locations/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        [Authorize(Policy = "MustBeAdmin")]
-        public async Task<IActionResult> PutLocation(Guid id, Location location)
-        {
-            if (id != location.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(location).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!LocationExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Locations
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        [Authorize(Policy = "MustBeAdmin")]
-        public async Task<ActionResult<Location>> PostLocation(CreateLocationDTO createLocationDTO)
+        [Authorize(Policy = "MustBeGuest")]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult> CreateLocation(CreateLocationDTO createLocationDTO)
         {
-
-
-            Guid currentGuid = Guid.NewGuid();
-
-            Location location = new Location
+            if (!ModelState.IsValid)
             {
-                Id = currentGuid,
-                Name = createLocationDTO.name,
-                Description = createLocationDTO.description,
-                Capacity = createLocationDTO.capacity,
-                NumberOfTables = createLocationDTO.numberOfTables,
-                Rating = -1, // Unrated
-                IsHighlighted = false,
-                IsOpen = true,
-                CreatedAt = DateTime.UtcNow,
-                ImgUrl = $"{currentGuid}.webp"
-            };
-
-            _context.Locations.Add(location);
+                return BadRequest(new
+                {
+                    error = "invalid_request",
+                    message = "Request body is missing, malformed, or incomplete."
+                });
+            }
 
             try
             {
+                var currentLocation = new Location
+                {
+                    Id = Guid.NewGuid(),
+                    Name = createLocationDTO.name,
+                    Description = createLocationDTO.description,
+                    Capacity = createLocationDTO.capacity,
+                    NumberOfTables = createLocationDTO.numberOfTables,
+                    Rating = -1,
+                    IsHighlighted = false,
+                    IsOpen = true,
+                    CreatedAt = DateTime.Now,
+                    ImgUrl = "string",
+                };
+
+                await _context.Locations.AddAsync(currentLocation);
                 await _context.SaveChangesAsync();
+
+                return Ok();
             }
-            catch (DbUpdateException)
+            catch (Exception)
             {
-                if (LocationExists(location.Id))
+                return StatusCode((int)HttpStatusCode.InternalServerError, new
                 {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
+                    error = "server_error",
+                    message = "An unexpected error occurred while updating the password.",
+                });
             }
-
-            return CreatedAtAction("GetLocation", new { id = location.Id }, location);
-        }
-
-        // DELETE: api/Locations/5
-        [HttpDelete("{id}")]
-        [Authorize(Policy = "MustBeAdmin")]
-        public async Task<IActionResult> DeleteLocation(string id)
-        {
-            var location = await _context.Locations.FindAsync(id);
-            if (location == null)
-            {
-                return NotFound();
-            }
-
-            _context.Locations.Remove(location);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
         }
 
         private bool LocationExists(Guid id)

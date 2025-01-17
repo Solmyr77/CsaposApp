@@ -217,7 +217,7 @@ namespace CsaposApi.Controllers
         /// <param name="refreshTokenRequestDto">Refresh token.</param>
         /// <returns>Ok on success, otherwise an error response.</returns>
         [HttpPut("update-password")]
-        [AllowAnonymous]
+        [Authorize(Policy = "MustBeGuest")]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.Unauthorized)]
@@ -254,7 +254,7 @@ namespace CsaposApi.Controllers
                     return Unauthorized(new
                     {
                         error = "invalid_token",
-                        message = "The token does not contain a valid subject (sub) claim."
+                        message = "The token does not contain a valid subject claim."
                     });
                 }
 
@@ -298,7 +298,7 @@ namespace CsaposApi.Controllers
                     message = ex.Message
                 });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError, new
                 {

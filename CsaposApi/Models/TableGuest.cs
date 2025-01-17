@@ -9,9 +9,9 @@ public partial class TableGuest
 
     public Guid? UserId { get; set; }
 
-    public Guid? TableId { get; set; }
+    public Guid? BookingId { get; set; }
 
-    public virtual Table? Table { get; set; }
+    public virtual TableBooking? Booking { get; set; }
 
     public virtual User? User { get; set; }
 }

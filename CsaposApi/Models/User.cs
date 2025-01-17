@@ -31,7 +31,7 @@ public partial class User
 
     public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 
-    public virtual ICollection<TableGuest> TableGuests { get; set; } = new List<TableGuest>();
+    public virtual ICollection<TableBooking> TableBookings { get; set; } = new List<TableBooking>();
 
-    public virtual ICollection<Table> Tables { get; set; } = new List<Table>();
+    public virtual ICollection<TableGuest> TableGuests { get; set; } = new List<TableGuest>();
 }

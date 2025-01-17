@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using CsaposApi.Models;
 using static CsaposApi.Models.DTOs.TableDTO;
 using Microsoft.AspNetCore.Authorization;
+using static CsaposApi.Models.DTOs.LocationDTO;
+using System.Net;
 
 namespace CsaposApi.Controllers
 {
@@ -45,87 +47,47 @@ namespace CsaposApi.Controllers
             return Ok(table);
         }
 
-        // PUT: api/Tables/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        [Authorize(Policy = "MustBeAdmin")]
-        public async Task<IActionResult> PutTable(Guid id, Table table)
-        {
-            if (id != table.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(table).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TableExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Tables
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        [Authorize(Policy = "MustBeAdmin")]
-        public async Task<ActionResult<Table>> PostTable(CreateTableDTO createTableDTO)
+        [Authorize(Policy = "MustBeGuest")]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult> CreateTable(CreateTableDTO createTableDTO)
         {
-            Table table = new Table
+            if (!ModelState.IsValid)
             {
-                Id = Guid.NewGuid(),
-                Number = createTableDTO.number,
-                Capacity = createTableDTO.capacity,
-                LocationId = createTableDTO.locationId
-            };
+                return BadRequest(new
+                {
+                    error = "invalid_request",
+                    message = "Request body is missing, malformed, or incomplete."
+                });
+            }
 
-            _context.Tables.Add(table);
             try
             {
+                var currentTable = new Table
+                {
+                    Id = Guid.NewGuid(),
+                    Number = createTableDTO.number,
+                    Capacity = createTableDTO.capacity,
+                    IsBooked = false,
+
+                };
+
+                await _context.Tables.AddAsync(currentTable);
                 await _context.SaveChangesAsync();
+
+                return Ok();
             }
-            catch (DbUpdateException)
+            catch (Exception)
             {
-                if (TableExists(table.Id))
+                return StatusCode((int)HttpStatusCode.InternalServerError, new
                 {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
+                    error = "server_error",
+                    message = "An unexpected error occurred while updating the password.",
+                });
             }
-
-            return CreatedAtAction("GetTable", new { id = table.Id }, table);
-        }
-
-        // DELETE: api/Tables/5
-        [HttpDelete("{id}")]
-        [Authorize(Policy = "MustBeAdmin")]
-        public async Task<IActionResult> DeleteTable(string id)
-        {
-            var table = await _context.Tables.FindAsync(id);
-            if (table == null)
-            {
-                return NotFound();
-            }
-
-            _context.Tables.Remove(table);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
         }
 
         private bool TableExists(Guid id)

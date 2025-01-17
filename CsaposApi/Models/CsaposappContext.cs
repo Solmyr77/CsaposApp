@@ -33,6 +33,8 @@ public partial class CsaposappContext : DbContext
 
     public virtual DbSet<Table> Tables { get; set; }
 
+    public virtual DbSet<TableBooking> TableBookings { get; set; }
+
     public virtual DbSet<TableGuest> TableGuests { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
@@ -336,18 +338,9 @@ public partial class CsaposappContext : DbContext
 
             entity.ToTable("tables");
 
-            entity.HasIndex(e => e.BookerId, "booker_id");
-
             entity.HasIndex(e => e.LocationId, "location_id");
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.BookedFrom)
-                .HasColumnType("datetime")
-                .HasColumnName("booked_from");
-            entity.Property(e => e.BookedTo)
-                .HasColumnType("datetime")
-                .HasColumnName("booked_to");
-            entity.Property(e => e.BookerId).HasColumnName("booker_id");
             entity.Property(e => e.Capacity)
                 .HasColumnType("tinyint(4)")
                 .HasColumnName("capacity");
@@ -357,15 +350,41 @@ public partial class CsaposappContext : DbContext
                 .HasColumnType("int(11)")
                 .HasColumnName("number");
 
-            entity.HasOne(d => d.Booker).WithMany(p => p.Tables)
-                .HasForeignKey(d => d.BookerId)
-                .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("tables_ibfk_1");
-
             entity.HasOne(d => d.Location).WithMany(p => p.Tables)
                 .HasForeignKey(d => d.LocationId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("tables_ibfk_2");
+        });
+
+        modelBuilder.Entity<TableBooking>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("table_bookings");
+
+            entity.HasIndex(e => e.BookerId, "booker_id");
+
+            entity.HasIndex(e => new { e.TableId, e.BookerId }, "table_id");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.BookedFrom)
+                .HasColumnType("datetime")
+                .HasColumnName("booked_from");
+            entity.Property(e => e.BookedTo)
+                .HasColumnType("datetime")
+                .HasColumnName("booked_to");
+            entity.Property(e => e.BookerId).HasColumnName("booker_id");
+            entity.Property(e => e.TableId).HasColumnName("table_id");
+
+            entity.HasOne(d => d.Booker).WithMany(p => p.TableBookings)
+                .HasForeignKey(d => d.BookerId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("table_bookings_ibfk_1");
+
+            entity.HasOne(d => d.Table).WithMany(p => p.TableBookings)
+                .HasForeignKey(d => d.TableId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("table_bookings_ibfk_2");
         });
 
         modelBuilder.Entity<TableGuest>(entity =>
@@ -374,16 +393,16 @@ public partial class CsaposappContext : DbContext
 
             entity.ToTable("table_guests");
 
-            entity.HasIndex(e => e.TableId, "table_id");
+            entity.HasIndex(e => e.BookingId, "booking_id");
 
             entity.HasIndex(e => e.UserId, "user_id");
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.TableId).HasColumnName("table_id");
+            entity.Property(e => e.BookingId).HasColumnName("booking_id");
             entity.Property(e => e.UserId).HasColumnName("user_id");
 
-            entity.HasOne(d => d.Table).WithMany(p => p.TableGuests)
-                .HasForeignKey(d => d.TableId)
+            entity.HasOne(d => d.Booking).WithMany(p => p.TableGuests)
+                .HasForeignKey(d => d.BookingId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("table_guests_ibfk_2");
 

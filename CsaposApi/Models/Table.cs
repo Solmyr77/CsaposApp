@@ -15,17 +15,9 @@ public partial class Table
 
     public Guid LocationId { get; set; }
 
-    public Guid BookerId { get; set; }
-
-    public DateTime BookedFrom { get; set; }
-
-    public DateTime BookedTo { get; set; }
-
-    public virtual User Booker { get; set; } = null!;
-
     public virtual Location Location { get; set; } = null!;
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
-    public virtual ICollection<TableGuest> TableGuests { get; set; } = new List<TableGuest>();
+    public virtual ICollection<TableBooking> TableBookings { get; set; } = new List<TableBooking>();
 }

@@ -84,14 +84,14 @@ function ModifyModal({ isModifyModalVisible, setIsModifyModalVisible }) {
                 <PencilSquareIcon className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-12"/>
                 <input id="fileInput" type="file" style={{"display" : "none"}} onChange={(event) => handleImageUpload(event)}/>
               </div>
-              <div className="flex flex-col items-center w-full">
+              <div className="flex flex-col justify-between items-center w-full mt-2">
                 <label className="text-left w-full font-normal">Felhasználónév</label>
                 <input defaultValue={user.name} id="username" name="username" type="text" className="w-full bg-dark-grey px-5 py-2 rounded-md font-normal mt-0.5 focus:outline-none" onChange={(event) => {
                   setNewUsername(event.target.value.trim());
                   setErrorMessage("");
                   }} required/>
                 <p className={`text-red-500 text-center font-normal ${errorMessage !== "" ? "visible" : "invisible"}`}>{errorMessage}</p>
-                <input type="submit" value="Mentés" className="bg-dark-grey w-fit py-2 px-3 my-2 rounded-md text-blue drop-shadow-[0px_2px_2px_rgba(0,0,0,.5)] hover:cursor-pointer"/>
+                <input type="submit" value="Mentés" className="bg-dark-grey w-fit py-2 px-3 mt-2 rounded-md text-blue drop-shadow-[0px_2px_2px_rgba(0,0,0,.5)] hover:cursor-pointer"/>
               </div>
             </form>
           </div> : 

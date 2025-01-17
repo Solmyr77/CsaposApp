@@ -11,7 +11,8 @@ function PasswordModal( { isPasswordModalVisible, setIsPasswordModalVisible } ) 
     event.preventDefault();
     if (password1.trim() !== "" && password2.trim() !== "") {
       if (password1 === password2) {
-        event.target.reset();
+        setPassword1("");
+        setPassword2("");
         setIsSucceeded(true);
         setTimeout(() => {
           setIsSucceeded(false);
@@ -22,14 +23,12 @@ function PasswordModal( { isPasswordModalVisible, setIsPasswordModalVisible } ) 
         setErrorMessage("A megadott jelszavak nem egyeznek!");
         setPassword1("");
         setPassword2("");
-        event.target.reset();
       }
     }
     else {
       setErrorMessage("Kötelező megadnod jelszavat!");
       setPassword1("");
       setPassword2("");
-      event.target.reset();
     }
   }
 
@@ -46,24 +45,30 @@ function PasswordModal( { isPasswordModalVisible, setIsPasswordModalVisible } ) 
         {
         isSucceeded === false ?  
         <div>
-          <p className="text-md pt-4 text-center mb-6">Jelszó módosítása</p>
-          <form className="flex flex-col h-full justify-between items-center px-2" onSubmit={(event) => handleSubmit(event)}>
+          <form className="flex flex-col h-80 justify-between items-center px-2" onSubmit={(event) => handleSubmit(event)}>
+              <p className="text-md pt-4 text-center mb-6">Jelszó módosítása</p>
               <div className="w-full">
                   <label className="text-left min-w-full font-normal">Új jelszó</label>
-                  <input id="newpassword1" name="newpassword1" type="password" className="w-full bg-dark-grey px-5 py-2 rounded-md font-normal mt-0.5 focus:outline-none" onChange={(event) => {
+                  <input id="newpassword1" name="newpassword1" type="password" value={password1} className="w-full bg-dark-grey px-5 py-2 rounded-md font-normal mt-0.5 focus:outline-none" onChange={(event) => {
                     setErrorMessage("");
                     setPassword1(event.target.value);
+                    console.log(event.target.value);
+                    console.log("sdfsdf")
                   }} required/>
               </div>
               <div className="w-full">
                   <label className="text-left w-full font-normal">Új jelszó újra</label>
-                  <input id="newpassword2" name="newpassword2" type="password" className="w-full bg-dark-grey px-5 py-2 rounded-md font-normal mt-0.5 focus:outline-none" onChange={(event) => {
+                  <input id="newpassword2" name="newpassword2" type="password" value={password2} className="w-full bg-dark-grey px-5 py-2 rounded-md font-normal mt-0.5 focus:outline-none" onChange={(event) => {
                     setErrorMessage("");
                     setPassword2(event.target.value);
+                    console.log(event.target.value);
+                    console.log("sdfsdf")
                   }} required/>
               </div>
-              <p className={`text-red-500 text-center font-normal ${errorMessage !== "" ? "visible" : "invisible"}`}>{errorMessage}</p>
-              <input type="submit" value="Mentés" className="bg-dark-grey w-fit py-2 px-3 my-2 rounded-md text-blue drop-shadow-[0px_2px_2px_rgba(0,0,0,.5)] hover:cursor-pointer"/>
+              <div className="flex flex-col items-center">
+                <p className={`text-red-500 text-center font-normal ${errorMessage !== "" ? "visible" : "invisible"}`}>{errorMessage}</p>
+                <input type="submit" value="Mentés" className="bg-dark-grey w-fit py-2 px-3 my-2 rounded-md text-blue drop-shadow-[0px_2px_2px_rgba(0,0,0,.5)] hover:cursor-pointer"/>
+              </div>
           </form>
         </div> : 
         <div className="flex h-full w-full justify-center items-center">

@@ -25,5 +25,11 @@ namespace CsaposApi.Services
                 return Convert.ToBase64String(hashBytes);
             }
         }
+
+        public bool VerifyPassword(string inputPassword, string storedPasswordHash, string salt)
+        {
+            var inputPasswordHash = HashPassword(inputPassword, salt);
+            return storedPasswordHash == inputPasswordHash;
+        }
     }
 }

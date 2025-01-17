@@ -407,6 +407,9 @@ public partial class CsaposappContext : DbContext
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("timestamp")
                 .HasColumnName("created_at");
+            entity.Property(e => e.DisplayName)
+                .HasMaxLength(50)
+                .HasColumnName("display_name");
             entity.Property(e => e.ImgUrl)
                 .HasMaxLength(255)
                 .HasColumnName("img_url");

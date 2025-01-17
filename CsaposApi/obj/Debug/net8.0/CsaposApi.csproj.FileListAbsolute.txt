@@ -316,12 +316,9 @@ C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\System.Composition.
 C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\System.Composition.Runtime.dll
 C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\System.Composition.TypedParts.dll
 C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\System.Configuration.ConfigurationManager.dll
-C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\System.Diagnostics.DiagnosticSource.dll
-C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\System.Formats.Asn1.dll
 C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\System.Reflection.MetadataLoadContext.dll
 C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\System.Security.Cryptography.ProtectedData.dll
 C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\System.Security.Permissions.dll
-C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\System.Text.Json.dll
 C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\System.Windows.Extensions.dll
 C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\ZstdSharp.dll
 C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\af\Humanizer.resources.dll
@@ -499,3 +496,7 @@ C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\Microsoft.IdentityM
 C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
 C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\CsaposApi.staticwebassets.endpoints.json
+C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\obj\Debug\net8.0\staticwebassets\msbuild.CsaposApi.Microsoft.AspNetCore.StaticWebAssetEndpoints.props
+C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Crypto.Generators;
 using System.ComponentModel.DataAnnotations;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Text;
 using static CsaposApi.Models.DTOs.AuthDTO;
@@ -108,6 +110,7 @@ namespace CsaposApi.Controllers
             {
                 Id = userId,
                 Username = registerUserDto.Username,
+                DisplayName = registerUserDto.LegalName,
                 PasswordHash = passwordHash,
                 Salt = salt,
                 LegalName = registerUserDto.LegalName,
@@ -207,5 +210,103 @@ namespace CsaposApi.Controllers
                 });
             }
         }
+
+        /// <summary>
+        /// Update an existing password using a valid access token.
+        /// </summary>
+        /// <param name="refreshTokenRequestDto">Refresh token.</param>
+        /// <returns>Ok on success, otherwise an error response.</returns>
+        [HttpPut("update-password")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> UpdatePassword([FromBody][Required] PasswordUpdateDTO passwordUpdateDTO)
+        {
+            if (!ModelState.IsValid || passwordUpdateDTO == null || string.IsNullOrWhiteSpace(passwordUpdateDTO.AccessToken))
+            {
+                return BadRequest(new
+                {
+                    error = "malformed_request",
+                    message = "Request body is missing, malformed, or incomplete."
+                });
+            }
+
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+
+                if (!tokenHandler.CanReadToken(passwordUpdateDTO.AccessToken))
+                {
+                    return Unauthorized(new
+                    {
+                        error = "invalid_token",
+                        message = "The access token is invalid or unreadable."
+                    });
+                }
+
+                var tokenObject = tokenHandler.ReadJwtToken(passwordUpdateDTO.AccessToken);
+                var subClaimValue = tokenObject.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+
+                if (string.IsNullOrWhiteSpace(subClaimValue) || !Guid.TryParse(subClaimValue, out Guid subClaim))
+                {
+                    return Unauthorized(new
+                    {
+                        error = "invalid_token",
+                        message = "The token does not contain a valid subject (sub) claim."
+                    });
+                }
+
+                var user = await _context.Users.FirstOrDefaultAsync(usr => usr.Id == subClaim);
+
+                if (user == null)
+                {
+                    return NotFound(new
+                    {
+                        error = "user_not_found",
+                        message = "The user associated with the token could not be found."
+                    });
+                }
+
+                if (!_passwordService.VerifyPassword(passwordUpdateDTO.CurrentPassword, user.PasswordHash, user.Salt))
+                {
+                    return Unauthorized(new
+                    {
+                        error = "invalid_credentials",
+                        message = "The current password is incorrect."
+                    });
+                }
+
+                var newSalt = _passwordService.GenerateSalt();
+                user.PasswordHash = _passwordService.HashPassword(passwordUpdateDTO.NewPassword, newSalt);
+                user.Salt = newSalt;
+
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    message = "Password updated successfully."
+                });
+            }
+            catch (SecurityTokenException ex)
+            {
+                return Unauthorized(new
+                {
+                    error = "invalid_token",
+                    message = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, new
+                {
+                    error = "server_error",
+                    message = "An unexpected error occurred while updating the password.",
+                });
+            }
+        }
+
     }
 }

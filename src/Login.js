@@ -1,11 +1,14 @@
 import React, { useContext, useState } from "react";
-import { data, Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Context from "./Context";
-import { UserCircleIcon, EyeIcon, LockClosedIcon } from "@heroicons/react/24/outline";
+import { UserCircleIcon, EyeIcon, LockClosedIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
 
 function Login() {
   const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const { setIsAuthenticated } = useContext(Context);
 
@@ -18,24 +21,29 @@ function Login() {
         localStorage.setItem("refreshToken", JSON.stringify(data.refreshToken));
         return true;
       }
-      else {
-        setErrorMessage("Hibás felhasználónév vagy jelszó!");
-        return false;
-      }
     } 
-    catch {
-      setErrorMessage("Hálózati hiba!");
+    catch (error) {
+      if (error.response?.status === 401) {
+        setErrorMessage("Hibás felhasználónév vagy jelszó!");
+      }
       return false;
     }
   }
   
   async function validateLogin(event) {
     event.preventDefault();
-    const username = event.target.username;
-    const password = event.target.password;
-    if (await handleLogin(username.value, password.value)) {
-      setIsAuthenticated(true);
-      navigate("/");
+    if (username.trim() !==  "" && password.trim() !==  "") {
+      if (await handleLogin(username, password)) {
+        setIsAuthenticated(true);
+        localStorage.setItem("password", password);
+        navigate("/");
+      }
+    }
+    else if (username.trim() === "") {
+      setErrorMessage("Kötelező megadnod felhasználónevet!");
+    }
+    else if (password.trim() === "") {
+      setErrorMessage("Kötelező megadnod jelszavat!");
     }
   }
 
@@ -45,13 +53,28 @@ function Login() {
         <form className="flex flex-col mt-8 justify-evenly items-center" onSubmit={(event) => validateLogin(event)}>
             <label className="text-left w-full">Felhasználónév</label>
             <div className="relative mt-0.5 mb-4">
-              <input name="username" type="text" className="w-full bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none" required onChange={() => setErrorMessage("")}/>
+              <input name="username" type="text" value={username} className="w-full bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none" required onChange={(event) => {
+                setErrorMessage("");
+                setUsername(event.target.value);
+              }}/>
               <UserCircleIcon className="w-6 absolute top-1/2 right-2 -translate-y-1/2"/>
             </div>
             <label className="text-left w-full">Jelszó</label>
             <div className="relative mt-0.5 mb-4">
-              <input name="password" type="password" className="w-full bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none" required onChange={() => setErrorMessage("")}/>
-              <LockClosedIcon className="w-6 absolute top-1/2 right-2 -translate-y-1/2"/>
+              <input name="password" type={`${isPasswordVisible ? "text" : "password"}`} value={password} className="w-full bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none" required onChange={(event) => {
+                setErrorMessage("");
+                password === "" && setIsPasswordVisible(false);
+                setPassword(event.target.value);
+              }}/>
+              {
+                password === "" ? 
+                <LockClosedIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2`}/> 
+                : 
+                <div>
+                  <EyeIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPasswordVisible ? "invisible" : "visible"}`} onClick={() => setIsPasswordVisible(true)}/>
+                  <EyeSlashIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPasswordVisible ? "visible" : "invisible"}`} onClick={() =>setIsPasswordVisible(false)}/>
+                </div>
+              }
             </div>
             <p id="errorText" className={`text-center text-red-500 text-wrap max-w-40 ${errorMessage !== "" ? "visible" : "invisible"}`}>{errorMessage}</p>
             <button type="submit" className="w-full h-16 bg-blue rounded font-bold text-lg mt-4">Bejelentkezés</button>

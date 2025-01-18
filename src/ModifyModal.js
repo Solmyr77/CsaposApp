@@ -4,15 +4,15 @@ import Context from "./Context";
 
 function ModifyModal({ isModifyModalVisible, setIsModifyModalVisible }) {
   const { user, setUser } = useContext(Context);
-  const [newUsername, setNewUsername] = useState(user.name);
+  const [newprofilename, setNewProfileName] = useState(user.name);
   const [profilePicture, setProfilePicture] = useState(user.image);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSucceeded, setIsSucceeded] = useState(false);
   
   useEffect(() => {
     if (isModifyModalVisible) {
-      document.getElementById("username").value = user.name;
-      setNewUsername(user.name);
+      document.getElementById("profilename").value = user.name;
+      setNewProfileName(user.name);
       setErrorMessage("");
     }
   }, [isModifyModalVisible])
@@ -54,9 +54,9 @@ function ModifyModal({ isModifyModalVisible, setIsModifyModalVisible }) {
 
   function handleSubmit(event) {
     event.preventDefault();
-    if (event.target.username.value.trim() !== "") {
-      setUser({name: newUsername, image: profilePicture});
-      localStorage.setItem("user", JSON.stringify({name: newUsername, image: profilePicture}));
+    if (event.target.profilename.value.trim() !== "") {
+      setUser({name: newprofilename, image: profilePicture});
+      localStorage.setItem("user", JSON.stringify({name: newprofilename, image: profilePicture}));
       setIsSucceeded(true);
       setTimeout(() => {
         setIsSucceeded(false);
@@ -65,8 +65,8 @@ function ModifyModal({ isModifyModalVisible, setIsModifyModalVisible }) {
     }
     else {
       setErrorMessage("Kötelező megadnod felhasználónevet!")
-      event.target.username.value = "";
-      setNewUsername(event.target.username.value);
+      event.target.profilename.value = "";
+      setNewProfileName(event.target.profilename.value);
     }
   }
 
@@ -85,9 +85,9 @@ function ModifyModal({ isModifyModalVisible, setIsModifyModalVisible }) {
                 <input id="fileInput" type="file" style={{"display" : "none"}} onChange={(event) => handleImageUpload(event)}/>
               </div>
               <div className="flex flex-col justify-between items-center w-full mt-2">
-                <label className="text-left w-full font-normal">Felhasználónév</label>
-                <input defaultValue={user.name} id="username" name="username" type="text" className="w-full bg-dark-grey px-5 py-2 rounded-md font-normal mt-0.5 focus:outline-none" onChange={(event) => {
-                  setNewUsername(event.target.value.trim());
+                <label className="text-left w-full font-normal">Profilnév</label>
+                <input defaultValue={user.name} id="profilename" name="profilename" type="text" className="w-full bg-dark-grey px-5 py-2 rounded-md font-normal mt-0.5 focus:outline-none" onChange={(event) => {
+                  setNewProfileName(event.target.value.trim());
                   setErrorMessage("");
                   }} required/>
                 <p className={`text-red-500 text-center font-normal ${errorMessage !== "" ? "visible" : "invisible"}`}>{errorMessage}</p>

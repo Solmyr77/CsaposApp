@@ -19,7 +19,6 @@ code {
 }
 
 input[type=date] {
-  -webkit-appearance: none;
   appearance: none;
   min-height: 40px;
   height: 100%;

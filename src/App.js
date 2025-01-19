@@ -8,6 +8,7 @@ import Pub from './Pub';
 import Register from './Register';
 import Login from './Login';
 import ProtectedRoute from './ProtectedRoute';
+import Notifications from './Notifications';
 
 function App() {
   return (
@@ -34,6 +35,10 @@ function App() {
           <Route path="/pub/:name" element={
             <ProtectedRoute isProtected={true}>
               <Pub />
+            </ProtectedRoute>}/>
+          <Route path="/notifications" element={
+            <ProtectedRoute isProtected={true}>
+              <Notifications />
             </ProtectedRoute>}/>
           <Route path="/register" element={
             <ProtectedRoute>

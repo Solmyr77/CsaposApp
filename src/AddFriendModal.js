@@ -21,12 +21,11 @@ function AddFriendModal({ isAddFriendModalVisible, setIsAddFriendModalVisible })
           {recordsToDisplay.map((record) => {
             if (record === recordsToDisplay[recordsToDisplay.length - 1]) {
               return (
-                <div>
+                <div className="mb-2">
                   <Friend name={record.name} image={user.image}/>
                 </div>
               )
             }
-
             return (
               <div>
                 <Friend name={record.name} image={user.image}/>

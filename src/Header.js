@@ -13,7 +13,9 @@ function Header({ notification }) {
           <p className="ml-3 text-lg text-white">Szia {user.name}!</p>
       </div>
       <div className="relative">
-      <EnvelopeIcon className="text-white h-6"></EnvelopeIcon>
+      <Link to={"/notifications"}>
+        <EnvelopeIcon className="text-white h-6"></EnvelopeIcon>
+      </Link>
       {
         notification == true && <div className="absolute bg-red-500 top-0 -right-[.125rem] w-2 h-2 rounded-full"></div>
       }

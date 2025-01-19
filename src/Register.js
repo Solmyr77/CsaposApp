@@ -41,17 +41,27 @@ function Register() {
   }
 
   async function handleRegister() {
-    const response = await axios.post("https://backend.csaposapp.hu/api/auth/register",
-      {
-        username: username,
-        password: password1,
-        legalName: legalName,
-        birthDate: birthDate
-      })
-    if (response.status === 201) {
-      return true;
+    try {
+      const response = await axios.post("https://backend.csaposapp.hu/api/auth/register",
+        {
+          username: username,
+          password: password1,
+          legalName: legalName,
+          birthDate: birthDate
+        })
+      if (response.status === 201) {
+        return true;
+      } 
     } 
-    return false;
+    catch (error) {
+      if (error.response?.status === 409)
+      {
+        setErrorMessage("Ez a felhasználónév már foglalt!");
+        setUsername("");
+        console.log(username);
+      }
+      return false;
+    }
   }
 
   function validateForm(event) {
@@ -92,20 +102,20 @@ function Register() {
           <form className="flex flex-col mt-8 justify-evenly items-center" onSubmit={(event) => validateForm(event)}>
           <label className="text-left w-full">Teljes név</label>
           <div className="relative mt-0.5 mb-4">
-            <input type="text" name="fullname" className="w-full bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none" required onChange={(event) => {
+            <input type="text" name="fullname" value={legalName} className="w-full bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none" required onChange={(event) => {
               setLegalName(event.target.value);
               setErrorMessage("");
             }}/>
             <IdentificationIcon className="w-5 absolute top-1/2 right-2 -translate-y-1/2"/>
           </div>
           <label className="text-left w-full">Születési idő</label>
-          <input id="date" name="birthdate" type="date" className="bg-dark-grey px-5 rounded-md py-2 text-white mt-0.5 mb-4 w-full focus:outline-none" max={date.getFullYear()} required onChange={(event) => {
+          <input id="date" name="birthdate" value={birthDate} type="date" className="bg-dark-grey px-5 rounded-md py-2 text-white mt-0.5 mb-4 w-full focus:outline-none" max={date.getFullYear()} required onChange={(event) => {
               setBirthDate(event.target.value);
               setErrorMessage("");
             }}/>
           <label className="text-left w-full">Email cím</label>
           <div className="relative mt-0.5 mb-4">
-            <input type="email" className="w-full bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none" required onChange={(event) => {
+            <input type="email" value={email} className="w-full bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none" required onChange={(event) => {
               setEmail(event.target.value);
               setErrorMessage("");
             }}/>
@@ -113,7 +123,7 @@ function Register() {
           </div>
           <label className="text-left w-full">Felhasználónév</label>
           <div className="relative mt-0.5 mb-4">
-            <input type="text" name="username" className="w-full bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none" required onChange={(event) => {
+            <input type="text" name="username" value={username} className="w-full bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none" required onChange={(event) => {
               setUsername(event.target.value);
               setErrorMessage("");
             }}/>
@@ -121,7 +131,7 @@ function Register() {
           </div>
           <label className="text-left w-full">Jelszó</label>
           <div className="relative mt-0.5 mb-4">
-            <input type={`${isPassword1Visible ? "text" : "password"}`} id="password1" name="password1" className="w-full bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none" required onChange={(event) => {
+            <input type={`${isPassword1Visible ? "text" : "password"}`} id="password1" name="password1" value={password1} className="w-full bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none" required onChange={(event) => {
               setPassword1(event.target.value);
               if (event.target.value === "") setIsPassword1Visible(false);
               setErrorMessage("");
@@ -137,7 +147,7 @@ function Register() {
           </div>
           <label className="text-left w-full">Jelszó újra</label>
           <div className="relative mt-0.5 mb-4">
-            <input type={`${isPassword2Visible ? "text" : "password"}`} name="password2" className="w-full bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none" required onChange={(event) => {
+            <input type={`${isPassword2Visible ? "text" : "password"}`} name="password2" value={password2} className="w-full bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none" required onChange={(event) => {
               setPassword2(event.target.value);
               if (event.target.value === "") setIsPassword2Visible(false);
               setErrorMessage("");

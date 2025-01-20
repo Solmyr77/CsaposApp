@@ -6,7 +6,7 @@ import { Outlet } from "react-router-dom";
 function Layout() {
   return (
     <div className="bg-grey min-h-screen">
-        <Header/>
+        <Header notification={true}/>
         <main>
             <Outlet/>
         </main>

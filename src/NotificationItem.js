@@ -5,18 +5,19 @@ import Context from "./Context";
 function NotificationItem({ isFriendRequest }) {
   const [isAccepted, setIsAccepted] = useState(null);
   const [Icon, setIcon] = useState(null);
+  const [isRead, setIsRead] = useState(null);
   const { user } = useContext(Context);
 
   const importIcon = async() => {
     if (isAccepted === true) {
-        return await import("@heroicons/react/20/solid/CheckCircleIcon");
+      return await import("@heroicons/react/20/solid/CheckCircleIcon");
     }
     return await import("@heroicons/react/20/solid/XCircleIcon");
   }
   
   useEffect(() => {
     const run = async() => {
-        setIcon((await importIcon()).default);
+      setIcon((await importIcon()).default);
     }
     run();
   }, [isAccepted]);
@@ -43,10 +44,10 @@ function NotificationItem({ isFriendRequest }) {
     )
   }
   return (
-    <div className="w-full h-16 bg-dark-grey rounded-md flex flex-row items-center p-4">
+    <div className="w-full h-16 bg-dark-grey rounded-md flex flex-row items-center p-4" onClick={() => setIsRead(true)}>
         <div className="relative">
             <EnvelopeIcon className="h-10"/>
-            <div className="absolute top-0.5 -right-[.125rem] rounded-full w-3 aspect-square bg-red-500"></div>
+            <div className={`absolute top-0.5 -right-[.125rem] rounded-full w-3 aspect-square bg-red-500 ${isRead ? "invisible" : "visible"}`}></div>
         </div>
         <div className="flex flex-col w-full pl-4">
             <p className="text-sm font-bold text-left">Azahriah koncert a Félidőben!</p>

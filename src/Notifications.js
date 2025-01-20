@@ -1,10 +1,31 @@
-import React from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import BackButton from "./BackButton";
 import NotificationItem from "./NotificationItem";
 import NavItem from "./NavItem";
+import Context from "./Context";
 
 function Notifications() {
+    const [recordsToDisplay, setRecordsToDisplay] = useState([]);
+    const { notificationFilter } = useContext(Context);
+
+    const friendRecords = Array(5).fill(<NotificationItem isFriendRequest={true}/>);
+    const eventRecords = Array(5).fill(<NotificationItem/>);
+    
+    useEffect(() => {
+        switch (notificationFilter) {
+            case "Összes":
+                setRecordsToDisplay(friendRecords.concat(eventRecords));
+                break;
+            case "Események":
+                setRecordsToDisplay(eventRecords);
+                break;
+            case "Barát felkérések":
+                setRecordsToDisplay(friendRecords);
+                break;
+        }
+    }, [notificationFilter]);
+
   return (
     <div className="w-full h-screen bg-grey py-8 px-4 text-white flex flex-col overflow-hidden">
         <Link to={"/"}><BackButton/></Link>
@@ -15,32 +36,9 @@ function Notifications() {
             <NavItem title={"Barát felkérések"} isNotificationPage={true}/>
         </div>
         <div className="flex flex-col mt-4 gap-y-2 pr-1 overflow-y-auto">
-            <NotificationItem />
-            <NotificationItem isFriendRequest={true}/>
-            <NotificationItem isFriendRequest={true}/>
-            <NotificationItem isFriendRequest={true}/>
-            <NotificationItem isFriendRequest={true}/>
-            <NotificationItem isFriendRequest={true}/>
-            <NotificationItem isFriendRequest={true}/>
-            <NotificationItem isFriendRequest={true}/>
-            <NotificationItem isFriendRequest={true}/>
-            <NotificationItem isFriendRequest={true}/>
-            <NotificationItem isFriendRequest={true}/>
-            <NotificationItem isFriendRequest={true}/>
-            <NotificationItem isFriendRequest={true}/>
-            <NotificationItem isFriendRequest={true}/>
-            <NotificationItem isFriendRequest={true}/>
-            <NotificationItem isFriendRequest={true}/>
-            <NotificationItem isFriendRequest={true}/>
-            <NotificationItem isFriendRequest={true}/>
-            <NotificationItem isFriendRequest={true}/>
-            <NotificationItem isFriendRequest={true}/>
-            <NotificationItem isFriendRequest={true}/>
-            <NotificationItem isFriendRequest={true}/>
-            <NotificationItem isFriendRequest={true}/>
-            <NotificationItem isFriendRequest={true}/>
-            <NotificationItem isFriendRequest={true}/>
-            <NotificationItem isFriendRequest={true}/>
+            {
+                recordsToDisplay.map(record => record)
+            }
         </div>
     </div>
   );

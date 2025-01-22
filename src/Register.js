@@ -92,7 +92,9 @@ function Register() {
 
   return (
     <div className="min-h-screen w-full bg-grey text-white px-4 py-8">
-      <Link to={"/login"}><BackButton/></Link>
+      <Link to={"/login"} className="flex w-fit">
+        <BackButton/>
+      </Link>
       <div className="flex items-center flex-col">
         <h1 className="font-bold text-3xl">Regisztráció</h1>
         {
@@ -138,8 +140,8 @@ function Register() {
               password1 === "" ? 
               <LockClosedIcon className="w-6 absolute top-1/2 right-2 -translate-y-1/2"/> :
               <div>
-                <EyeIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPassword1Visible ? "invisible" : "visible"}`} onClick={() => setIsPassword1Visible(true)}/>
-                <EyeSlashIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPassword1Visible ? "visible" : "invisible"}`} onClick={() =>setIsPassword1Visible(false)}/>
+                <EyeIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPassword1Visible ? "invisible" : "visible"} hover:cursor-pointer`} onClick={() => setIsPassword1Visible(true)}/>
+                <EyeSlashIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPassword1Visible ? "visible" : "invisible"} hover:cursor-pointer`} onClick={() =>setIsPassword1Visible(false)}/>
               </div>
             }
           </div>
@@ -154,8 +156,8 @@ function Register() {
               password2 === "" ? 
               <LockClosedIcon className="w-6 absolute top-1/2 right-2 -translate-y-1/2"/> :
               <div>
-                <EyeIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPassword2Visible ? "invisible" : "visible"}`} onClick={() => setIsPassword2Visible(true)}/>
-                <EyeSlashIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPassword2Visible ? "visible" : "invisible"}`} onClick={() =>setIsPassword2Visible(false)}/>
+                <EyeIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPassword2Visible ? "invisible" : "visible"} hover:cursor-pointer`} onClick={() => setIsPassword2Visible(true)}/>
+                <EyeSlashIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPassword2Visible ? "visible" : "invisible"} hover:cursor-pointer`} onClick={() =>setIsPassword2Visible(false)}/>
               </div>
             }
           </div>

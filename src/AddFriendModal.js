@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { XMarkIcon, UserPlusIcon } from "@heroicons/react/20/solid";
 import SearchBar from "./SearchBar";
 import { useState } from "react";
@@ -10,6 +10,12 @@ import Friend from "./Friend";
 function AddFriendModal({ isAddFriendModalVisible, setIsAddFriendModalVisible }) {
   const { user, locations } = useContext(Context);
   const [recordsToDisplay, setRecordsToDisplay] = useState(locations);
+
+  useEffect(() => {
+    if (locations.length > 0) setRecordsToDisplay(locations);
+  }, [locations]);
+  
+
   return (
     <div className={`w-full min-h-screen h-full absolute top-0 left-0 bg-opacity-65 bg-black ${isAddFriendModalVisible ? "flex" : "hidden"} justify-center items-center`}>
       <div className={`w-80 min-h-80 h-96 bg-grey rounded-xl flex flex-col relative px-4`}>

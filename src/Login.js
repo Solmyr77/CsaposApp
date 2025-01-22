@@ -71,16 +71,16 @@ function Login() {
                 <LockClosedIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2`}/> 
                 : 
                 <div>
-                  <EyeIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPasswordVisible ? "invisible" : "visible"}`} onClick={() => setIsPasswordVisible(true)}/>
-                  <EyeSlashIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPasswordVisible ? "visible" : "invisible"}`} onClick={() =>setIsPasswordVisible(false)}/>
+                  <EyeIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPasswordVisible ? "invisible" : "visible"} hover:cursor-pointer`} onClick={() => setIsPasswordVisible(true)}/>
+                  <EyeSlashIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPasswordVisible ? "visible" : "invisible"} hover:cursor-pointer`} onClick={() =>setIsPasswordVisible(false)}/>
                 </div>
               }
             </div>
             <p id="errorText" className={`text-center text-red-500 text-wrap max-w-40 ${errorMessage !== "" ? "visible" : "invisible"}`}>{errorMessage}</p>
-            <button type="submit" className="w-full h-16 bg-blue rounded font-bold text-lg mt-4">Bejelentkezés</button>
+            <button type="submit" className="w-full h-16 bg-blue rounded font-bold text-lg mt-4 select-none">Bejelentkezés</button>
         </form>
         <p className="mt-8">Még nincs fiókod?</p>
-        <Link to="/register"><button className="w-full bg-dark-grey text-blue py-2 px-4 rounded-md mt-1">Regisztráció</button></Link>
+        <Link to="/register"><button className="w-full bg-dark-grey text-blue py-2 px-4 rounded-md mt-1 select-none">Regisztráció</button></Link>
     </div>
   );
 }

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { UserPlusIcon, CheckIcon } from "@heroicons/react/20/solid";
 
 function Friend( { isVertical, name, image} ) {
-  const [isFriendRequestSent, setIsFriendRequestSent] = useState(false);
+  const [isFriendRequestSent, setIsFriendRequestSent] = useState(localStorage.getItem(name));
 
   return (
     isVertical ?
@@ -16,7 +16,7 @@ function Friend( { isVertical, name, image} ) {
           <p className="text-md ml-2 font-normal">{name}</p>
       </div>
       <div className={`flex items-center ${isFriendRequestSent ? "hover:cursor-default" : "hover:cursor-pointer"}`} onClick={() => setIsFriendRequestSent(true)}>
-        { isFriendRequestSent ? 
+        { isFriendRequestSent == true ? 
           <CheckIcon className="w-6 text-green-500"/> : 
           <UserPlusIcon className="w-6 text-blue p-0"/>
         }

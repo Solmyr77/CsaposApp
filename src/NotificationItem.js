@@ -1,12 +1,14 @@
 import React, { useState, useContext, useEffect } from "react";
 import { EnvelopeIcon, CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import Context from "./Context";
+import { useNavigate } from "react-router-dom";
 
-function NotificationItem({ isFriendRequest }) {
+function NotificationItem({ isFriendRequest, setIsEventModalVisible }) {
   const [isAccepted, setIsAccepted] = useState(null);
   const [Icon, setIcon] = useState(null);
   const [isRead, setIsRead] = useState(null);
   const { user } = useContext(Context);
+  const navigate = useNavigate();
 
   const importIcon = async() => {
     if (isAccepted === true) {
@@ -31,8 +33,8 @@ function NotificationItem({ isFriendRequest }) {
           {
             isAccepted === null ? 
             <div className="flex flex-row gap-x-1 basis-1/5">
-                <CheckCircleIcon className="h-10 text-green-500" onClick={() => setIsAccepted(true)}/>
-                <XCircleIcon className="h-10 text-red-500" onClick={() => setIsAccepted(false)}/>
+                <CheckCircleIcon className="h-10 text-green-500 hover:cursor-pointer" onClick={() => setIsAccepted(true)}/>
+                <XCircleIcon className="h-10 text-red-500 hover:cursor-pointer" onClick={() => setIsAccepted(false)}/>
             </div> :
             <div className="flex flex-row gap-x-1 basis-1/5">
                 <Icon className={`h-10 text-green-500 ${isAccepted ? "visible" : "invisible"}`}/>
@@ -44,7 +46,10 @@ function NotificationItem({ isFriendRequest }) {
     )
   }
   return (
-    <div className="w-full h-16 bg-dark-grey rounded-md flex flex-row items-center p-4" onClick={() => setIsRead(true)}>
+    <div className="w-full h-16 bg-dark-grey rounded-md flex flex-row items-center p-4 hover:cursor-pointer" onClick={() => {
+      setIsRead(true);
+      navigate("/event");
+      }}>
         <div className="relative">
             <EnvelopeIcon className="h-10"/>
             <div className={`absolute top-0.5 -right-[.125rem] rounded-full w-3 aspect-square bg-red-500 ${isRead ? "invisible" : "visible"}`}></div>

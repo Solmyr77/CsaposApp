@@ -9,8 +9,8 @@ function Notifications() {
     const [recordsToDisplay, setRecordsToDisplay] = useState([]);
     const { notificationFilter } = useContext(Context);
 
-    const friendRecords = Array(5).fill(<NotificationItem isFriendRequest={true}/>);
-    const eventRecords = Array(5).fill(<NotificationItem/>);
+    const friendRecords = Array(1).fill(<NotificationItem isFriendRequest={true}/>);
+    const eventRecords = Array(1).fill(<NotificationItem/>);
     
     useEffect(() => {
         switch (notificationFilter) {
@@ -28,7 +28,9 @@ function Notifications() {
 
   return (
     <div className="w-full h-screen bg-grey py-8 px-4 text-white flex flex-col overflow-hidden">
-        <Link to={"/"}><BackButton/></Link>
+        <Link to={"/"} className="flex w-fit">
+            <BackButton/>
+        </Link>
         <p className="text-xl font-bold text-center mb-4">Értesítések</p>
         <div className="flex flex-row justify-between font-bold">
             <NavItem title={"Összes"} isNotificationPage={true}/>

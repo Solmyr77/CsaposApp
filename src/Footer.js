@@ -9,7 +9,7 @@ function Footer() {
   const { menuState } = useContext(Context);
 
   return (
-    <div className="w-full h-[10vh] fixed bottom-0 flex justify-evenly items-center font-normal bg-dark-grey py-2 font-play">
+    <div className="w-full h-[10vh] fixed bottom-0 flex justify-evenly items-center font-normal bg-dark-grey py-2 font-play select-none">
         <Link to="/" className="basis-1/3">
           <div className={`flex flex-col justify-center items-center ${menuState === "Main" ? "text-blue" : "text-white"}`}>
               <GlobeAltIcon className=" h-6"/>

@@ -7,56 +7,22 @@ import img1 from "./img/pub.webp"
 import { Rating } from "@mui/material";
 import { MapPinIcon } from "@heroicons/react/20/solid";
 import MainButton from "./MainButton";
-import axios from "axios";
-import getAccessToken from "./refreshToken";
+import Context from "./Context";
 
 function Pub() {
+  const { locations } = useContext(Context);
   const { name } = useParams();
   const [record, setRecord] = useState({});
 
-  async function getLocations() {
-    try {
-      const config = {
-        headers: { Authorization: `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` },
-      };
-      const response = await axios.get("https://backend.csaposapp.hu/api/locations", config);
-      const data = response.data;
-      const record = data.find((record) => record.name === name);
-
-      if (record) {
-        setRecord(record);
-        return true;
-      } 
-      else {
-        return false;
-      }
-    }
-    catch (error) {
-      if (error.response?.status === 401) {
-        return false;
-      } 
-      else {
-        console.error("Error fetching locations:", error.message);
-        return false;
-      }
-    }
-  }
-
   useEffect(() => {
-    const fetchData = async () => {
-      let isSucceeded = await getLocations();
-      while (isSucceeded === false) {
-        await getAccessToken();
-        isSucceeded = await getLocations();
-      }
+    if (locations.length > 0) {
+        setRecord(locations.find((record) => record.name === name));
     }
-    fetchData();
-  }, []);
-
+  }, [locations]);
 
   return (
     <div className="min-h-screen bg-grey px-4 pt-8 text-white">
-        <Link to={"/"}>
+        <Link to={"/"} className="flex w-fit">
             <BackButton/>
         </Link>
         <div className="w-full h-fit relative my-4">

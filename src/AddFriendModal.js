@@ -6,13 +6,16 @@ import records from "./records";
 import TitleDivider from "./TitleDivider";
 import Context from "./Context";
 import Friend from "./Friend";
+import AddFriendItem from "./AddFriendItem";
 
 function AddFriendModal({ isAddFriendModalVisible, setIsAddFriendModalVisible }) {
   const { user, locations } = useContext(Context);
   const [recordsToDisplay, setRecordsToDisplay] = useState(locations);
 
   useEffect(() => {
-    if (locations.length > 0) setRecordsToDisplay(locations);
+    if (locations.length > 0) {
+      setRecordsToDisplay(locations);
+    }
   }, [locations]);
   
 
@@ -24,21 +27,29 @@ function AddFriendModal({ isAddFriendModalVisible, setIsAddFriendModalVisible })
         <SearchBar displayTitle={false} setRecordsToDisplay={setRecordsToDisplay}/>
         <TitleDivider title={"Találatok"}/>
         <div className="overflow-y-scroll pl-2">
-          {recordsToDisplay.map((record) => {
-            if (record === recordsToDisplay[recordsToDisplay.length - 1]) {
+          { recordsToDisplay.length !== 0 ? (
+            recordsToDisplay.sort((a, b) => a.name.localeCompare(b.name)).map((record) => {
+              if (record === recordsToDisplay[recordsToDisplay.length - 1]) {
+                return (
+                  <div className="mb-2">
+                    <AddFriendItem name={record.name} image={user.image}/>
+                  </div>
+                );
+              }
               return (
-                <div className="mb-2">
-                  <Friend name={record.name} image={user.image}/>
+                <div>
+                  <AddFriendItem name={record.name} image={user.image}/>
+                  <hr className="h-0.5 my-2 w-full bg-dark-grey border-0 rounded-md"/>
                 </div>
-              )
-            }
-            return (
-              <div>
-                <Friend name={record.name} image={user.image}/>
-                <hr className="h-0.5 my-2 w-full bg-dark-grey border-0 rounded-md"/>
-              </div>
-            )
-          })}
+              );
+            })
+          ) :
+          (
+            <div className="font-normal text-center">
+              Nincs találat
+            </div>
+          )
+          }
         </div>
       </div>
     </div>

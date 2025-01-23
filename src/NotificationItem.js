@@ -29,7 +29,7 @@ function NotificationItem({ isFriendRequest, setIsEventModalVisible }) {
       <div className="w-full h-16 bg-dark-grey rounded-md flex flex-row items-center p-4">
         <img src={user.image} alt="" className="h-10 aspect-square rounded-full object-cover"/>
         <div className="flex flex-row w-full pl-2 items-center">
-          <p className="flex flex-row items-center text-sm font-bold text-left text-nowrap basis-4/5"><span className="truncate inline-block max-w-20 mr-1">Azahriah</span> barátnak jelölt!</p>
+          <p className="flex flex-row items-center text-sm text-left text-nowrap basis-4/5"><span className="truncate inline-block max-w-20 mr-1 font-bold">Azahriah</span> barátnak jelölt!</p>
           {
             isAccepted === null ? 
             <div className="flex flex-row gap-x-1 basis-1/5">

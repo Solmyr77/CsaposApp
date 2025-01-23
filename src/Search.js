@@ -19,7 +19,19 @@ function Search() {
       <div className="px-4">
         <SearchBar displayTitle={true} setRecordsToDisplay={setRecordsToDisplay} />
         <TitleDivider title={"Legutóbbi"}/>
-        <CardContainer records={recordsToDisplay} cardsToShow={"Összes"}/>
+        {
+          recordsToDisplay.length !== 0 ? 
+          (
+            <div>
+              <CardContainer records={recordsToDisplay} cardsToShow={"Összes"}/>
+            </div>
+          ) :
+          (
+            <div className="font-normal text-center">
+              Nincs találat
+            </div>
+          )
+        }
       </div>
     </div>
   )

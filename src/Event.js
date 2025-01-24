@@ -13,7 +13,7 @@ function Event() {
       <Link to={"/notifications"} className="flex w-fit">
         <BackButton/>
       </Link>
-      <div className="w-full h-fit relative mt-4">
+      <div className="w-full h-fit relative">
         <img src={img1} alt="kep" className="rounded-md w-full h-40 object-cover"/>
         <div className="w-full h-full bg-gradient-to-t from-dark-grey via-15% via-dark-grey bg-opacity-65 absolute inset-0 flex flex-col rounded-t-md text-wrap">
           <p className="font-bold text-xl px-1 break-words text-center leading-tight absolute bottom-0 w-full">Azahriah a Félidőben!</p>

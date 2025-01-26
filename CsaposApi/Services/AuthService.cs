@@ -6,6 +6,7 @@ using System.Text;
 using CsaposApi.Services.IService;
 using CsaposApi.Models;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Common;
 
 public class AuthService : IAuthService
 {
@@ -111,5 +112,22 @@ public class AuthService : IAuthService
         );
 
         return tokenHandler.WriteToken(token);
+    }
+
+    public string GetUserId(string token)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var jwtToken = handler.ReadJwtToken(token);
+
+        var subject = jwtToken.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+
+        if (!string.IsNullOrEmpty(subject))
+        {
+            return subject;
+        }
+        else
+        {
+            throw new ArgumentException("Token is malformed.");
+        }
     }
 }

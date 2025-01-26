@@ -24,5 +24,11 @@ namespace CsaposApi.Services.IService
         /// </summary>
         /// <param name="refreshToken">The refresh token to revoke.</param>
         Task RevokeRefreshTokenAsync(string refreshToken);
+
+        /// <summary>
+        /// Gets user id (sub) from access token
+        /// </summary>
+        /// <param name="token">The refresh token to revoke.</param>
+        string GetUserId(string token);
     }
 }

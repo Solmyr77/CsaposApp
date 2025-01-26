@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "REnPcKwdFVfHNSTWpybU9kpTjZFWKLBgL8Ocgp3gYD7YhXPkG5jQj3Engb25Ix5crU0a1DHHkoP7luKvJAhI8Q==",
+  "dgSpecHash": "9vgGnZIvTok=",
   "success": true,
   "projectFilePath": "C:\\Users\\Solmyr\\Desktop\\CsaposApp\\CsaposApi\\CsaposApi.csproj",
   "expectedPackageFiles": [
@@ -124,6 +124,7 @@
     "C:\\Users\\Solmyr\\.nuget\\packages\\nuget.projectmodel\\6.11.0\\nuget.projectmodel.6.11.0.nupkg.sha512",
     "C:\\Users\\Solmyr\\.nuget\\packages\\nuget.protocol\\6.11.0\\nuget.protocol.6.11.0.nupkg.sha512",
     "C:\\Users\\Solmyr\\.nuget\\packages\\nuget.versioning\\6.11.0\\nuget.versioning.6.11.0.nupkg.sha512",
+    "C:\\Users\\Solmyr\\.nuget\\packages\\sixlabors.imagesharp\\3.1.6\\sixlabors.imagesharp.3.1.6.nupkg.sha512",
     "C:\\Users\\Solmyr\\.nuget\\packages\\swashbuckle.aspnetcore\\6.4.0\\swashbuckle.aspnetcore.6.4.0.nupkg.sha512",
     "C:\\Users\\Solmyr\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\6.4.0\\swashbuckle.aspnetcore.swagger.6.4.0.nupkg.sha512",
     "C:\\Users\\Solmyr\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\6.4.0\\swashbuckle.aspnetcore.swaggergen.6.4.0.nupkg.sha512",

@@ -15,5 +15,12 @@
             public string Username { get; set; }
             public string Password { get; set; }
         }
+
+        public class GetProfileDTO
+        {
+            public Guid Id { get; set; }
+            public string DisplayName { get; set; }
+            public string ImageUrl { get; set; }
+        }
     }
 }

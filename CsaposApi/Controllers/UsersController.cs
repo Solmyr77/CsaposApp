@@ -34,7 +34,7 @@ namespace CsaposApi.Controllers
         // GET: api/Users/5
         [HttpGet("{id}")]
         [Authorize(Policy = "MustBeAdmin")]
-        public async Task<ActionResult<User>> GetUser(string id)
+        public async Task<ActionResult<User>> GetUser(Guid id)
         {
             var user = await _context.Users.FindAsync(id);
 
@@ -44,6 +44,27 @@ namespace CsaposApi.Controllers
             }
 
             return Ok(user);
+        }
+
+        [HttpGet("profile/{id}")]
+        [Authorize(Policy = "MustBeGuest")]
+        public async Task<ActionResult> GetProfile(Guid id)
+        {
+            var user = await _context.Users.FindAsync(id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var currentProfile = new GetProfileDTO
+            {
+                Id = user.Id,
+                DisplayName = user.DisplayName,
+                ImageUrl = user.ImgUrl
+            };
+
+            return Ok(currentProfile);
         }
 
         private bool UserExists(Guid id)

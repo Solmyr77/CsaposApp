@@ -59,12 +59,21 @@ namespace CsaposApi.Controllers
                 // Load the image into memory
                 using var image = Image.Load(file.OpenReadStream());
 
-                // Resize the image (optional: adjust dimensions as needed)
-                image.Mutate(x => x.Resize(new ResizeOptions
+                // Calculate the crop dimensions for a 1:1 aspect ratio
+                int cropSize = Math.Min(image.Width, image.Height); // Smallest dimension for a square
+                int cropX = (image.Width - cropSize) / 2;           // Center the crop horizontally
+                int cropY = (image.Height - cropSize) / 2;          // Center the crop vertically
+
+                // Crop and resize the image
+                image.Mutate(x =>
                 {
-                    Size = new Size(512, 512), // Resize to 512x512
-                    Mode = ResizeMode.Max
-                }));
+                    x.Crop(new Rectangle(cropX, cropY, cropSize, cropSize)) // Crop to 1:1 aspect ratio
+                     .Resize(new ResizeOptions
+                     {
+                         Size = new Size(512, 512), // Resize to 512x512
+                         Mode = ResizeMode.Crop     // Ensure exact dimensions
+                     });
+                });
 
                 // Compress and convert to WebP
                 var fileName = userId.ToString() + ".webp";

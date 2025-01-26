@@ -23,7 +23,7 @@ namespace CsaposApi.Controllers
         }
 
         private const long MaxFileSize = 4 * 1024 * 1024; // 4 MB
-        private readonly string _uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "/var/www/assets/images");
+        private readonly string _uploadPath = "/var/www/assets/images";
 
         [HttpPost("upload/profile")]
         [Authorize(Policy = "MustBeGuest")]

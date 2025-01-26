@@ -7,7 +7,7 @@ import Context from "./Context";
 
 function Notifications() {
     const [recordsToDisplay, setRecordsToDisplay] = useState([]);
-    const { notificationFilter } = useContext(Context);
+    const { notificationFilter, previousRoutes } = useContext(Context);
 
     const friendRecords = Array(1).fill(<NotificationItem isFriendRequest={true}/>);
     const eventRecords = Array(1).fill(<NotificationItem/>);
@@ -28,7 +28,7 @@ function Notifications() {
 
   return (
     <div className="w-full h-screen bg-grey py-8 px-4 text-white flex flex-col overflow-hidden">
-        <Link to={"/"} className="flex w-fit">
+        <Link to={previousRoutes[previousRoutes.length - 1]} className="flex w-fit">
             <BackButton/>
         </Link>
         <p className="text-xl font-bold text-center mb-4">Értesítések</p>

@@ -4,14 +4,17 @@ import SearchBar from "./SearchBar";
 import CardContainer from "./CardContainer";
 import Context from "./Context";
 import { useContext, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 function Search() {
-  const { setMenuState, locations } = useContext(Context);
+  const { setMenuState, locations, setPreviousRoutes } = useContext(Context);
   const [recordsToDisplay, setRecordsToDisplay] = useState([]);
+  const location = useLocation();
 
   useEffect(() => {
     setMenuState("Search");
     setRecordsToDisplay(locations);
+    setPreviousRoutes(Array(location.pathname));
   }, [locations]);
 
   return (

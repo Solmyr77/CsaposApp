@@ -4,13 +4,14 @@ import img1 from "./img/avatar.webp";
 import axios from "axios";
 import getAccessToken from "./refreshToken";
 
-function Provider( { children } ) {
+function Provider({ children }) {
   const [navState, setNavState] = useState("Összes");
   const [menuState, setMenuState] = useState("Main");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || {name: "Lajos", image: img1});
   const [locations, setLocations] = useState( localStorage.getItem("locations") || []);
   const [notificationFilter, setNotificationFilter] = useState("Összes");
+  const [previousRoutes, setPreviousRoutes] = useState([]);
 
   async function getLocations() {
     try {
@@ -51,7 +52,7 @@ function Provider( { children } ) {
   }
 
   return (
-    <Context.Provider value={{ navState, setNavState, menuState, setMenuState, isAuthenticated, setIsAuthenticated, user, setUser, locations, setLocations, notificationFilter, setNotificationFilter }}>
+    <Context.Provider value={{ navState, setNavState, menuState, setMenuState, isAuthenticated, setIsAuthenticated, user, setUser, locations, setLocations, notificationFilter, setNotificationFilter, previousRoutes, setPreviousRoutes }}>
       {children}
     </Context.Provider>
   )

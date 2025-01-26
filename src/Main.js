@@ -4,12 +4,15 @@ import TitleDivider from "./TitleDivider";
 import StyledSwiper from "./StyledSwiper";
 import CardContainer from "./CardContainer";
 import Context from "./Context";
+import { useLocation } from "react-router-dom";
 
 function Main() {
-  const { navState, setMenuState, locations } = useContext(Context);
+  const { navState, setMenuState, locations, setPreviousRoutes } = useContext(Context);
+  const location = useLocation();
 
   useEffect(() => {
     setMenuState("Main");
+    setPreviousRoutes(Array(location.pathname));
   }, [])
 
   return (

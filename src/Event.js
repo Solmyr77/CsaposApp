@@ -1,17 +1,25 @@
-import React, { useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import BackButton from "./BackButton";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import img1 from "./img/azahriah.jpg";
 import img2 from "./img/pub.jpg";
 import TitleDivider from "./TitleDivider";
+import Context from "./Context";
 
 function Event() {
+  const { previousRoutes, setPreviousRoutes } = useContext(Context);
   const [isAttending, setIsAttending] = useState(null);
+  const location = useLocation();
+
+  useEffect(() => {
+    console.log(previousRoutes);
+  }, []);
+  
 
   return (
     <div className="min-h-screen bg-grey px-4 pt-8 pb-8 text-white">
-      <Link to={"/notifications"} className="flex w-fit">
-        <BackButton/>
+      <Link to={previousRoutes[previousRoutes.length - 1]} className="flex w-fit">
+        <BackButton isInset/>
       </Link>
       <div className="w-full h-fit relative">
         <img src={img1} alt="kep" className="rounded-md w-full h-40 object-cover"/>
@@ -50,7 +58,10 @@ function Event() {
       </p>
       <TitleDivider title={"Helyszín"}/>
       <Link to={`/pub/${"Félidő Söröző"}`}>
-        <div className="relative drop-shadow-sm select-none">
+        <div className="relative drop-shadow-sm select-none" onClick={() => setPreviousRoutes((state) => {
+          if (!state.includes(location.pathname)) return [...state, location.pathname];
+          return state;
+        })}>
           <img src={img2} alt="pub" className="h-full max-h-20 w-full object-cover rounded-md"/>
           <div className={`absolute inset-0 ${true ? 'bg-opacity-70' : 'bg-opacity-85'} bg-black flex flex-col rounded-md`}>
             <p className="absolute top-1/2 -translate-y-1/2 text-lg font-normal pl-5">Félidő Söröző</p>

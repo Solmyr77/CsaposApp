@@ -9,7 +9,7 @@ import Context from "./Context";
 
 const StyledSwipers = styled(Swiper)`.swiper-pagination-bullet-active{
   background-color: white;
-  } `
+  } `;
 
 function StyledSwiper() {
   const { locations } = useContext(Context);

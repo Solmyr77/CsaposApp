@@ -1,14 +1,15 @@
 import React, { useState, useContext, useEffect } from "react";
 import { EnvelopeIcon, CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import Context from "./Context";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
-function NotificationItem({ isFriendRequest, setIsEventModalVisible }) {
+function NotificationItem({ isFriendRequest }) {
   const [isAccepted, setIsAccepted] = useState(null);
   const [Icon, setIcon] = useState(null);
   const [isRead, setIsRead] = useState(null);
-  const { user } = useContext(Context);
+  const { user, setPreviousRoutes } = useContext(Context);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const importIcon = async() => {
     if (isAccepted === true) {
@@ -48,6 +49,10 @@ function NotificationItem({ isFriendRequest, setIsEventModalVisible }) {
   return (
     <div className="w-full h-16 bg-dark-grey rounded-md flex flex-row items-center p-4 hover:cursor-pointer" onClick={() => {
       setIsRead(true);
+      setPreviousRoutes((state) => {
+        if (!state.includes(location.pathname)) return [...state, location.pathname];
+        return state;
+      });
       navigate("/event");
       }}>
         <div className="relative">

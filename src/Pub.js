@@ -4,16 +4,15 @@ import ListItem from "./ListItem";
 import BackButton from "./BackButton";
 import { Link, useLocation, useParams } from "react-router-dom";
 import img1 from "./img/pub.webp"
-import img2 from "./img/azahriah.jpg";
 import { Rating } from "@mui/material";
 import { ChevronRightIcon, MapPinIcon } from "@heroicons/react/20/solid";
 import MainButton from "./MainButton";
 import Context from "./Context";
+import EventSwiper from "./EventSwiper";
 
 function Pub() {
-  const { locations } = useContext(Context);
+  const { locations, previousRoutes } = useContext(Context);
   const { name } = useParams();
-  const location = useLocation();
   const [record, setRecord] = useState({});
   const [isBusinessHoursVisible, setIsBusinessHoursVisible] = useState(false);
   const [isDescriptionWrapped, setIsDescriptionWrapped] = useState(true);
@@ -22,13 +21,13 @@ function Pub() {
     if (locations.length > 0) {
         setRecord(locations.find((record) => record.name === name));
     }
-    console.log(location);
+    console.log(previousRoutes);
   }, [locations]);
 
   return (
     <div className="min-h-screen bg-grey text-white flex flex-col">
-        <Link to={"/"} className="flex w-fit">
-            <BackButton/>
+        <Link to={previousRoutes[previousRoutes.length - 1]} className="flex w-fit">
+            <BackButton isInset/>
         </Link>
         <div className="w-full h-fit relative">
             <img src={img1} alt="kep" className="rounded-md w-full h-48 object-cover"/>
@@ -79,14 +78,7 @@ function Pub() {
             </div>
             <TitleDivider title={"Események"}/>
             <div className="flex flex-col gap-y-2">
-                <Link to={"/event"}>
-                    <div className="relative drop-shadow-sm select-none">
-                        <img src={img2} alt="pub" className="h-full max-h-20 w-full object-cover rounded-md"/>
-                        <div className={`absolute inset-0 ${true ? 'bg-opacity-70' : 'bg-opacity-85'} bg-black flex flex-col rounded-md`}>
-                        <p className="absolute top-1/2 -translate-y-1/2 text-lg font-normal pl-5">Azahriah a Félidőben!</p>
-                        </div>
-                    </div>
-                </Link>
+                <EventSwiper/>
             </div>
             <div className="flex justify-center items-center self-center h-full py-10">
                 <MainButton title={"FOGLALOK"} isActive={record.isOpen ? true : false}/>

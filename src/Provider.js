@@ -11,7 +11,7 @@ function Provider({ children }) {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || {name: "Lajos", image: img1});
   const [locations, setLocations] = useState( localStorage.getItem("locations") || []);
   const [notificationFilter, setNotificationFilter] = useState("Összes");
-  const [previousRoutes, setPreviousRoutes] = useState([]);
+  const [previousRoutes, setPreviousRoutes] = useState(["/"]);
 
   async function getLocations() {
     try {

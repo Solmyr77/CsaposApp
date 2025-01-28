@@ -1,28 +1,43 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import BackButton from "./BackButton";
 import { Link, useLocation } from "react-router-dom";
 import img1 from "./img/azahriah.jpg";
 import img2 from "./img/pub.jpg";
 import TitleDivider from "./TitleDivider";
 import Context from "./Context";
+import { ChevronRightIcon } from "@heroicons/react/20/solid";
 
 function Event() {
   const { previousRoutes, setPreviousRoutes } = useContext(Context);
   const [isAttending, setIsAttending] = useState(null);
+  const [isDescriptionWrapped, setIsDescriptionWrapped] = useState(true);  
+  const [isClamped, setIsClamped] = useState(false);
+  const textRef = useRef(null);
   const location = useLocation();
+  
+  const checkIfClamped = () => {
+    const element = textRef.current;
+    if (element) {
+      const lineHeight = parseFloat(getComputedStyle(element).lineHeight);
+      const linesVisible = Math.floor(element.clientHeight / lineHeight);
+      const totalLines = Math.ceil(element.scrollHeight / lineHeight);
+      setIsClamped(totalLines > linesVisible);
+    }
+  };
 
   useEffect(() => {
-    console.log(previousRoutes);
+    checkIfClamped();
+    window.addEventListener('resize', checkIfClamped);
+    return () => window.removeEventListener('resize', checkIfClamped);
   }, []);
-  
 
   return (
-    <div className="min-h-screen bg-grey px-4 pt-8 pb-8 text-white">
+    <div className="min-h-screen bg-grey pb-8 text-white">
       <Link to={previousRoutes[previousRoutes.length - 1]} className="flex w-fit">
         <BackButton isInset/>
       </Link>
       <div className="w-full h-fit relative">
-        <img src={img1} alt="kep" className="rounded-md w-full h-40 object-cover"/>
+        <img src={img1} alt="kep" className="w-full h-40 object-cover"/>
         <div className="w-full h-full bg-gradient-to-t from-dark-grey via-15% via-dark-grey bg-opacity-65 absolute inset-0 flex flex-col rounded-t-md text-wrap">
           <p className="font-bold text-xl px-1 break-words text-center leading-tight absolute bottom-0 w-full">Azahriah a Félidőben!</p>
         </div>
@@ -41,21 +56,19 @@ function Event() {
             </div>
           </div>
         </div>
-      </div>
       <TitleDivider title={"Leírás"}/>
-      <p className="max-w-full text-wrap mb-4">
+      <p ref={textRef} className={`max-w-full ${isDescriptionWrapped ? "line-clamp-[8]" : "line-clamp-none"}`}>
         Lorem ipsum dolor sit amet...
         Lorem ipsum dolor sit amet...
         Lorem ipsum dolor sit amet...
         Lorem ipsum dolor sit amet...
         Lorem ipsum dolor sit amet...
         Lorem ipsum dolor sit amet...
-        Lorem ipsum dolor sit amet...
-        Lorem ipsum dolor sit amet...
-        Lorem ipsum dolor sit amet...
-        Lorem ipsum dolor sit amet...
-        Lorem ipsum dolor sit amet...
+        Lorem ipsum dolor sit amet
       </p>
+      <div className="flex w-full justify-center">
+        <ChevronRightIcon className={`w-10 ${isDescriptionWrapped ? "rotate-90" : "-rotate-90"} ${isClamped ? "flex" : "hidden"} `} onClick={() => setIsDescriptionWrapped((state) => !state)}/>
+      </div>
       <TitleDivider title={"Helyszín"}/>
       <Link to={`/pub/${"Félidő Söröző"}`}>
         <div className="relative drop-shadow-sm select-none" onClick={() => setPreviousRoutes((state) => {
@@ -68,6 +81,7 @@ function Event() {
           </div>
         </div>
       </Link>      
+      </div>
     </div>
   )
 }

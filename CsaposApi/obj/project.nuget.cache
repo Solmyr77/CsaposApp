@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "9vgGnZIvTok=",
+  "dgSpecHash": "sTG8FiTqvtg=",
   "success": true,
   "projectFilePath": "C:\\Users\\Solmyr\\Desktop\\CsaposApp\\CsaposApi\\CsaposApi.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\Solmyr\\.nuget\\packages\\aspnetcoreratelimit\\5.0.0\\aspnetcoreratelimit.5.0.0.nupkg.sha512",
     "C:\\Users\\Solmyr\\.nuget\\packages\\bouncycastle.cryptography\\2.3.1\\bouncycastle.cryptography.2.3.1.nupkg.sha512",
     "C:\\Users\\Solmyr\\.nuget\\packages\\google.protobuf\\3.26.1\\google.protobuf.3.26.1.nupkg.sha512",
     "C:\\Users\\Solmyr\\.nuget\\packages\\humanizer\\2.14.1\\humanizer.2.14.1.nupkg.sha512",

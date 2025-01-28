@@ -19,7 +19,7 @@ namespace CsaposApi.Controllers
             _context = context;
         }
 
-        [HttpPost]
+        [HttpPost("book-table")]
         [Authorize(Policy = "MustBeGuest")]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.BadRequest)]
@@ -50,7 +50,48 @@ namespace CsaposApi.Controllers
                 await _context.TableBookings.AddAsync(currentBooking);
                 await _context.SaveChangesAsync();
 
-                return Ok();
+                return Ok(currentBooking);
+            }
+            catch (Exception)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, new
+                {
+                    error = "server_error",
+                    message = "An unexpected error occurred while updating the password.",
+                });
+            }
+        }
+
+        [HttpPost("add-to-table")]
+        [Authorize(Policy = "MustBeGuest")]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult> AddToTable(AddToTableDTO addToTableDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    error = "invalid_request",
+                    message = "Request body is missing, malformed, or incomplete."
+                });
+            }
+
+            try
+            {
+                var currentAdding = new TableGuest
+                {
+                    Id = Guid.NewGuid(),
+                    BookingId = addToTableDTO.bookingId,
+                    UserId = addToTableDTO.userId,
+                };
+
+                await _context.TableGuests.AddAsync(currentAdding);
+                await _context.SaveChangesAsync();
+
+                return Ok(currentAdding);
             }
             catch (Exception)
             {

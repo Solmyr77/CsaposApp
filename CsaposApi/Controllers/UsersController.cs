@@ -7,6 +7,7 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
 using CsaposApi.Services.IService;
+using System.Net;
 
 namespace CsaposApi.Controllers
 {
@@ -65,6 +66,37 @@ namespace CsaposApi.Controllers
             };
 
             return Ok(currentProfile);
+        }
+
+        [HttpGet("profile/search/{displayName}")]
+        [Authorize(Policy = "MustBeGuest")]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.NoContent)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult> GetProfile(string displayName)
+        {
+            if (string.IsNullOrEmpty(displayName) || displayName.Length < 3)
+            {
+                return NoContent();
+            }
+
+            var users = await _context.Users.Where(x => x.DisplayName.Contains(displayName)).ToListAsync();
+
+            List<GetProfileDTO> usersToReturn = new List<GetProfileDTO>();
+
+            foreach (var user in users)
+            {
+                usersToReturn.Add(new GetProfileDTO
+                {
+                    Id = user.Id,
+                    DisplayName = user.DisplayName,
+                    ImageUrl = user.ImgUrl
+                });
+            }
+
+            return Ok(usersToReturn);
         }
 
         private bool UserExists(Guid id)

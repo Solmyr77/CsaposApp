@@ -9,5 +9,11 @@
             public DateTime BookedFrom { get; set; }
             public DateTime BookedTo { get; set; }
         }
+
+        public class AddToTableDTO
+        {
+            public Guid userId { get; set; }
+            public Guid bookingId { get; set; }
+        }
     }
 }

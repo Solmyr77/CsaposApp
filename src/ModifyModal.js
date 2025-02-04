@@ -1,18 +1,22 @@
 import React, { useContext, useState, useEffect } from "react";
 import { PencilSquareIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import Context from "./Context";
+import axios from "axios";
+import getAccessToken from "./refreshToken";
 
 function ModifyModal({ isModifyModalVisible, setIsModifyModalVisible }) {
-  const { user, setUser } = useContext(Context);
-  const [newprofilename, setNewProfileName] = useState(user.name);
-  const [profilePicture, setProfilePicture] = useState(user.image);
+  const { user, setUser, getProfile } = useContext(Context);
+  const [newProfileName, setNewProfileName] = useState(user.displayName);
+  const [previewProfilePicture, setPreviewProfilePicture] = useState(user.imageUrl);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSucceeded, setIsSucceeded] = useState(false);
-  
+  const [formData, setFormData] = useState(new FormData());
+
   useEffect(() => {
     if (isModifyModalVisible) {
-      document.getElementById("profilename").value = user.name;
-      setNewProfileName(user.name);
+      document.getElementById("profilename").value = user.displayName;
+      setNewProfileName(user.displayName);
+      setPreviewProfilePicture(user.imageUrl);
       setErrorMessage("");
     }
   }, [isModifyModalVisible])
@@ -21,47 +25,69 @@ function ModifyModal({ isModifyModalVisible, setIsModifyModalVisible }) {
     document.getElementById("fileInput").click();
   }
 
-  function isImageSizeValid(base64String) {
+  function isImageSizeValid(file) {
     const LOCAL_STORAGE_LIMIT_BYTES = 4 * 1000 * 1000;
-    const base64Length = base64String.length;
-    const padding = (base64String.endsWith("==") ? 2 : base64String.endsWith("=") ? 1 : 0);
-    const byteSize = (base64Length * 3) / 4 - padding;
-
-    return byteSize <= LOCAL_STORAGE_LIMIT_BYTES;
+    if (file && file.size <= LOCAL_STORAGE_LIMIT_BYTES) {
+      return true;
+    }
+    return false;
   }
 
-  function handleImageUpload(event) {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        if (isImageSizeValid(reader.result)) {
-          setProfilePicture(reader.result);
+  async function showImagePreview(event) {
+    const file = await event.target.files[0];
+    const updatedFormData = new FormData();
+    updatedFormData.append("file", file);
+    console.log(updatedFormData.get("file"));
+    if (isImageSizeValid(file)) {
+      const fileURL = URL.createObjectURL(file);
+      setPreviewProfilePicture(fileURL);
+      console.log(previewProfilePicture);
+      setFormData(updatedFormData);
+    }
+    else {
+      setIsSucceeded(true);
+      setErrorMessage("A kép mérete meghaladja a limitet! (4MB)");
+      setTimeout(() => {
+        setIsSucceeded(false);
+        setErrorMessage("");
+      }, 1000)
+    }
+  }
+
+  async function handleImageUpload() {
+    console.log(formData.get("file"));
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+          "Cache-Control": "no-cache"
         }
-        else {
-          setIsSucceeded(true);
-          setErrorMessage("A kép mérete meghaladja a limitet! (4MB)");
-          setTimeout(() => {
-            setIsSucceeded(false);
-            setErrorMessage(false);
-            setErrorMessage("");
-          }, 1000)
-        }
+      }
+      const response = await axios.post("https://backend.csaposapp.hu/api/Images/upload/profile", formData, config);
+      console.log("Upload successful:", response.data);
+    }
+    catch (error) {
+      if (error.response?.status === 401) {
+        getAccessToken();
+        handleImageUpload();
+        console.log(error.message);
       }
     }
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
     if (event.target.profilename.value.trim() !== "") {
-      setUser({name: newprofilename, image: profilePicture});
-      localStorage.setItem("user", JSON.stringify({name: newprofilename, image: profilePicture}));
+      await handleImageUpload();
+      setUser({...user, displayName: newProfileName});
+      localStorage.setItem("user", JSON.stringify({...user, displayName: newProfileName}));
       setIsSucceeded(true);
-      setTimeout(() => {
+      setTimeout(async() => {
         setIsSucceeded(false);
         setIsModifyModalVisible(false);
-      }, 1000)
+        await getProfile(user.id);
+      }, 1000);
     }
     else {
       setErrorMessage("Kötelező megadnod felhasználónevet!")
@@ -80,13 +106,13 @@ function ModifyModal({ isModifyModalVisible, setIsModifyModalVisible }) {
             <p className="text-md pt-4 text-center mb-6">Profil szerkesztése</p>
             <form className="flex flex-col justify-between h-3/4 items-center px-2" onSubmit={(event) => handleSubmit(event)}>
               <div className="relative select-none hover:cursor-pointer" onClick={triggerFileInputClick}>
-                <img src={profilePicture} className="rounded-full object-cover aspect-square w-24 opacity-50"/>
+                <img src={previewProfilePicture} className="rounded-full object-cover aspect-square w-24 opacity-50"/>
                 <PencilSquareIcon className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-12"/>
-                <input id="fileInput" type="file" style={{"display" : "none"}} onChange={(event) => handleImageUpload(event)}/>
+                <input id="fileInput" type="file" style={{"display" : "none"}} onChange={(event) => showImagePreview(event)}/>
               </div>
               <div className="flex flex-col justify-between items-center w-full mt-2">
                 <label className="text-left w-full font-normal">Profilnév</label>
-                <input defaultValue={user.name} id="profilename" name="profilename" type="text" className="w-full bg-dark-grey px-5 py-2 rounded-md font-normal mt-0.5 focus:outline-none" onChange={(event) => {
+                <input defaultValue={user.displayName} id="profilename" name="profilename" type="text" className="w-full bg-dark-grey px-5 py-2 rounded-md font-normal mt-0.5 focus:outline-none" onChange={(event) => {
                   setNewProfileName(event.target.value.trim());
                   setErrorMessage("");
                   }} required/>

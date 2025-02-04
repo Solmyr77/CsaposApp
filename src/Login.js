@@ -35,7 +35,6 @@ function Login() {
     if (username.trim() !==  "" && password.trim() !==  "") {
       if (await handleLogin(username, password)) {
         setIsAuthenticated(true);
-        localStorage.setItem("password", password);
         navigate("/");
       }
     }

@@ -1,6 +1,5 @@
 import { React, useState, useEffect} from "react";
 import Context from "./Context";
-import img1 from "./img/avatar.webp";
 import axios from "axios";
 import getAccessToken from "./refreshToken";
 
@@ -8,10 +7,39 @@ function Provider({ children }) {
   const [navState, setNavState] = useState("Összes");
   const [menuState, setMenuState] = useState("Main");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || {name: "Lajos", image: img1});
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || "");
+  const [userId, setUserId] = useState("");
   const [locations, setLocations] = useState( localStorage.getItem("locations") || []);
   const [notificationFilter, setNotificationFilter] = useState("Összes");
   const [previousRoutes, setPreviousRoutes] = useState(["/"]);
+
+  async function getProfile(id) {
+    try {
+      const config = {
+        headers: { 
+          Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+          "Cache-Content": "no-cache"
+        }
+      }
+      const response = await axios.get(`https://backend.csaposapp.hu/api/Users/profile/${id}`, config);
+      const data = response.data;
+      setUser({
+        id: data.id,
+        displayName: data.displayName,
+        imageUrl: `https://assets.csaposapp.hu/assets/images/${data.imageUrl}?t=${new Date().getTime()}`
+      });
+      localStorage.setItem("user", JSON.stringify({
+        id: data.id,
+        displayName: data.displayName,
+        imageUrl: `https://assets.csaposapp.hu/assets/images/${data.imageUrl}?t=${new Date().getTime()}`
+      }));
+      console.log(data);
+    }
+    catch (error) {
+      console.log(error.data?.status);
+      console.log(error.message);
+    }
+  }
 
   async function getLocations() {
     try {
@@ -25,7 +53,8 @@ function Provider({ children }) {
     }
     catch (error) {
       if (error.response?.status === 401) {
-        return false;
+        getAccessToken();
+        getLocations();
       } 
       else {
         console.error("Error fetching locations:", error.message);
@@ -35,15 +64,14 @@ function Provider({ children }) {
   }
 
   useEffect(() => {
-    const fetchData = async () => {
-      let isSucceeded = await getLocations();
-      while (localStorage.getItem("accessToken") && isSucceeded === false) {
-        await getAccessToken();
-        isSucceeded = await getLocations();
+    if (localStorage.getItem("accessToken")) {
+      setUserId(decodeJWT(localStorage.getItem("accessToken")).sub);
+      if (userId) {
+        getProfile(userId);
+        getLocations();
       }
     }
-    fetchData();
-  }, [isAuthenticated]);
+  }, [localStorage.getItem("accessToken"), userId]);
 
   function decodeJWT(token) {
     const payload = token.split('.')[1]; 
@@ -52,7 +80,7 @@ function Provider({ children }) {
   }
 
   return (
-    <Context.Provider value={{ navState, setNavState, menuState, setMenuState, isAuthenticated, setIsAuthenticated, user, setUser, locations, setLocations, notificationFilter, setNotificationFilter, previousRoutes, setPreviousRoutes }}>
+    <Context.Provider value={{ navState, setNavState, menuState, setMenuState, isAuthenticated, setIsAuthenticated, user, setUser, locations, setLocations, notificationFilter, setNotificationFilter, previousRoutes, setPreviousRoutes, getProfile, setUserId }}>
       {children}
     </Context.Provider>
   )

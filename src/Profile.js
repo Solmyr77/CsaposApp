@@ -14,7 +14,7 @@ import PasswordModal from "./PasswordModal";
 
 function Profile() {
   const navigate = useNavigate();
-  const { setMenuState, setIsAuthenticated, user } = useContext(Context);
+  const { setMenuState, setIsAuthenticated, user, setUserId } = useContext(Context);
   const [isModifyModalVisible, setIsModifyModalVisible] = useState(false);
   const [isAddFriendModalVisible, setIsAddFriendModalVisible] = useState(false);
   const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
@@ -28,6 +28,8 @@ function Profile() {
         setIsAuthenticated(false);
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
+        localStorage.removeItem("user");
+        setUserId("");
         navigate("/login");
       }
     }
@@ -36,12 +38,12 @@ function Profile() {
 
   useEffect(() => {
     setMenuState("Profile");
-  }, []);
+  }, [user]);
   
   return (
     <div className="min-h-screen h-full w-full max-w-full bg-grey flex px-4 text-white font-bold font play flex-col items-center relative">
-        <h1 className="text-center w-full pt-8 text-2xl mb-2">{user.name}</h1>
-        <img src={user.image} alt="avatar" className="w-28 object-cover aspect-square rounded-full mb-8"/>
+        <h1 className="text-center w-full pt-8 text-2xl mb-2">{user.displayName}</h1>
+        <img src={user.imageUrl} alt="avatar" className="w-28 object-cover aspect-square rounded-full mb-8"/>
         <TitleDivider title={"Barátok"}/>
         <div className="flex flex-row w-full overflow-x-scroll mb-8">
           {
@@ -54,7 +56,6 @@ function Profile() {
                   </div>
                 )
               }
-
               return (
                 <div className="flex items-center">
                   <Friend name={name} image={user.image} isVertical={true}/>

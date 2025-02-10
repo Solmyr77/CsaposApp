@@ -33,7 +33,6 @@ function Provider({ children }) {
         displayName: data.displayName,
         imageUrl: `https://assets.csaposapp.hu/assets/images/${data.imageUrl}?t=${new Date().getTime()}`
       }));
-      console.log(data);
     }
     catch (error) {
       console.log(error.data?.status);

@@ -37,11 +37,9 @@ function ModifyModal({ isModifyModalVisible, setIsModifyModalVisible }) {
     const file = await event.target.files[0];
     const updatedFormData = new FormData();
     updatedFormData.append("file", file);
-    console.log(updatedFormData.get("file"));
     if (isImageSizeValid(file)) {
       const fileURL = URL.createObjectURL(file);
       setPreviewProfilePicture(fileURL);
-      console.log(previewProfilePicture);
       setFormData(updatedFormData);
     }
     else {
@@ -55,7 +53,6 @@ function ModifyModal({ isModifyModalVisible, setIsModifyModalVisible }) {
   }
 
   async function handleImageUpload() {
-    console.log(formData.get("file"));
     try {
       const config = {
         headers: {
@@ -65,7 +62,6 @@ function ModifyModal({ isModifyModalVisible, setIsModifyModalVisible }) {
         }
       }
       const response = await axios.post("https://backend.csaposapp.hu/api/Images/upload/profile", formData, config);
-      console.log("Upload successful:", response.data);
     }
     catch (error) {
       if (error.response?.status === 401) {

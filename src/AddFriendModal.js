@@ -32,13 +32,13 @@ function AddFriendModal({ isAddFriendModalVisible, setIsAddFriendModalVisible })
               if (record === recordsToDisplay[recordsToDisplay.length - 1]) {
                 return (
                   <div className="mb-2">
-                    <AddFriendItem name={record.name} image={user.image}/>
+                    <AddFriendItem name={record.name} image={user.imageUrl}/>
                   </div>
                 );
               }
               return (
                 <div>
-                  <AddFriendItem name={record.name} image={user.image}/>
+                  <AddFriendItem name={record.name} image={user.imageUrl}/>
                   <hr className="h-0.5 my-2 w-full bg-dark-grey border-0 rounded-md"/>
                 </div>
               );

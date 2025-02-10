@@ -10,7 +10,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const { setIsAuthenticated } = useContext(Context);
+  const { setIsAuthenticated, setUserId } = useContext(Context);
 
   async function handleLogin(username, password) {
     try {

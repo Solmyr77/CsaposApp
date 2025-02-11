@@ -2,22 +2,23 @@ import React, { useState, useEffect, useContext, useRef } from "react";
 import TitleDivider from "./TitleDivider";
 import ListItem from "./ListItem";
 import BackButton from "./BackButton";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import img1 from "./img/pub.webp"
 import { Rating } from "@mui/material";
 import { ChevronRightIcon, MapPinIcon } from "@heroicons/react/20/solid";
-import MainButton from "./MainButton";
 import Context from "./Context";
 import EventSwiper from "./EventSwiper";
 
 function Pub() {
-  const { locations, previousRoutes } = useContext(Context);
+  const { locations, previousRoutes, setPreviousRoutes } = useContext(Context);
   const { name } = useParams();
+  const location = useLocation();
   const [record, setRecord] = useState({});
   const [isBusinessHoursVisible, setIsBusinessHoursVisible] = useState(false);
   const [isDescriptionWrapped, setIsDescriptionWrapped] = useState(true);
   const [isClamped, setIsClamped] = useState(false);
   const textRef = useRef(null);
+  const navigate = useNavigate();
 
   const checkIfClamped = () => {
     const element = textRef.current;
@@ -95,7 +96,15 @@ function Pub() {
                 <EventSwiper/>
             </div>
             <div className="flex justify-center items-center self-center h-full py-10">
-                <MainButton title={"FOGLALOK"} isActive={record.isOpen ? true : false}/>
+                <div className={`w-64 h-20 bg-blue ${record.isOpen === true ? "opacity-1" : "opacity-50"} rounded flex justify-center items-center select-none hover:cursor-pointer`} onClick={() => {
+                    setPreviousRoutes((state) => {
+                        if (!state.includes(location.pathname)) return [...state, location.pathname];
+                        return state;
+                      }) 
+                    navigate(`/book/${record.name}`);
+                }}>
+                    <p className="font-bold text-lg">Foglalok</p>
+                </div>
             </div>
         </div>
     </div>

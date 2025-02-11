@@ -9,34 +9,23 @@ import { useNavigate } from "react-router-dom";
 import { PencilSquareIcon, UserPlusIcon, LockClosedIcon } from "@heroicons/react/20/solid";
 import ModifyModal from "./ModifyModal";
 import AddFriendModal from "./AddFriendModal";
-import axios from "axios";
 import PasswordModal from "./PasswordModal";
 import FriendModal from "./FriendModal";
 
 function Profile() {
-  const navigate = useNavigate();
-  const { setMenuState, setIsAuthenticated, user, setUserId } = useContext(Context);
+  const { setMenuState, setIsAuthenticated, user, setUserId, logout } = useContext(Context);
   const [isModifyModalVisible, setIsModifyModalVisible] = useState(false);
   const [isAddFriendModalVisible, setIsAddFriendModalVisible] = useState(false);
   const [isFriendModalVisible, setIsFriendModalVisible] = useState(false);
   const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
   const [selectedFriend, setSelectedFriend] = useState(null);
+  const navigate = useNavigate();
 
   const friendNames = ["Barát1", "Barát2", "Barát3", "Barát4", "Barát5", "Barát6"];
-  
-  function handleLogout() {
-    const logout = async () => {
-      const response = await axios.post("https://backend.csaposapp.hu/api/auth/logout", {refreshToken : localStorage.getItem("refreshToken")});
-      if (response.status === 204) {
-        setIsAuthenticated(false);
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("user");
-        setUserId("");
-        navigate("/login");
-      }
-    }
-    logout();
+
+  const handleLogout = async() => {
+    await logout();
+    navigate("login");
   }
 
   useEffect(() => {

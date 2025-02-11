@@ -52,13 +52,28 @@ function Provider({ children }) {
     }
     catch (error) {
       if (error.response?.status === 401) {
-        getAccessToken();
-        getLocations();
+        if (getAccessToken()) {
+          getLocations();
+        }
+        await logout();
+        window.location.reload();
+        return false;
       } 
       else {
         console.error("Error fetching locations:", error.message);
         return false;
       }
+    }
+  }
+
+  const logout = async () => {
+    const response = await axios.post("https://backend.csaposapp.hu/api/auth/logout", {refreshToken : localStorage.getItem("refreshToken")});
+    if (response.status === 204) {
+      setIsAuthenticated(false);
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("user");
+      setUserId("");
     }
   }
 
@@ -79,7 +94,7 @@ function Provider({ children }) {
   }
 
   return (
-    <Context.Provider value={{ navState, setNavState, menuState, setMenuState, isAuthenticated, setIsAuthenticated, user, setUser, locations, setLocations, notificationFilter, setNotificationFilter, previousRoutes, setPreviousRoutes, getProfile, setUserId }}>
+    <Context.Provider value={{ navState, setNavState, menuState, setMenuState, isAuthenticated, setIsAuthenticated, user, setUser, locations, setLocations, notificationFilter, setNotificationFilter, previousRoutes, setPreviousRoutes, getProfile, setUserId, logout }}>
       {children}
     </Context.Provider>
   )

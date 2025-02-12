@@ -10,7 +10,8 @@ import Login from './Login';
 import ProtectedRoute from './ProtectedRoute';
 import Notifications from './Notifications';
 import Event from './Event';
-import Book from './Book';
+import Tables from './Tables';
+import ReserveTable from './ReserveTable';
 
 function App() {
   return (
@@ -46,9 +47,13 @@ function App() {
             <ProtectedRoute isProtected={true}>
               <Event />
             </ProtectedRoute>}/>
-          <Route path="/book/:name" element={
+          <Route path="/tables/:name" element={
             <ProtectedRoute isProtected={true}>
-              <Book />
+              <Tables />
+            </ProtectedRoute>}/>
+          <Route path="/reservetable/:name/table/:number" element={
+            <ProtectedRoute isProtected={true}>
+              <ReserveTable />
             </ProtectedRoute>}/>
           <Route path="/register" element={
             <ProtectedRoute>

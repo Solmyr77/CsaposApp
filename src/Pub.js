@@ -101,8 +101,8 @@ function Pub() {
                         setPreviousRoutes((state) => {
                             if (!state.includes(location.pathname)) return [...state, location.pathname];
                             return state;
-                          }) 
-                        navigate(`/book/${record.name}?t=${new Date().getTime()}`);
+                          });
+                        navigate(`/tables/${record.name}`);
                     }
                 }}>
                     <p className="font-bold text-lg">Foglalok</p>

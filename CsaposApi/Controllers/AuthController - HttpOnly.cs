@@ -15,7 +15,7 @@ using static CsaposApi.Models.DTOs.UserDTO;
 namespace CsaposApi.Controllers
 {
     [ApiController]
-    [Route("api/auth")]
+    [Route("api/do-not-use")]
     public class AuthControllerHttpOnly : ControllerBase
     {
         private readonly CsaposappContext _context;

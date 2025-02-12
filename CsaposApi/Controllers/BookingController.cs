@@ -9,7 +9,7 @@ using static CsaposApi.Models.DTOs.BookingDTO;
 
 namespace CsaposApi.Controllers
 {
-    [Route("api/booking")]
+    [Route("api/bookings")]
     [ApiController]
     public class BookingController : ControllerBase
     {

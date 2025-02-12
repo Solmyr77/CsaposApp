@@ -16,13 +16,13 @@ namespace CsaposApi.Controllers
 {
     [ApiController]
     [Route("api/auth")]
-    public class AuthController : ControllerBase
+    public class AuthControllerHttpOnly : ControllerBase
     {
         private readonly CsaposappContext _context;
         private readonly IAuthService _authService;
         private readonly IPasswordService _passwordService;
 
-        public AuthController(
+        public AuthControllerHttpOnly(
             CsaposappContext context,
             IAuthService authService,
             IPasswordService passwordService)
@@ -69,7 +69,23 @@ namespace CsaposApi.Controllers
             // 3) Generate token pair
             var tokenResponse = await _authService.GenerateTokenPairAsync(user.Id);
 
-            return Ok(tokenResponse);
+            Response.Cookies.Append("access_token", tokenResponse.AccessToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true, // Use HTTPS
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddMinutes(15) // Match token expiration
+            });
+
+            Response.Cookies.Append("refresh_token", tokenResponse.RefreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddDays(7) // Match refresh token expiration
+            });
+
+            return Ok(new { message = "Login successful" });
         }
 
         /// <summary>
@@ -148,7 +164,22 @@ namespace CsaposApi.Controllers
 
             try
             {
-                // The service layer should handle revoking the token in your database or token store.
+                Response.Cookies.Append("access_token", "", new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.UtcNow.AddSeconds(-1) // Expire immediately
+                });
+
+                Response.Cookies.Append("refresh_token", "", new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.UtcNow.AddSeconds(-1)
+                });
+
                 await _authService.RevokeRefreshTokenAsync(logoutRequestDto.RefreshToken);
                 return NoContent();
             }
@@ -188,10 +219,15 @@ namespace CsaposApi.Controllers
             {
                 var accessToken = await _authService.RefreshAccessTokenAsync(refreshTokenRequestDto.RefreshToken);
 
-                return Ok(new
+                Response.Cookies.Append("access_token", accessToken, new CookieOptions
                 {
-                    accessToken
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.UtcNow.AddMinutes(15) // Adjust expiration as needed
                 });
+
+                return Ok(new { message = "Token refreshed successfully" });
             }
             catch (SecurityTokenException ex)
             {

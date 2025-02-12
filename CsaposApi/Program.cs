@@ -135,7 +135,7 @@ namespace CsaposApi
             app.UseSwaggerUI();
 
             // Use CORS
-            app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            app.UseCors("AllowOrigin");
 
             // app.UseHttpsRedirection();
 

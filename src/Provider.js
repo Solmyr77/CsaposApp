@@ -52,12 +52,14 @@ function Provider({ children }) {
     }
     catch (error) {
       if (error.response?.status === 401) {
-        if (getAccessToken()) {
+        if (await getAccessToken()) {
           getLocations();
         }
-        await logout();
-        window.location.reload();
-        return false;
+        else {
+          await logout();
+          window.location.reload();
+          return false;
+        }
       } 
       else {
         console.error("Error fetching locations:", error.message);

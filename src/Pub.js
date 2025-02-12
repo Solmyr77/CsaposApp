@@ -97,11 +97,13 @@ function Pub() {
             </div>
             <div className="flex justify-center items-center self-center h-full py-10">
                 <div className={`w-64 h-20 bg-blue ${record.isOpen === true ? "opacity-1" : "opacity-50"} rounded flex justify-center items-center select-none hover:cursor-pointer`} onClick={() => {
-                    setPreviousRoutes((state) => {
-                        if (!state.includes(location.pathname)) return [...state, location.pathname];
-                        return state;
-                      }) 
-                    navigate(`/book/${record.name}`);
+                    if (record.isOpen) {
+                        setPreviousRoutes((state) => {
+                            if (!state.includes(location.pathname)) return [...state, location.pathname];
+                            return state;
+                          }) 
+                        navigate(`/book/${record.name}?t=${new Date().getTime()}`);
+                    }
                 }}>
                     <p className="font-bold text-lg">Foglalok</p>
                 </div>

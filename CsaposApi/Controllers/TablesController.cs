@@ -27,17 +27,36 @@ namespace CsaposApi.Controllers
         // GET: api/Tables
         [HttpGet]
         [Authorize(Policy = "MustBeGuest")]
-        public async Task<ActionResult<IEnumerable<Table>>> GetTables()
+        public async Task<ActionResult<IEnumerable<TableResponseDTO>>> GetTables()
         {
-            return Ok(await _context.Tables.ToListAsync());
+            return Ok(await _context.Tables
+                .Select(t => new TableResponseDTO
+                {
+                    Id = t.Id,
+                    Number = t.Number,
+                    Capacity = t.Capacity,
+                    IsBooked = t.IsBooked,
+                    LocationId = t.LocationId
+                })
+                .ToListAsync());
         }
 
         // GET: api/Tables/5
         [HttpGet("{id}")]
         [Authorize(Policy = "MustBeGuest")]
-        public async Task<ActionResult<Table>> GetTable(string id)
+        public async Task<ActionResult<TableResponseDTO>> GetTable(Guid id)
         {
-            var table = await _context.Tables.FindAsync(id);
+            var table = await _context.Tables
+                .Where(t => t.Id == id)
+                .Select(t => new TableResponseDTO
+                {
+                    Id = t.Id,
+                    Number = t.Number,
+                    Capacity = t.Capacity,
+                    IsBooked = t.IsBooked,
+                    LocationId = t.LocationId
+                })
+                .SingleOrDefaultAsync();
 
             if (table == null)
             {
@@ -72,7 +91,7 @@ namespace CsaposApi.Controllers
                     Number = createTableDTO.number,
                     Capacity = createTableDTO.capacity,
                     IsBooked = false,
-
+                    LocationId = createTableDTO.locationId
                 };
 
                 await _context.Tables.AddAsync(currentTable);
@@ -80,12 +99,13 @@ namespace CsaposApi.Controllers
 
                 return Ok();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError, new
                 {
                     error = "server_error",
-                    message = "An unexpected error occurred while updating the password.",
+                    // message = "An unexpected error occurred while booking the table.",
+                    message = ex.Message
                 });
             }
         }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 using static CsaposApi.Models.DTOs.AuthDTO;
 using static CsaposApi.Models.DTOs.BookingDTO;
@@ -18,6 +19,54 @@ namespace CsaposApi.Controllers
         {
             _context = context;
         }
+
+        [HttpGet]
+        [Authorize(Policy = "MustBeGuest")]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<IEnumerable<BookingResponseDTO>>> GetTableBookings()
+        {
+            var bookings = await _context.TableBookings
+                .Select(tb => new BookingResponseDTO
+                {
+                    Id = tb.Id,
+                    BookerId = tb.BookerId,
+                    TableId = tb.TableId,
+                    BookedFrom = tb.BookedFrom,
+                    BookedTo = tb.BookedTo
+                })
+                .ToListAsync();
+
+            return Ok(bookings);
+        }
+
+        [HttpGet("{bookerId}")]
+        [Authorize(Policy = "MustBeGuest")]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<IEnumerable<BookingResponseDTO>>> GetTableBookings(Guid bookerId)
+        {
+            var bookings = await _context.TableBookings
+                .Where(tb => tb.BookerId == bookerId)
+                .Select(tb => new BookingResponseDTO
+                {
+                    Id = tb.Id,
+                    BookerId = tb.BookerId,
+                    TableId = tb.TableId,
+                    BookedFrom = tb.BookedFrom,
+                    BookedTo = tb.BookedTo
+                })
+                .ToListAsync();
+
+            if (bookings == null || !bookings.Any())
+                return NotFound();
+
+            return Ok(bookings);
+        }
+
 
         [HttpPost("book-table")]
         [Authorize(Policy = "MustBeGuest")]

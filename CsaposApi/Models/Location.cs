@@ -11,6 +11,8 @@ public partial class Location
 
     public string Description { get; set; } = null!;
 
+    public string Address { get; set; } = null!;
+
     public int Capacity { get; set; }
 
     public int NumberOfTables { get; set; }

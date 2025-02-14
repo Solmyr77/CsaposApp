@@ -77,13 +77,14 @@ namespace CsaposApi
                 });
             });
 
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IPasswordService, PasswordService>();
+            builder.Services.AddScoped<IFriendshipService, FriendshipService>();
+
             // 1. Bind JwtSettings
             var jwtSection = builder.Configuration.GetSection("JwtSettings");
             builder.Services.Configure<JwtSettings>(jwtSection);
             var jwtSettings = jwtSection.Get<JwtSettings>();
-
-            builder.Services.AddScoped<IAuthService, AuthService>();
-            builder.Services.AddScoped<IPasswordService, PasswordService>();
 
             // 2. Register Authentication
             var key = Encoding.UTF8.GetBytes(jwtSettings.SecretKey);

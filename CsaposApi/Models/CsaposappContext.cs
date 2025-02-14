@@ -21,6 +21,8 @@ public partial class CsaposappContext : DbContext
 
     public virtual DbSet<EventAttendance> EventAttendances { get; set; }
 
+    public virtual DbSet<Friendship> Friendships { get; set; }
+
     public virtual DbSet<Location> Locations { get; set; }
 
     public virtual DbSet<Order> Orders { get; set; }
@@ -160,6 +162,42 @@ public partial class CsaposappContext : DbContext
                 .HasConstraintName("event_attendance_ibfk_3");
         });
 
+        modelBuilder.Entity<Friendship>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("friendships");
+
+            entity.HasIndex(e => e.UserId2, "fk_friendship_user2");
+
+            entity.HasIndex(e => new { e.UserId1, e.UserId2 }, "unique_friendship_pair").IsUnique();
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("created_at");
+            entity.Property(e => e.Status)
+                .HasDefaultValueSql("'pending'")
+                .HasColumnType("enum('pending','accepted','rejected','blocked')")
+                .HasColumnName("status");
+            entity.Property(e => e.UpdatedAt)
+                .ValueGeneratedOnAddOrUpdate()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("updated_at");
+            entity.Property(e => e.UserId1).HasColumnName("user_id1");
+            entity.Property(e => e.UserId2).HasColumnName("user_id2");
+
+            entity.HasOne(d => d.UserId1Navigation).WithMany(p => p.FriendshipUserId1Navigations)
+                .HasForeignKey(d => d.UserId1)
+                .HasConstraintName("fk_friendship_user1");
+
+            entity.HasOne(d => d.UserId2Navigation).WithMany(p => p.FriendshipUserId2Navigations)
+                .HasForeignKey(d => d.UserId2)
+                .HasConstraintName("fk_friendship_user2");
+        });
+
         modelBuilder.Entity<Location>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
@@ -167,6 +205,9 @@ public partial class CsaposappContext : DbContext
             entity.ToTable("locations");
 
             entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Address)
+                .HasMaxLength(100)
+                .HasColumnName("address");
             entity.Property(e => e.Capacity)
                 .HasColumnType("int(11)")
                 .HasColumnName("capacity");

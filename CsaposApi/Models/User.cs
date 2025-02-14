@@ -27,6 +27,10 @@ public partial class User
 
     public virtual ICollection<EventAttendance> EventAttendances { get; set; } = new List<EventAttendance>();
 
+    public virtual ICollection<Friendship> FriendshipUserId1Navigations { get; set; } = new List<Friendship>();
+
+    public virtual ICollection<Friendship> FriendshipUserId2Navigations { get; set; } = new List<Friendship>();
+
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
     public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();

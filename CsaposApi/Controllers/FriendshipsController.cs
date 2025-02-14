@@ -59,6 +59,7 @@ namespace CsaposApi.Controllers
 
         // Send Friend Request
         [HttpPost("request")]
+        [Authorize(Policy = "MustBeGuest")]
         public async Task<IActionResult> SendFriendRequest([FromQuery] Guid receiverId)
         {
             try
@@ -81,6 +82,7 @@ namespace CsaposApi.Controllers
 
         // Accept Friend Request
         [HttpPost("accept/{friendshipId}")]
+        [Authorize(Policy = "MustBeGuest")]
         public async Task<IActionResult> AcceptFriendRequest(Guid friendshipId)
         {
             try
@@ -103,6 +105,7 @@ namespace CsaposApi.Controllers
 
         // Reject Friend Request
         [HttpPost("reject/{friendshipId}")]
+        [Authorize(Policy = "MustBeGuest")]
         public async Task<IActionResult> RejectFriendRequest(Guid friendshipId)
         {
             try
@@ -125,6 +128,7 @@ namespace CsaposApi.Controllers
 
         // Remove Friend
         [HttpDelete("remove/{friendId}")]
+        [Authorize(Policy = "MustBeGuest")]
         public async Task<IActionResult> RemoveFriend(Guid friendId)
         {
             try
@@ -147,6 +151,7 @@ namespace CsaposApi.Controllers
 
         // Block User
         [HttpPost("block/{friendId}")]
+        [Authorize(Policy = "MustBeGuest")]
         public async Task<IActionResult> BlockUser(Guid friendId)
         {
             try
@@ -169,6 +174,7 @@ namespace CsaposApi.Controllers
 
         // Get Friends List
         [HttpGet("list")]
+        [Authorize(Policy = "MustBeGuest")]
         public async Task<IActionResult> GetFriends()
         {
             try
@@ -190,6 +196,7 @@ namespace CsaposApi.Controllers
 
         // Get Pending Friend Requests
         [HttpGet("requests")]
+        [Authorize(Policy = "MustBeGuest")]
         public async Task<IActionResult> GetPendingRequests()
         {
             try

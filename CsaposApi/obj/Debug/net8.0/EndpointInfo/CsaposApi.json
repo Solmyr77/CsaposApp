@@ -2377,10 +2377,6 @@
       "CreateBookingDTO": {
         "type": "object",
         "properties": {
-          "bookerId": {
-            "type": "string",
-            "format": "uuid"
-          },
           "tableId": {
             "type": "string",
             "format": "uuid"

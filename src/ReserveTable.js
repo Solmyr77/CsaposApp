@@ -2,10 +2,16 @@ import React, { forwardRef, useContext, useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import Context from "./Context";
 import BackButton from "./BackButton";
-import DatePicker from "react-datepicker";
+import { CalendarIcon, PlusIcon, XMarkIcon } from "@heroicons/react/20/solid";
+import DatePicker, {registerLocale} from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { addDays } from 'date-fns';
 import styled from "styled-components";
+import hu from 'date-fns/locale/hu';
+import Friend from "./Friend";
+import AddFriendToTableModal from "./AddFriendToTableModal";
+registerLocale('hu', hu);
+
 
 const StyledDatePickerWrapper = styled.div`
   .react-datepicker {
@@ -30,7 +36,7 @@ const StyledDatePickerWrapper = styled.div`
 
   .react-datepicker__day--selected {
     color: white;
-    background-color: #007AFF;
+    background-color: #007AFF !important;
     color: white;
   }
 
@@ -80,15 +86,16 @@ const StyledDatePickerWrapper = styled.div`
 `;
 
 function ReserveTable() {
-  const { locations, previousRoutes } = useContext(Context);  
+  const { locations, previousRoutes, user, tableFriends, setTableFriends } = useContext(Context);  
   const { name, number } = useParams(); 
   const navigate = useNavigate();
   const [record, setRecord] = useState({});
   const [startDate, setStartDate] = useState(new Date());
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const ExampleCustomInput = forwardRef(
     ({ value, onClick, className }, ref) => (
       <button className={className} onClick={onClick} ref={ref}>
-        {value}
+        {value} <hr className="w-8 rotate-90 rounded-md"/> <CalendarIcon className="w-6"/>
       </button>
     ),
   );
@@ -114,7 +121,7 @@ function ReserveTable() {
       </Link>
       <p className="text-center text-xxl">Asztal {number}</p>
       <div className="flex flex-col flex-grow w-full mt-4">
-        <p className="text-xl mb-2">Időpont</p>
+        <p className="text-lg mb-2">Időpont</p>
         <div className="flex justify-center">
           <StyledDatePickerWrapper>
             <DatePicker 
@@ -128,8 +135,25 @@ function ReserveTable() {
             timeIntervals={15}
             minDate={new Date()} 
             maxDate={addDays(new Date(), 7)}
-            customInput={<ExampleCustomInput className="bg-dark-grey px-8 py-2 rounded-md text-xl"/>}/>
+            locale={"hu"}
+            timeCaption="Idő"
+            className="font-play"
+            customInput={<ExampleCustomInput className="bg-dark-grey px-4 py-2 rounded-md text-lg flex flex-row items-center"/>}/>
           </StyledDatePickerWrapper>
+        </div>
+        <p className="text-lg mt-6 mb-1">Barátok meghívása</p>
+        <p className="text-sm font-normal mb-4">Max: 3 fő</p>
+        <div className="grid grid-cols-4 gap-2 place-items-center">
+          <AddFriendToTableModal isModalVisible={isModalVisible} setIsModalVisible={setIsModalVisible}/>
+          {
+            tableFriends.map(name => (
+              <div className="relative">
+                <Friend name={name} image={user.imageUrl}/>
+                <XMarkIcon className="w-6 bg-red-500 rounded-full absolute -top-1 right-0" onClick={() => setTableFriends(tableFriends.filter(element => element != name))}/>
+              </div>
+            ))
+          }
+          <PlusIcon className={`${tableFriends.length < 4 - 1 ? "block" : "hidden"} w-16 bg-dark-grey text-gray-500 rounded-full hover:cursor-pointer`} onClick={() => setIsModalVisible(state => !state)}/>
         </div>
       </div>
     </div>

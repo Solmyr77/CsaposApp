@@ -105,7 +105,7 @@ function Pub() {
                         navigate(`/tables/${record.name}`);
                     }
                 }}>
-                    <p className="font-bold text-lg">Foglalok</p>
+                    <p className="font-bold text-xl">Foglalok</p>
                 </div>
             </div>
         </div>

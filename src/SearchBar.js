@@ -1,15 +1,53 @@
 import React, { useContext, useState } from "react";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Context from "./Context";
+import axios from "axios";
+import getAccessToken from "./refreshToken";
 
-function SearchBar({ displayTitle, setRecordsToDisplay }) {
-  const { locations } = useContext(Context);
+function SearchBar({ displayTitle, setRecordsToDisplay, friendSearch }) {
+  const { user, locations, logout } = useContext(Context);
   const [searchValue, setSearchValue] = useState("");
 
   function handleSearch(event) {
     setSearchValue(event.target.value);
     const filteredRecords = locations.filter(record => record.name.toLowerCase().includes(event.target.value.toLowerCase()));
     setRecordsToDisplay(filteredRecords);
+  }
+
+  async function handleFriendSearch(event) {
+    const value = event.target.value;
+    setSearchValue(value);
+    if (value.trim() !== "" && value.length > 2) {
+      try {
+        const config = {
+          headers : {
+            Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+            "Cache-Content": "no-cache"
+          }
+        }
+        const response = await axios.get(`https://backend.csaposapp.hu/api/Users/profile/search/${value}`, config);
+        const data = await response.data;
+        console.log(data);
+        const filteredRecords = data.filter(record => record.id !== user.id);
+        console.log(filteredRecords);
+        filteredRecords.length > 0 ? setRecordsToDisplay(filteredRecords) : setRecordsToDisplay([]);
+      }
+      catch (error) {
+        if (error.response?.status === 401) {
+          if (await getAccessToken()) {
+            handleFriendSearch(event);
+          }
+          else {
+            await logout();
+            window.location.reload();
+          }
+        }
+        console.log(error.message);
+      }
+    }
+    else {
+      setRecordsToDisplay([]);
+    }
   }
 
   return (
@@ -19,12 +57,12 @@ function SearchBar({ displayTitle, setRecordsToDisplay }) {
             {
               searchValue.trim() === "" ? 
               <MagnifyingGlassIcon className="h-6 absolute right-3 top-1/2 -translate-y-1/2"/> :
-              <XMarkIcon className="h-6 absolute right-3 top-1/2 -translate-y-1/2 text-red-500" onClick={() => {
-                setSearchValue("")
-                setRecordsToDisplay(locations);
+              <XMarkIcon className="h-6 absolute right-3 top-1/2 -translate-y-1/2 text-red-500 hover:cursor-pointer" onClick={() => {
+                setSearchValue("");
+                !friendSearch ? setRecordsToDisplay(locations) : setRecordsToDisplay([]);
               }}/>
             }
-            <input type="text" className="w-full bg-dark-grey pl-5 pr-10 py-2 rounded-full font-normal focus:outline-none" placeholder="Keresés" onChange={(event) => handleSearch(event)} value={searchValue}/>
+            <input type="text" className="w-full bg-dark-grey pl-5 pr-10 py-2 rounded-full font-normal focus:outline-none" placeholder="Keresés" onChange={(event) => friendSearch ? handleFriendSearch(event) : handleSearch(event)} value={searchValue}/>
         </div>
     </div>
   )

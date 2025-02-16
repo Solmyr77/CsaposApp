@@ -77,12 +77,11 @@ function ModifyModal({ isModifyModalVisible, setIsModifyModalVisible }) {
     if (event.target.profilename.value.trim() !== "") {
       await handleImageUpload();
       setUser({...user, displayName: newProfileName});
-      localStorage.setItem("user", JSON.stringify({...user, displayName: newProfileName}));
       setIsSucceeded(true);
       setTimeout(async() => {
         setIsSucceeded(false);
         setIsModifyModalVisible(false);
-        await getProfile(user.id);
+        await getProfile(user.id, "user");
       }, 1000);
     }
     else {

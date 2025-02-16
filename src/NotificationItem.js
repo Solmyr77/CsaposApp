@@ -2,14 +2,17 @@ import React, { useState, useContext, useEffect } from "react";
 import { EnvelopeIcon, CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import Context from "./Context";
 import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
+import getAccessToken from "./refreshToken";
 
-function NotificationItem({ isFriendRequest }) {
+function NotificationItem({ record, isFriendRequest }) {
+  const { getProfile, friendRequests, setFriendRequests, setFriends, setPreviousRoutes, logout } = useContext(Context);
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isAccepted, setIsAccepted] = useState(null);
   const [Icon, setIcon] = useState(null);
   const [isRead, setIsRead] = useState(null);
-  const { user, setPreviousRoutes } = useContext(Context);
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [profile, setProfile] = useState({});
 
   const importIcon = async() => {
     if (isAccepted === true) {
@@ -17,25 +20,93 @@ function NotificationItem({ isFriendRequest }) {
     }
     return await import("@heroicons/react/20/solid/XCircleIcon");
   }
+
+  async function handleAccept(id) {
+    try {
+      const config = {
+        headers : {
+          Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+          "Cache-Content": "no-cache"
+        }
+      }
+      const response = await axios.post(`https://backend.csaposapp.hu/api/friends/accept/${id}`, {}, config);
+      if (response.status === 200) {
+        setIsAccepted(true);
+        setTimeout(() => {
+          setFriends(state => state.filter(friend => friend.id !== profile.id));
+          setFriendRequests(state => state.filter(friendRequest => friendRequest.id !== record.id));
+        }, 2000);
+      }
+    }
+    catch (error) {
+      const response = error.response;
+      if (response?.status === 401) {
+        console.log(error.message);
+        if (await getAccessToken()) {
+          handleAccept(id);
+        }
+        else {
+          await logout();
+          navigate("/login");
+        }
+      }
+    }
+  }
+
+  async function handleReject(id) {
+    try {
+      const config = {
+        headers : {
+          Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+          "Cache-Content": "no-cache"
+        }
+      }
+      const response = await axios.post(`https://backend.csaposapp.hu/api/friends/reject/${id}`, {}, config);
+      if (response.status === 200) {
+        setIsAccepted(false);
+        setTimeout(() => {
+          setFriends(state => state.filter(friend => friend.id !== profile.id));
+          setFriendRequests(state => state.filter(friendRequest => friendRequest.id !== record.id));
+        }, 2000);
+      }
+    }
+    catch (error) {
+      const response = error.response;
+      if (response?.status === 401) {
+        console.log(error.message);
+        if (await getAccessToken()) {
+          handleReject(id);
+        }
+        else {
+          await logout();
+          navigate("/login");
+        }
+      }
+    }
+  }
   
   useEffect(() => {
-    const run = async() => {
+    const run = async () => {
       setIcon((await importIcon()).default);
+      if (isFriendRequest) {
+        console.log(await getProfile(record.userId1));
+        setProfile(await getProfile(record.userId1));
+      }
     }
     run();
-  }, [isAccepted]);
+  }, [isAccepted, record]);
 
   if (isFriendRequest === true) {
     return(
       <div className="w-full h-16 bg-dark-grey rounded-md flex flex-row items-center p-4">
-        <img src={user.imageUrl} alt="" className="h-10 aspect-square rounded-full object-cover"/>
+        <img src={`https://assets.csaposapp.hu/assets/images/${profile.imageUrl}`} alt="" className="h-10 aspect-square rounded-full object-cover"/>
         <div className="flex flex-row w-full pl-2 items-center">
-          <p className="flex flex-row items-center text-sm text-left text-nowrap basis-4/5"><span className="truncate inline-block max-w-20 mr-1 font-bold">Azahriah</span> barátnak jelölt!</p>
+          <p className="flex flex-row items-center text-sm text-left text-nowrap basis-4/5"><span className="truncate inline-block max-w-20 mr-1 font-bold">{profile.displayName}</span> barátnak jelölt!</p>
           {
             isAccepted === null ? 
             <div className="flex flex-row gap-x-1 basis-1/5">
-                <CheckCircleIcon className="h-10 text-green-500 hover:cursor-pointer" onClick={() => setIsAccepted(true)}/>
-                <XCircleIcon className="h-10 text-red-500 hover:cursor-pointer" onClick={() => setIsAccepted(false)}/>
+                <CheckCircleIcon className="h-10 text-green-500 hover:cursor-pointer" onClick={async () => await handleAccept(record.id)}/>
+                <XCircleIcon className="h-10 text-red-500 hover:cursor-pointer" onClick={async () => await handleReject(record.id)}/>
             </div> :
             <div className="flex flex-row gap-x-1 basis-1/5">
                 <Icon className={`h-10 text-green-500 ${isAccepted ? "visible" : "invisible"}`}/>

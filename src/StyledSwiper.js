@@ -18,7 +18,7 @@ function StyledSwiper() {
   return (
     <StyledSwipers autoplay={{delay: 5000}} speed={500} pagination={{dynamicBullets: true}} modules={[Pagination, Autoplay]} className="mySwiper mb-3 drop-shadow-[0_4px_4px_rgba(0,0,0,0.25)]">
       {
-        highlightedLocations.map(record => <SwiperSlide><HighlightedCard key={record.id} record={record}/></SwiperSlide>)
+        highlightedLocations.map(record => <SwiperSlide key={record.id}><HighlightedCard record={record}/></SwiperSlide>)
       }
     </StyledSwipers> 
   )

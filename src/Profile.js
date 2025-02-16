@@ -13,24 +13,22 @@ import PasswordModal from "./PasswordModal";
 import FriendModal from "./FriendModal";
 
 function Profile() {
-  const { setMenuState, setIsAuthenticated, user, setUserId, logout } = useContext(Context);
+  const { setMenuState, user, friends, logout } = useContext(Context);
   const [isModifyModalVisible, setIsModifyModalVisible] = useState(false);
   const [isAddFriendModalVisible, setIsAddFriendModalVisible] = useState(false);
   const [isFriendModalVisible, setIsFriendModalVisible] = useState(false);
   const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
-  const [selectedFriend, setSelectedFriend] = useState(null);
+  const [selectedFriend, setSelectedFriend] = useState({});
   const navigate = useNavigate();
-
-  const friendNames = ["Barát1", "Barát2", "Barát3", "Barát4", "Barát5", "Barát6"];
 
   const handleLogout = async() => {
     await logout();
-    navigate("login");
+    navigate("/login");
   }
 
   useEffect(() => {
     setMenuState("Profile");
-  }, [user]);
+  }, [user, friends]);
   
   return (
     <div className="min-h-screen h-full w-full max-w-full bg-grey flex px-4 text-white font-bold font play flex-col items-center relative">
@@ -38,29 +36,30 @@ function Profile() {
       <img src={user.imageUrl} alt="avatar" className="w-28 object-cover aspect-square rounded-full mb-8"/>
       <TitleDivider title={"Barátok"}/>
       <div className="flex flex-row w-full overflow-x-scroll mb-8">
-        {
-          friendNames.map(name =>
-          {
-            if(name === friendNames[friendNames.length-1]) {
+        { friends.length > 0 ? 
+          friends.sort((a, b) => a.displayName.localeCompare(b.displayName)).map(friend =>
+            {
+              if(friend === friends[friends.length-1]) {
+                return (
+                  <div className="flex hover:cursor-pointer" onClick={() => {
+                    setIsFriendModalVisible(true);
+                    setSelectedFriend(friend);
+                    }}>
+                    <Friend record={friend} isVertical={true}/>
+                  </div>
+                )
+              }
               return (
-                <div className="flex hover:cursor-pointer" onClick={() => {
+                <div className="flex items-center hover:cursor-pointer" onClick={()=> {
                   setIsFriendModalVisible(true);
-                  setSelectedFriend(name);
+                  setSelectedFriend(friend);
                   }}>
-                  <Friend name={name} image={user.imageUrl} isVertical={true}/>
+                  <Friend record={friend} isVertical={true}/>
+                  <div className="h-4/5 w-[2px] rounded-md bg-dark-grey"></div>
                 </div>
               )
-            }
-            return (
-              <div className="flex items-center hover:cursor-pointer" onClick={()=> {
-                setIsFriendModalVisible(true);
-                setSelectedFriend(name);
-                }}>
-                <Friend name={name} image={user.imageUrl} isVertical={true}/>
-                <div className="h-4/5 w-[2px] rounded-md bg-dark-grey"></div>
-              </div>
-            )
-          })
+            }):
+          <p className="font-normal text-center w-full">Nincsenek barátaid</p>
         }
       </div>
       <TitleDivider title={"Eredmények"}/>
@@ -82,7 +81,7 @@ function Profile() {
       </div>
       <button className="w-1/2 bg-dark-grey text-red-500 py-2 px-4 rounded-md mt-2 drop-shadow-[0_4px_4px_rgba(0,0,0,.5)] select-none" onClick={handleLogout}>Kijelentkezés</button>
       <div className="h-[12vh]"></div>
-      <FriendModal name={selectedFriend} isFriendModalVisible={isFriendModalVisible} setIsFriendModalVisible={setIsFriendModalVisible}/>
+      <FriendModal record={selectedFriend} isFriendModalVisible={isFriendModalVisible} setIsFriendModalVisible={setIsFriendModalVisible}/>
       <ModifyModal isModifyModalVisible={isModifyModalVisible} setIsModifyModalVisible={setIsModifyModalVisible}/>
       <AddFriendModal isAddFriendModalVisible={isAddFriendModalVisible} setIsAddFriendModalVisible={setIsAddFriendModalVisible}/>
       <PasswordModal isPasswordModalVisible={isPasswordModalVisible} setIsPasswordModalVisible={setIsPasswordModalVisible}/>

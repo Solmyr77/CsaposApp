@@ -6,25 +6,23 @@ import NavItem from "./NavItem";
 import Context from "./Context";
 
 function Notifications() {
+    const { friendRequests, notificationFilter, previousRoutes } = useContext(Context);
     const [recordsToDisplay, setRecordsToDisplay] = useState([]);
-    const { notificationFilter, previousRoutes } = useContext(Context);
+    const eventRecords = [""];
 
-    const friendRecords = Array(1).fill(<NotificationItem isFriendRequest={true}/>);
-    const eventRecords = Array(1).fill(<NotificationItem/>);
-    
     useEffect(() => {
         switch (notificationFilter) {
             case "Összes":
-                setRecordsToDisplay(friendRecords.concat(eventRecords));
+                setRecordsToDisplay(friendRequests.concat(eventRecords));
                 break;
             case "Események":
                 setRecordsToDisplay(eventRecords);
                 break;
             case "Barát felkérések":
-                setRecordsToDisplay(friendRecords);
+                setRecordsToDisplay(friendRequests);
                 break;
         }
-    }, [notificationFilter]);
+    }, [notificationFilter, friendRequests]);
 
   return (
     <div className="w-full h-screen bg-grey py-8 px-4 text-white flex flex-col overflow-hidden">
@@ -39,7 +37,16 @@ function Notifications() {
         </div>
         <div className="flex flex-col mt-4 gap-y-2 pr-1 overflow-y-auto">
             {
-                recordsToDisplay.map(record => record)
+                recordsToDisplay.map(record => Object.hasOwn(record, "id") ? (
+                    <div>
+                        <NotificationItem record={record} isFriendRequest/>
+                    </div>
+                ) :
+                (
+                    <div>
+                        <NotificationItem/>
+                    </div> 
+                ))
             }
         </div>
     </div>

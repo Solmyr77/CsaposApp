@@ -16,6 +16,7 @@ function Provider({ children }) {
   const [friends, setFriends] = useState([]);
   const [friendRequests, setFriendRequests] = useState([]);
   const [tableFriends, setTableFriends] = useState([]);
+  const [tables, setTables] = useState([]);
 
   async function getProfile(id, profile) {
     try {
@@ -109,6 +110,24 @@ function Provider({ children }) {
     }
   }
 
+  async function getTables() {
+    try {
+      const config = {
+        headers: { 
+          Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+          "Cache-Content": "no-cache"
+        }
+      }
+      const response = await axios.get(`https://backend.csaposapp.hu/api/tables`, config);
+      const data = response.data;
+      if (response.status === 200 && data.length > 0) setTables(data);
+    }
+    catch (error) {
+      console.log(error.data?.status);
+      console.log(error.message);
+    }
+  }
+
   const logout = async () => {
     const response = await axios.post("https://backend.csaposapp.hu/api/auth/logout", {refreshToken : localStorage.getItem("refreshToken")});
     if (response.status === 204) {
@@ -129,6 +148,7 @@ function Provider({ children }) {
         getFriends();
         getFriendRequests();
         getLocations();
+        getTables();
       }
     }
   }, [localStorage.getItem("accessToken"), userId]);
@@ -140,7 +160,7 @@ function Provider({ children }) {
   }
 
   return (
-    <Context.Provider value={{ navState, setNavState, menuState, setMenuState, isAuthenticated, setIsAuthenticated, user, setUser, locations, setLocations, notificationFilter, setNotificationFilter, previousRoutes, setPreviousRoutes, friends, setFriends, friendRequests, setFriendRequests, tableFriends, setTableFriends, getProfile, setUserId, logout }}>
+    <Context.Provider value={{ navState, setNavState, menuState, setMenuState, isAuthenticated, setIsAuthenticated, user, setUser, locations, setLocations, notificationFilter, setNotificationFilter, previousRoutes, setPreviousRoutes, friends, setFriends, friendRequests, setFriendRequests, tables, tableFriends, setTableFriends, getProfile, setUserId, logout }}>
       {children}
     </Context.Provider>
   )

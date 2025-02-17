@@ -5,16 +5,20 @@ import BackButton from "./BackButton";
 import TableItem from "./TableItem";
 
 function Tables() { 
-  const { locations, previousRoutes } = useContext(Context);  
+  const { locations, tables, previousRoutes } = useContext(Context);  
   const { name } = useParams(); 
   const [record, setRecord] = useState({});
-  
+  const [locationTables, setLocationTables] = useState([]);
+
   useEffect(() => {
     if (locations.length > 0) {
       setRecord(locations.find(record => record.name === name));
-      console.log(record);
+      if (record && tables) {
+        console.log(tables.filter(table => table.locationId === record.id));
+        setLocationTables(tables.filter(table => table.locationId === record.id));
+      }
     }
-  }, [locations, record]);
+  }, [locations, record, tables]);
 
   return (
     <div className="flex flex-col min-h-screen max-h-screen overflow-y-hidden bg-grey text-white font-bold px-4 py-8">
@@ -25,7 +29,7 @@ function Tables() {
       <div className="flex flex-col w-full max-h-full gap-y-3 mt-8 overflow-y-scroll">
         {
           record.numberOfTables > 0 ?
-          Array.from({length: record.numberOfTables}).map((_, i) => <TableItem record={record} tableNumber={Number(i + 1)}/>) :
+          locationTables.map(record => <TableItem name={name} record={record}/>) :
           <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2">
             <p className="font-normal text-center">Jelenleg nincsenek szabad asztalok</p>
           </div>

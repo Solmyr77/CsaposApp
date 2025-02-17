@@ -63,11 +63,11 @@ function AddFriendItem({ record, plusIcon }) {
         </div>
         <div className={`flex items-center ${isAddedToTable ? "hover:cursor-default" : "hover:cursor-pointer"}`} onClick={() => {
           setIsAddedToTable(true);
-          if (tableFriends.includes(record.displayName) === false && tableFriends.length < 3) {
-            setTableFriends(state => [...state, record.displayName]);
+          if (tableFriends.some(element => element.id === record.id) === false && tableFriends.length < 3) {
+            setTableFriends(state => [...state, record]);
           }
           }}>
-          { isAddedToTable ? 
+          { tableFriends.some(element => element.id === record.id) ? 
             <CheckIcon className="w-6 text-green-500"/> : 
             <PlusIcon className="w-6 text-blue p-0"/>
           }

@@ -3,7 +3,7 @@ import { UserIcon } from "@heroicons/react/20/solid";
 import { useLocation, useNavigate } from "react-router-dom";
 import Context from "./Context";
 
-function TableItem({ record, tableNumber }) {
+function TableItem({ name, record }) {
   const { setPreviousRoutes } = useContext(Context);
   const navigate = useNavigate();
   const location = useLocation();
@@ -11,11 +11,19 @@ function TableItem({ record, tableNumber }) {
     <div className="flex flex-row w-full h-20 rounded-md bg-dark-grey">
       <div className="flex flex-row items-center justify-evenly basis-2/3">
         <div className="flex flex-col items-center">
-          <p className="text-lg">Asztal {tableNumber}</p>
-          <p className="text-green-500 font-normal">Szabad 18:00-tól</p>
+          <p className="text-lg">Asztal {record.number}</p>
+          {
+            !record.isBooked ? 
+            <div>
+              <p className="text-green-500 font-normal">Szabad</p>
+            </div> :
+            <div>
+              <p className="text-red-500 font-normal">Foglalt</p>
+            </div>
+          }
         </div>
         <div className="flex flex-row">
-          <p className="text-md">4</p>
+          <p className="text-md">{record.capacity}</p>
           <UserIcon className="w-6"/>
         </div>
       </div>
@@ -24,7 +32,7 @@ function TableItem({ record, tableNumber }) {
           if (!state.includes(location.pathname)) return [...state, location.pathname];
           return state;
         });
-        navigate(`/reservetable/${record.name}/table/${tableNumber}`);
+        navigate(`/reservetable/${name}/table/${record.number}`);
       }}>Kiválasztom</button>
     </div>
   )

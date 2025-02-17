@@ -20,7 +20,7 @@ function Search() {
   return (
     <div className="bg-grey font-play font-bold text-white">
       <div className="px-4">
-        <SearchBar displayTitle={true} setRecordsToDisplay={setRecordsToDisplay} />
+        <SearchBar displayTitle={true} setRecordsToDisplay={setRecordsToDisplay} locationSearch/>
         <TitleDivider title={"Legutóbbi"}/>
         {
           recordsToDisplay.length !== 0 ? 

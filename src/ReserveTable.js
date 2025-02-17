@@ -146,10 +146,10 @@ function ReserveTable() {
         <div className="grid grid-cols-4 gap-2 place-items-center">
           <AddFriendToTableModal isModalVisible={isModalVisible} setIsModalVisible={setIsModalVisible}/>
           {
-            tableFriends.map(name => (
+            tableFriends.map(record => (
               <div className="relative">
-                <Friend name={name} image={user.imageUrl}/>
-                <XMarkIcon className="w-6 bg-red-500 rounded-full absolute -top-1 right-0" onClick={() => setTableFriends(tableFriends.filter(element => element != name))}/>
+                <Friend record={record}/>
+                <XMarkIcon className="w-6 bg-red-500 rounded-full absolute -top-1 right-0" onClick={() => setTableFriends(tableFriends.filter(element => element.displayName !== record.displayName))}/>
               </div>
             ))
           }

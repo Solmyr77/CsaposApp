@@ -51,7 +51,7 @@ function FriendModal({ record, isFriendModalVisible, setIsFriendModalVisible}) {
           <XMarkIcon className="absolute left-0 top-0 w-9 text-red-500 font-bold bg-dark-grey p-1 rounded-tl-md rounded-tr-none rounded-bl-none rounded-br-md hover:cursor-pointer" onClick={() => setIsFriendModalVisible(false)}/>
           <p className="text-md pt-4 text-center mb-6">Barát kezelése</p>
           <div className="flex flex-col items-center">
-            <img src={`https://assets.csaposapp.hu/assets/images/${record.imageUrl}`} className="rounded-full object-cover aspect-square w-28"/>
+            <img src={`https://assets.csaposapp.hu/assets/images/${record.imageUrl}?t=${new Date().getTime()}`} className="rounded-full object-cover aspect-square w-28"/>
             <p className="font-bold text-md mt-1">{record.displayName}</p>
             <p className="font-normal text-small mt-2"> Barátod 2024.12.03. óta</p>
           </div>

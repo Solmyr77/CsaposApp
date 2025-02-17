@@ -14,7 +14,6 @@ function Tables() {
     if (locations.length > 0) {
       setRecord(locations.find(record => record.name === name));
       if (record && tables) {
-        console.log(tables.filter(table => table.locationId === record.id));
         setLocationTables(tables.filter(table => table.locationId === record.id));
       }
     }
@@ -28,8 +27,8 @@ function Tables() {
       <p className="font-bold text-xxl text-center">Asztalok</p>
       <div className="flex flex-col w-full max-h-full gap-y-3 mt-8 overflow-y-scroll">
         {
-          record.numberOfTables > 0 ?
-          locationTables.map(record => <TableItem name={name} record={record}/>) :
+          locationTables.length > 0 ?
+          locationTables.sort((a,b) => a.number - b.number).map(record => <TableItem name={name} record={record}/>) :
           <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2">
             <p className="font-normal text-center">Jelenleg nincsenek szabad asztalok</p>
           </div>

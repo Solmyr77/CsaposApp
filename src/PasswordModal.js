@@ -10,10 +10,8 @@ function PasswordModal( { isPasswordModalVisible, setIsPasswordModalVisible } ) 
   const [isSucceeded, setIsSucceeded] = useState(false);
 
   async function updatePassword() {
-    console.log(localStorage.getItem("accessToken"));
     try {
       const data = {
-        accessToken : JSON.parse(localStorage.getItem("accessToken")),
         currentPassword : currentPassword,
         newPassword : password1
       }
@@ -31,10 +29,9 @@ function PasswordModal( { isPasswordModalVisible, setIsPasswordModalVisible } ) 
   function handleSubmit(event) {
     event.preventDefault();
     if (currentPassword.trim() !== "" && password1.trim() !== "" && password2.trim() !== "") {
-      if (currentPassword === localStorage.getItem("password") && password1 === password2) {
+      if (password1 === password2) {
         const submit = async() => {
           if (await updatePassword() === true) {
-            localStorage.setItem("password", password1);
             setCurrentPassword("");
             setPassword1("");
             setPassword2("");
@@ -45,7 +42,7 @@ function PasswordModal( { isPasswordModalVisible, setIsPasswordModalVisible } ) 
             }, 1000)
           }
           else {
-            setErrorMessage("valami halo hiba van geci");
+            setErrorMessage("Hiba!");
           }
         }
         submit();

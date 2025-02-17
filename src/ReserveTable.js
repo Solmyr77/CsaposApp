@@ -5,7 +5,7 @@ import BackButton from "./BackButton";
 import { CalendarIcon, PlusIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import DatePicker, {registerLocale} from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { addDays } from 'date-fns';
+import { addDays, addHours, setHours, setMinutes } from 'date-fns';
 import styled from "styled-components";
 import hu from 'date-fns/locale/hu';
 import Friend from "./Friend";
@@ -86,33 +86,38 @@ const StyledDatePickerWrapper = styled.div`
 `;
 
 function ReserveTable() {
-  const { locations, previousRoutes, user, tableFriends, setTableFriends } = useContext(Context);  
+  const { locations, tables, previousRoutes, tableFriends, setTableFriends, logout } = useContext(Context);  
   const { name, number } = useParams(); 
   const navigate = useNavigate();
-  const [record, setRecord] = useState({});
   const [startDate, setStartDate] = useState(new Date());
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [table, setTable] = useState({});
   const ExampleCustomInput = forwardRef(
     ({ value, onClick, className }, ref) => (
       <button className={className} onClick={onClick} ref={ref}>
         {value} <hr className="w-8 rotate-90 rounded-md"/> <CalendarIcon className="w-6"/>
       </button>
-    ),
+    )
   );
 
   useEffect(() => {
-    if (locations.length > 0) {
-      setRecord(locations.find(record => record.name === name));
+    if (locations.length > 0 && name) {
       const roundedMinutes = Math.ceil(startDate.getMinutes() / 15) * 15;
       const newDate = new Date(startDate);
       newDate.setMinutes(roundedMinutes);
       setStartDate(newDate);
-      console.log(record);
-      if (!record || number > record.numberOfTables) {
-        navigate("/");
+      const location = locations.find(location => location.name === name);
+      if (location) {
+        if (tables.length > 0) {
+          const foundTable = tables.find(table => table.locationId === location.id && table.number === Number(number));
+          if (foundTable) {
+            setTable(foundTable);
+          }
+          else navigate("/");
+        }
       }
     }
-  }, [locations, record]);
+  }, [locations, tables, number, name]);
 
   return (
     <div className="flex flex-col min-h-screen overflow-y-hidden bg-grey text-white font-bold px-4 py-8 select-none">
@@ -135,25 +140,30 @@ function ReserveTable() {
             timeIntervals={15}
             minDate={new Date()} 
             maxDate={addDays(new Date(), 7)}
+            minTime={new Date()}
+            maxTime={setHours(setMinutes(new Date(), 45), 23)}
             locale={"hu"}
             timeCaption="Idő"
             className="font-play"
             customInput={<ExampleCustomInput className="bg-dark-grey px-4 py-2 rounded-md text-lg flex flex-row items-center"/>}/>
           </StyledDatePickerWrapper>
         </div>
-        <p className="text-lg mt-6 mb-1">Barátok meghívása</p>
-        <p className="text-sm font-normal mb-4">Max: 3 fő</p>
+        <p className="text-lg mt-8 mb-1">Barátok meghívása</p>
+        <p className="text-sm font-normal mb-4">Max: {Number(table.capacity) - 1} fő</p>
         <div className="grid grid-cols-4 gap-2 place-items-center">
           <AddFriendToTableModal isModalVisible={isModalVisible} setIsModalVisible={setIsModalVisible}/>
           {
             tableFriends.map(record => (
               <div className="relative">
                 <Friend record={record}/>
-                <XMarkIcon className="w-6 bg-red-500 rounded-full absolute -top-1 right-0" onClick={() => setTableFriends(tableFriends.filter(element => element.displayName !== record.displayName))}/>
+                <XMarkIcon className="w-6 bg-red-500 rounded-full absolute -top-1 right-0 hover:cursor-pointer" onClick={() => setTableFriends(tableFriends.filter(element => element.displayName !== record.displayName))}/>
               </div>
             ))
           }
-          <PlusIcon className={`${tableFriends.length < 4 - 1 ? "block" : "hidden"} w-16 bg-dark-grey text-gray-500 rounded-full hover:cursor-pointer`} onClick={() => setIsModalVisible(state => !state)}/>
+          <PlusIcon className={`${tableFriends.length < Number(table.capacity) - 1 ? "block" : "hidden"} w-16 bg-dark-grey text-gray-500 rounded-full hover:cursor-pointer`} onClick={() => setIsModalVisible(state => !state)}/>
+        </div>
+        <div className="flex h-full justify-center items-center flex-grow">
+          <button className="w-64 h-20 bg-blue rounded flex justify-center items-center select-none hover:cursor-pointer text-xl" onClick={() => console.log(table.id)}>Foglalás</button>
         </div>
       </div>
     </div>

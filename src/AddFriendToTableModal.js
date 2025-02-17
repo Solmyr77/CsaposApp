@@ -6,13 +6,12 @@ import TitleDivider from "./TitleDivider";
 import AddFriendItem from "./AddFriendItem";
 
 function AddFriendToTableModal({ isModalVisible, setIsModalVisible }) {
-    const { user, friends } = useContext(Context);
+    const { friends } = useContext(Context);
     const [recordsToDisplay, setRecordsToDisplay] = useState(friends);
 
     useEffect(() => {
         if (friends.length > 0) {
             setRecordsToDisplay(friends);
-            //console.log(friends);
         }
     }, [friends]);
 

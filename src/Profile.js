@@ -81,7 +81,7 @@ function Profile() {
       </div>
       <button className="w-1/2 bg-dark-grey text-red-500 py-2 px-4 rounded-md mt-2 drop-shadow-[0_4px_4px_rgba(0,0,0,.5)] select-none" onClick={handleLogout}>Kijelentkezés</button>
       <div className="h-[12vh]"></div>
-      <FriendModal record={selectedFriend} isFriendModalVisible={isFriendModalVisible} setIsFriendModalVisible={setIsFriendModalVisible}/>
+      <FriendModal record={Object.hasOwn(selectedFriend, "id") === true && selectedFriend} isFriendModalVisible={isFriendModalVisible} setIsFriendModalVisible={setIsFriendModalVisible}/>
       <ModifyModal isModifyModalVisible={isModifyModalVisible} setIsModifyModalVisible={setIsModifyModalVisible}/>
       <AddFriendModal isAddFriendModalVisible={isAddFriendModalVisible} setIsAddFriendModalVisible={setIsAddFriendModalVisible}/>
       <PasswordModal isPasswordModalVisible={isPasswordModalVisible} setIsPasswordModalVisible={setIsPasswordModalVisible}/>

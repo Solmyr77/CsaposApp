@@ -92,7 +92,7 @@ function NotificationItem({ record, isFriendRequest }) {
       <div className="w-full min-h-16 bg-dark-grey rounded-md flex flex-col p-4 pb-2">
         <div className="flex flex-row basis-2/3 items-center">
           <img src={`https://assets.csaposapp.hu/assets/images/${profile.imageUrl}`} alt="" className="h-10 aspect-square rounded-full object-cover mr-2"/>
-          <p className="flex flex-row items-center text-sm text-left text-nowrap basis-4/5"><span className="truncate inline-block max-w-20 mr-1 font-bold">{profile.displayName}asdfasdasdasd</span> barátnak jelölt!</p>
+          <p className="flex flex-row items-center text-sm text-left text-nowrap basis-4/5"><span className="truncate inline-block max-w-20 mr-1 font-bold">{profile.displayName}</span> barátnak jelölt!</p>
         </div>
         <div className="flex flex-row justify-end gap-2 basis-1/3 h-24 items-end">
           <button className={`bg-green-500 px-4 py-1 rounded-md h-8 ${isAccepted !== null && "invisible"}`} onClick={() => handleAccept(record.id)}>Elfogadás</button>

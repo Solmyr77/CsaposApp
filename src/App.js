@@ -15,8 +15,8 @@ import ReserveTable from './ReserveTable';
 
 function App() {
   return (
-    <Provider>
-      <BrowserRouter>
+    <BrowserRouter>
+          <Provider>
         <Routes>
           <Route path="/" element={
             <ProtectedRoute isProtected={true}>
@@ -65,8 +65,8 @@ function App() {
             </ProtectedRoute>}/>
           <Route path="*" element={<Navigate to="/login"/>}/>
         </Routes>
+          </Provider>
       </BrowserRouter>
-    </Provider>
   );
 }
 

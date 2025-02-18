@@ -17,7 +17,7 @@ function AddFriendToTableModal({ isModalVisible, setIsModalVisible }) {
 
     return (
     <div className={`w-full min-h-screen h-full absolute top-0 left-0 bg-opacity-65 bg-black ${isModalVisible ? "flex" : "hidden"} justify-center items-center z-20`}>
-      <div className={`w-80 min-h-80 h-96 bg-grey rounded-xl flex flex-col relative px-4`}>
+      <div className={`w-80 min-h-80 h-96 bg-grey rounded-xl flex flex-col px-4 sticky top-1/2 -translate-y-1/2`}>
         <XMarkIcon className="absolute left-0 top-0 w-9 text-red-500 font-bold bg-dark-grey p-1 rounded-tl-md rounded-tr-none rounded-bl-none rounded-br-md hover:cursor-pointer" onClick={() => setIsModalVisible(false)}/>
         <p className="text-md pt-4 text-center mb-6">Barát meghívása</p>
         <SearchBar displayTitle={false} defaultRecords={friends} setRecordsToDisplay={setRecordsToDisplay}/>

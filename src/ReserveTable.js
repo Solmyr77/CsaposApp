@@ -5,11 +5,13 @@ import BackButton from "./BackButton";
 import { CalendarIcon, PlusIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import DatePicker, {registerLocale} from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { addDays, addHours, setHours, setMinutes } from 'date-fns';
+import { addDays, setHours, setMinutes } from 'date-fns';
 import styled from "styled-components";
 import hu from 'date-fns/locale/hu';
 import Friend from "./Friend";
 import AddFriendToTableModal from "./AddFriendToTableModal";
+import axios from "axios";
+import getAccessToken from "./refreshToken";
 registerLocale('hu', hu);
 
 
@@ -100,12 +102,86 @@ function ReserveTable() {
     )
   );
 
+  async function handleAddToTable(userId, bookingId) {
+    console.log(localStorage.getItem("accessToken"));
+    try {
+      const config = {
+        headers: { 
+          Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+          "Cache-Content": "no-cache"
+        }
+      }
+      const response = await axios.post(`https://backend.csaposapp.hu/api/bookings/add-to-table`, {
+        userId: userId,
+        bookingId: bookingId
+      }, config);
+      const data = response.data;
+      console.log(data);
+    }
+    catch (error) {
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) {
+          handleAddToTable(userId, bookingId);
+        }
+        else {
+          await logout();
+          window.location.reload();
+          return false;
+        }
+      } 
+      else {
+        return false;
+      }
+    }
+  }
+
+  async function handleTableBooking() {
+    setStartDate(state => state.setHours(state.getHours() + 1));
+    try {
+      const config = {
+        headers: { 
+          Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+          "Cache-Content": "no-cache"
+        }
+      }
+      const response = await axios.post(`https://backend.csaposapp.hu/api/bookings/book-table`, {
+        tableId: table.id,
+        bookedFrom: startDate,
+        bookedTo: new Date()
+      }, config);
+      const data = response.data;
+      if (response.status === 200) {
+        console.log(data);
+      }
+    }
+    catch (error) {
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) {
+          handleTableBooking();
+        }
+        else {
+          await logout();
+          window.location.reload();
+          return false;
+        }
+      } 
+      else {
+        return false;
+      }
+    }
+  }
+
+  function updateTime() {
+    const roundedMinutes = Math.ceil(startDate.getMinutes() / 15) * 15;
+    const newDate = new Date(startDate);
+    newDate.setMinutes(roundedMinutes);
+    setStartDate(newDate);
+  }
+
   useEffect(() => {
+    setTableFriends([]);
     if (locations.length > 0 && name) {
-      const roundedMinutes = Math.ceil(startDate.getMinutes() / 15) * 15;
-      const newDate = new Date(startDate);
-      newDate.setMinutes(roundedMinutes);
-      setStartDate(newDate);
+      updateTime();
       const location = locations.find(location => location.name === name);
       if (location) {
         if (tables.length > 0) {
@@ -117,6 +193,9 @@ function ReserveTable() {
         }
       }
     }
+    setInterval(() => {
+      updateTime();
+    }, 900000);
   }, [locations, tables, number, name]);
 
   return (
@@ -163,7 +242,7 @@ function ReserveTable() {
           <PlusIcon className={`${tableFriends.length < Number(table.capacity) - 1 ? "block" : "hidden"} w-16 bg-dark-grey text-gray-500 rounded-full hover:cursor-pointer`} onClick={() => setIsModalVisible(state => !state)}/>
         </div>
         <div className="flex h-full justify-center items-center flex-grow">
-          <button className="w-64 h-20 bg-blue rounded flex justify-center items-center select-none hover:cursor-pointer text-xl" onClick={() => console.log(table.id)}>Foglalás</button>
+          <button className="w-64 h-20 bg-blue rounded flex justify-center items-center select-none hover:cursor-pointer text-xl" onClick={() => handleTableBooking()}>Foglalás</button>
         </div>
       </div>
     </div>

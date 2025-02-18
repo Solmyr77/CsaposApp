@@ -104,7 +104,6 @@ function Provider({ children }) {
         }
       } 
       else {
-        console.error("Error fetching locations:", error.message);
         return false;
       }
     }

@@ -93,7 +93,7 @@ function ModifyModal({ isModifyModalVisible, setIsModifyModalVisible }) {
 
   return (
     <div className={`w-full min-h-screen h-full absolute top-0 left-0 bg-opacity-65 bg-black ${isModifyModalVisible ? "flex" : "hidden"} justify-center items-center` }>
-      <div className={`w-80 h-80 aspect-square bg-grey rounded-xl flex flex-col justify-between relative`}>
+      <div className={`w-80 h-80 aspect-square bg-grey rounded-xl flex flex-col justify-between sticky top-1/2 -translate-y-1/2`}>
         <XMarkIcon className="absolute left-0 top-0 w-9 text-red-500 font-bold bg-dark-grey p-1 rounded-tl-md rounded-tr-none rounded-bl-none rounded-br-md hover:cursor-pointer" onClick={() => setIsModifyModalVisible(false)}/>
         {
           isSucceeded === false ? 

@@ -71,7 +71,6 @@ namespace CsaposApi.Controllers
                     BookerId = tb.BookerId,
                     TableId = tb.TableId,
                     BookedFrom = tb.BookedFrom,
-                    BookedTo = tb.BookedTo
                 })
                 .ToListAsync();
 
@@ -94,7 +93,6 @@ namespace CsaposApi.Controllers
                     BookerId = tb.BookerId,
                     TableId = tb.TableId,
                     BookedFrom = tb.BookedFrom,
-                    BookedTo = tb.BookedTo
                 })
                 .ToListAsync();
 
@@ -131,7 +129,6 @@ namespace CsaposApi.Controllers
                     TableId = createBookingDTO.TableId,
                     BookerId = bookerId,
                     BookedFrom = createBookingDTO.BookedFrom,
-                    BookedTo = createBookingDTO.BookedTo
                 };
 
                 await _context.TableBookings.AddAsync(currentBooking);
@@ -157,7 +154,7 @@ namespace CsaposApi.Controllers
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult> AddToTable(AddToTableDTO addToTableDTO)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || addToTableDTO.userIds == null || !addToTableDTO.userIds.Any())
             {
                 return BadRequest(new
                 {
@@ -170,38 +167,46 @@ namespace CsaposApi.Controllers
             {
                 Guid bookerId = GetUserIdFromToken();
 
-                bool isFriend = await _context.Friendships.AnyAsync(x => x.UserId1 == bookerId && x.UserId2 == addToTableDTO.userId);
+                // Check if all users are friends
+                var friendsList = await _context.Friendships
+                    .Where(x => x.UserId1 == bookerId && addToTableDTO.userIds.Contains(x.UserId2))
+                    .Select(x => x.UserId2)
+                    .ToListAsync();
 
-                if (!isFriend)
+                var notFriends = addToTableDTO.userIds.Except(friendsList).ToList();
+
+                if (notFriends.Any())
                 {
                     return Unauthorized(new
                     {
                         error = "invalid_request",
-                        message = "Person to add must be on friends list."
+                        message = "All users to add must be on the friends list.",
+                        notAllowedUserIds = notFriends
                     });
                 }
 
-                var currentAdding = new TableGuest
+                var guestsToAdd = addToTableDTO.userIds.Select(userId => new TableGuest
                 {
                     Id = Guid.NewGuid(),
                     BookingId = addToTableDTO.bookingId,
-                    UserId = addToTableDTO.userId,
-                };
+                    UserId = userId
+                }).ToList();
 
-                await _context.TableGuests.AddAsync(currentAdding);
+                await _context.TableGuests.AddRangeAsync(guestsToAdd);
                 await _context.SaveChangesAsync();
 
-                return Ok(currentAdding);
+                return Ok(guestsToAdd);
             }
             catch (Exception)
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError, new
                 {
                     error = "server_error",
-                    message = "An unexpected error occurred while adding the guest to the table."
+                    message = "An unexpected error occurred while adding the guests to the table."
                 });
             }
         }
+
 
         [HttpDelete("remove-from-table")]
         [Authorize(Policy = "MustBeGuest")]

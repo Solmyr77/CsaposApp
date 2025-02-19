@@ -224,7 +224,7 @@ namespace CsaposApi.Controllers
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> UpdatePassword([FromBody][Required] PasswordUpdateDTO passwordUpdateDTO)
         {
-            if (!ModelState.IsValid || passwordUpdateDTO == null || string.IsNullOrWhiteSpace(passwordUpdateDTO.AccessToken))
+            if (!ModelState.IsValid || passwordUpdateDTO == null)
             {
                 return BadRequest(new
                 {
@@ -235,30 +235,22 @@ namespace CsaposApi.Controllers
 
             try
             {
-                var tokenHandler = new JwtSecurityTokenHandler();
+                var authHeader = Request.Headers["Authorization"].FirstOrDefault();
 
-                if (!tokenHandler.CanReadToken(passwordUpdateDTO.AccessToken))
+                var token = "";
+
+                if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
                 {
-                    return Unauthorized(new
-                    {
-                        error = "invalid_token",
-                        message = "The access token is invalid or unreadable."
-                    });
+                    token = authHeader.Substring("Bearer ".Length).Trim();
+                }
+                else
+                {
+                    return Unauthorized("Token is malformed.");
                 }
 
-                var tokenObject = tokenHandler.ReadJwtToken(passwordUpdateDTO.AccessToken);
-                var subClaimValue = tokenObject.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+                Guid userId = Guid.Parse(_authService.GetUserId(token));
 
-                if (string.IsNullOrWhiteSpace(subClaimValue) || !Guid.TryParse(subClaimValue, out Guid subClaim))
-                {
-                    return Unauthorized(new
-                    {
-                        error = "invalid_token",
-                        message = "The token does not contain a valid subject claim."
-                    });
-                }
-
-                var user = await _context.Users.FirstOrDefaultAsync(usr => usr.Id == subClaim);
+                var user = await _context.Users.FirstOrDefaultAsync(usr => usr.Id == userId);
 
                 if (user == null)
                 {

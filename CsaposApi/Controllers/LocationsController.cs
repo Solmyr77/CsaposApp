@@ -66,9 +66,11 @@ namespace CsaposApi.Controllers
 
             try
             {
+                var locationId = Guid.NewGuid();
+
                 var currentLocation = new Location
                 {
-                    Id = Guid.NewGuid(),
+                    Id = locationId,
                     Name = createLocationDTO.name,
                     Description = createLocationDTO.description,
                     Capacity = createLocationDTO.capacity,
@@ -77,7 +79,7 @@ namespace CsaposApi.Controllers
                     IsHighlighted = false,
                     IsOpen = true,
                     CreatedAt = DateTime.Now,
-                    ImgUrl = "string",
+                    ImgUrl = $"{locationId}.webp"
                 };
 
                 await _context.Locations.AddAsync(currentLocation);
@@ -85,12 +87,12 @@ namespace CsaposApi.Controllers
 
                 return Ok();
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError, new
                 {
                     error = "server_error",
-                    message = "An unexpected error occurred while updating the password.",
+                    message = e.Message,
                 });
             }
         }

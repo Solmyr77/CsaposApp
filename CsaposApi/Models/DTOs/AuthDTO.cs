@@ -19,8 +19,8 @@ namespace CsaposApi.Models.DTOs
         public class PasswordUpdateDTO
         {
             [Required]
-            public string AccessToken { get; set; }
             public string CurrentPassword { get; set; }
+            [Required]
             public string NewPassword { get; set; }
         }
     }

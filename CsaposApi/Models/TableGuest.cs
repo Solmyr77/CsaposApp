@@ -11,6 +11,10 @@ public partial class TableGuest
 
     public Guid? BookingId { get; set; }
 
+    public DateTime CreatedAt { get; set; }
+
+    public DateTime UpdatedAt { get; set; }
+
     public virtual TableBooking? Booking { get; set; }
 
     public virtual User? User { get; set; }

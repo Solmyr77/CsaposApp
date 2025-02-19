@@ -27,6 +27,8 @@ public partial class Location
 
     public string? ImgUrl { get; set; }
 
+    public DateTime UpdatedAt { get; set; }
+
     public virtual ICollection<BusinessHour> BusinessHours { get; set; } = new List<BusinessHour>();
 
     public virtual ICollection<Event> Events { get; set; } = new List<Event>();

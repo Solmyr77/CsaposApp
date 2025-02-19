@@ -13,7 +13,9 @@ public partial class TableBooking
 
     public DateTime? BookedFrom { get; set; }
 
-    public DateTime? BookedTo { get; set; }
+    public DateTime CreatedAt { get; set; }
+
+    public DateTime UpdatedAt { get; set; }
 
     public virtual User? Booker { get; set; }
 

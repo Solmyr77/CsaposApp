@@ -11,6 +11,10 @@ public partial class EventAttendance
 
     public Guid? EventId { get; set; }
 
+    public DateTime CreatedAt { get; set; }
+
+    public DateTime UpdatedAt { get; set; }
+
     public virtual Event? Event { get; set; }
 
     public virtual User? User { get; set; }

@@ -19,6 +19,10 @@ public partial class Event
 
     public string? ImgUrl { get; set; }
 
+    public DateTime CreatedAt { get; set; }
+
+    public DateTime UpdatedAt { get; set; }
+
     public virtual ICollection<EventAttendance> EventAttendances { get; set; } = new List<EventAttendance>();
 
     public virtual Location? Location { get; set; }

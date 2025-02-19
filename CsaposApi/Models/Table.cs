@@ -15,6 +15,10 @@ public partial class Table
 
     public Guid LocationId { get; set; }
 
+    public DateTime CreatedAt { get; set; }
+
+    public DateTime UpdatedAt { get; set; }
+
     public virtual Location Location { get; set; } = null!;
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();

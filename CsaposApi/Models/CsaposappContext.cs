@@ -15,6 +15,8 @@ public partial class CsaposappContext : DbContext
     {
     }
 
+    public virtual DbSet<Achievement> Achievements { get; set; }
+
     public virtual DbSet<BusinessHour> BusinessHours { get; set; }
 
     public virtual DbSet<Event> Events { get; set; }
@@ -41,8 +43,47 @@ public partial class CsaposappContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+    public virtual DbSet<UserAchievement> UserAchievements { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Achievement>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("achievements");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("created_at");
+            entity.Property(e => e.Criteria)
+                .HasMaxLength(255)
+                .HasColumnName("criteria");
+            entity.Property(e => e.Description)
+                .HasColumnType("text")
+                .HasColumnName("description");
+            entity.Property(e => e.IconUrl)
+                .HasMaxLength(255)
+                .HasColumnName("icon_url");
+            entity.Property(e => e.Name)
+                .HasMaxLength(100)
+                .HasColumnName("name");
+            entity.Property(e => e.Points)
+                .HasDefaultValueSql("'0'")
+                .HasColumnType("int(11)")
+                .HasColumnName("points");
+            entity.Property(e => e.Type)
+                .HasMaxLength(50)
+                .HasColumnName("type");
+            entity.Property(e => e.UpdatedAt)
+                .ValueGeneratedOnAddOrUpdate()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("updated_at");
+        });
+
         modelBuilder.Entity<BusinessHour>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
@@ -52,6 +93,10 @@ public partial class CsaposappContext : DbContext
             entity.HasIndex(e => e.LocationId, "location_id");
 
             entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("created_at");
             entity.Property(e => e.FridayClose)
                 .HasColumnType("time")
                 .HasColumnName("friday_close");
@@ -92,6 +137,11 @@ public partial class CsaposappContext : DbContext
             entity.Property(e => e.TuesdayOpen)
                 .HasColumnType("time")
                 .HasColumnName("tuesday_open");
+            entity.Property(e => e.UpdatedAt)
+                .ValueGeneratedOnAddOrUpdate()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("updated_at");
             entity.Property(e => e.WednesdayClose)
                 .HasColumnType("time")
                 .HasColumnName("wednesday_close");
@@ -114,6 +164,10 @@ public partial class CsaposappContext : DbContext
             entity.HasIndex(e => e.LocationId, "location_id");
 
             entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("created_at");
             entity.Property(e => e.Description)
                 .HasMaxLength(255)
                 .HasColumnName("description");
@@ -130,6 +184,11 @@ public partial class CsaposappContext : DbContext
             entity.Property(e => e.Timeto)
                 .HasColumnType("datetime")
                 .HasColumnName("timeto");
+            entity.Property(e => e.UpdatedAt)
+                .ValueGeneratedOnAddOrUpdate()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("updated_at");
 
             entity.HasOne(d => d.Location).WithMany(p => p.Events)
                 .HasForeignKey(d => d.LocationId)
@@ -148,7 +207,16 @@ public partial class CsaposappContext : DbContext
             entity.HasIndex(e => e.UserId, "user_id");
 
             entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("created_at");
             entity.Property(e => e.EventId).HasColumnName("event_id");
+            entity.Property(e => e.UpdatedAt)
+                .ValueGeneratedOnAddOrUpdate()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("updated_at");
             entity.Property(e => e.UserId).HasColumnName("user_id");
 
             entity.HasOne(d => d.Event).WithMany(p => p.EventAttendances)
@@ -232,6 +300,11 @@ public partial class CsaposappContext : DbContext
             entity.Property(e => e.Rating)
                 .HasColumnType("tinyint(4)")
                 .HasColumnName("rating");
+            entity.Property(e => e.UpdatedAt)
+                .ValueGeneratedOnAddOrUpdate()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("updated_at");
         });
 
         modelBuilder.Entity<Order>(entity =>
@@ -291,6 +364,10 @@ public partial class CsaposappContext : DbContext
             entity.HasIndex(e => e.ProductId, "product_id");
 
             entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("created_at");
             entity.Property(e => e.OrderId).HasColumnName("order_id");
             entity.Property(e => e.ProductId).HasColumnName("product_id");
             entity.Property(e => e.Quantity)
@@ -299,6 +376,11 @@ public partial class CsaposappContext : DbContext
             entity.Property(e => e.UnitPrice)
                 .HasColumnType("int(11)")
                 .HasColumnName("unit_price");
+            entity.Property(e => e.UpdatedAt)
+                .ValueGeneratedOnAddOrUpdate()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("updated_at");
 
             entity.HasOne(d => d.Order).WithMany(p => p.OrderItems)
                 .HasForeignKey(d => d.OrderId)
@@ -323,6 +405,10 @@ public partial class CsaposappContext : DbContext
             entity.Property(e => e.Category)
                 .HasMaxLength(50)
                 .HasColumnName("category");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("created_at");
             entity.Property(e => e.DiscountPercentage)
                 .HasColumnType("int(11)")
                 .HasColumnName("discount_percentage");
@@ -343,6 +429,11 @@ public partial class CsaposappContext : DbContext
                 .HasDefaultValueSql("'0'")
                 .HasColumnType("int(11)")
                 .HasColumnName("stock_quantity");
+            entity.Property(e => e.UpdatedAt)
+                .ValueGeneratedOnAddOrUpdate()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("updated_at");
 
             entity.HasOne(d => d.Location).WithMany(p => p.Products)
                 .HasForeignKey(d => d.LocationId)
@@ -361,11 +452,20 @@ public partial class CsaposappContext : DbContext
             entity.HasIndex(e => e.Token, "IX_RefreshTokens_Token").IsUnique();
 
             entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("created_at");
             entity.Property(e => e.Expiration)
                 .HasColumnType("datetime")
                 .HasColumnName("expiration");
             entity.Property(e => e.IsRevoked).HasColumnName("is_revoked");
             entity.Property(e => e.Token).HasColumnName("token");
+            entity.Property(e => e.UpdatedAt)
+                .ValueGeneratedOnAddOrUpdate()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("updated_at");
             entity.Property(e => e.UserId).HasColumnName("user_id");
 
             entity.HasOne(d => d.User).WithMany(p => p.RefreshTokens)
@@ -385,11 +485,20 @@ public partial class CsaposappContext : DbContext
             entity.Property(e => e.Capacity)
                 .HasColumnType("tinyint(4)")
                 .HasColumnName("capacity");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("created_at");
             entity.Property(e => e.IsBooked).HasColumnName("is_booked");
             entity.Property(e => e.LocationId).HasColumnName("location_id");
             entity.Property(e => e.Number)
                 .HasColumnType("int(11)")
                 .HasColumnName("number");
+            entity.Property(e => e.UpdatedAt)
+                .ValueGeneratedOnAddOrUpdate()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("updated_at");
 
             entity.HasOne(d => d.Location).WithMany(p => p.Tables)
                 .HasForeignKey(d => d.LocationId)
@@ -411,11 +520,17 @@ public partial class CsaposappContext : DbContext
             entity.Property(e => e.BookedFrom)
                 .HasColumnType("datetime")
                 .HasColumnName("booked_from");
-            entity.Property(e => e.BookedTo)
-                .HasColumnType("datetime")
-                .HasColumnName("booked_to");
             entity.Property(e => e.BookerId).HasColumnName("booker_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("created_at");
             entity.Property(e => e.TableId).HasColumnName("table_id");
+            entity.Property(e => e.UpdatedAt)
+                .ValueGeneratedOnAddOrUpdate()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("updated_at");
 
             entity.HasOne(d => d.Booker).WithMany(p => p.TableBookings)
                 .HasForeignKey(d => d.BookerId)
@@ -440,6 +555,15 @@ public partial class CsaposappContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.BookingId).HasColumnName("booking_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt)
+                .ValueGeneratedOnAddOrUpdate()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("updated_at");
             entity.Property(e => e.UserId).HasColumnName("user_id");
 
             entity.HasOne(d => d.Booking).WithMany(p => p.TableGuests)
@@ -480,14 +604,46 @@ public partial class CsaposappContext : DbContext
                 .HasMaxLength(255)
                 .HasColumnName("password_hash");
             entity.Property(e => e.Role)
-                .HasColumnType("enum('guest','waiter','admin')")
+                .HasColumnType("enum('guest','waiter','admin','manager')")
                 .HasColumnName("role");
             entity.Property(e => e.Salt)
                 .HasMaxLength(255)
                 .HasColumnName("salt");
+            entity.Property(e => e.UpdatedAt)
+                .ValueGeneratedOnAddOrUpdate()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("updated_at");
             entity.Property(e => e.Username)
                 .HasMaxLength(20)
                 .HasColumnName("username");
+        });
+
+        modelBuilder.Entity<UserAchievement>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("user_achievements");
+
+            entity.HasIndex(e => e.AchievementId, "fk_achievement");
+
+            entity.HasIndex(e => new { e.UserId, e.AchievementId }, "unique_user_achievement").IsUnique();
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.AchievedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("achieved_at");
+            entity.Property(e => e.AchievementId).HasColumnName("achievement_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.Achievement).WithMany(p => p.UserAchievements)
+                .HasForeignKey(d => d.AchievementId)
+                .HasConstraintName("fk_achievement");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserAchievements)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("fk_user");
         });
 
         OnModelCreatingPartial(modelBuilder);

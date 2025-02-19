@@ -25,6 +25,8 @@ public partial class User
 
     public string? ImgUrl { get; set; }
 
+    public DateTime UpdatedAt { get; set; }
+
     public virtual ICollection<EventAttendance> EventAttendances { get; set; } = new List<EventAttendance>();
 
     public virtual ICollection<Friendship> FriendshipUserId1Navigations { get; set; } = new List<Friendship>();
@@ -38,4 +40,6 @@ public partial class User
     public virtual ICollection<TableBooking> TableBookings { get; set; } = new List<TableBooking>();
 
     public virtual ICollection<TableGuest> TableGuests { get; set; } = new List<TableGuest>();
+
+    public virtual ICollection<UserAchievement> UserAchievements { get; set; } = new List<UserAchievement>();
 }

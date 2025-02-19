@@ -11,17 +11,24 @@ function PasswordModal( { isPasswordModalVisible, setIsPasswordModalVisible } ) 
 
   async function updatePassword() {
     try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+        }
+      }
       const data = {
         currentPassword : currentPassword,
         newPassword : password1
       }
-      const response = await axios.put("https://backend.csaposapp.hu/api/auth/update-password", data);
+      const response = await axios.put("https://backend.csaposapp.hu/api/auth/update-password", data, config);
       if (response.status === 200) {
         return true;
       }
       return false;
     }
     catch (error) {
+      console.log(error.message);
       return false;
     }
   }

@@ -143,11 +143,14 @@ function Provider({ children }) {
     if (localStorage.getItem("accessToken")) {
       setUserId(decodeJWT(localStorage.getItem("accessToken")).sub);
       if (userId) {
-        getProfile(userId, "user");
-        getFriends();
-        getFriendRequests();
-        getLocations();
-        getTables();
+       const fetch = async () => {
+          await getProfile(userId, "user");
+          await getFriends();
+          await getFriendRequests();
+          await getLocations();
+          await getTables();
+        }
+        fetch()
       }
     }
   }, [localStorage.getItem("accessToken"), userId]);

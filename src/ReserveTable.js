@@ -136,7 +136,7 @@ function ReserveTable() {
   }
 
   async function handleTableBooking() {
-    setStartDate(state => state.setHours(state.getHours() + 1));
+    setStartDate(state => new Date(state.setHours(state.getHours() + 1)));
     try {
       const config = {
         headers: { 
@@ -195,7 +195,7 @@ function ReserveTable() {
     }
     setInterval(() => {
       updateTime();
-    }, 900000);
+    }, 900000 - startDate.getMilliseconds());
   }, [locations, tables, number, name]);
 
   return (

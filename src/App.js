@@ -12,6 +12,7 @@ import Notifications from './Notifications';
 import Event from './Event';
 import Tables from './Tables';
 import ReserveTable from './ReserveTable';
+import PubMenu from './PubMenu';
 
 function App() {
   return (
@@ -54,6 +55,10 @@ function App() {
           <Route path="/reservetable/:name/table/:number" element={
             <ProtectedRoute isProtected={true}>
               <ReserveTable />
+            </ProtectedRoute>}/>
+          <Route path="/pubmenu" element={
+            <ProtectedRoute isProtected={true}>
+              <PubMenu />
             </ProtectedRoute>}/>
           <Route path="/register" element={
             <ProtectedRoute>

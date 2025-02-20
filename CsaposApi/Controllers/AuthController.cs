@@ -72,11 +72,6 @@ namespace CsaposApi.Controllers
             return Ok(tokenResponse);
         }
 
-        /// <summary>
-        /// Registers a new user.
-        /// </summary>
-        /// <param name="registerUserDto">User registration data.</param>
-        /// <returns>The newly created user.</returns>
         [HttpPost("register")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(User), (int)HttpStatusCode.Created)]
@@ -89,13 +84,26 @@ namespace CsaposApi.Controllers
                 return BadRequest(ModelState);
             }
 
+            // Validate password strength
+            if (!IsPasswordStrong(registerUserDto.Password))
+            {
+                return BadRequest(new { Message = "Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, and a number." });
+            }
+
             // Check if the username is already taken
-            bool usernameTaken = await _context.Users
-                .AnyAsync(u => u.Username == registerUserDto.Username);
+            bool usernameTaken = await _context.Users.AnyAsync(u => u.Username == registerUserDto.Username);
 
             if (usernameTaken)
             {
                 return Conflict(new { Message = "Username is already taken." });
+            }
+
+            // Check if email is already taken
+            bool emailTaken = await _context.Users.AnyAsync(u => u.Email == registerUserDto.Email);
+
+            if (emailTaken)
+            {
+                return Conflict(new { Message = "User with this E-Mail already exists." });
             }
 
             // Generate salt and hash the password
@@ -110,6 +118,7 @@ namespace CsaposApi.Controllers
             {
                 Id = userId,
                 Username = registerUserDto.Username,
+                Email = registerUserDto.Email,
                 DisplayName = registerUserDto.LegalName,
                 PasswordHash = passwordHash,
                 Salt = salt,
@@ -129,6 +138,7 @@ namespace CsaposApi.Controllers
             // Return the created response with the user object
             return CreatedAtAction(nameof(Register), new { id = user.Id }, user);
         }
+
 
         /// <summary>
         /// Logs out a user by invalidating the provided refresh token.
@@ -298,6 +308,19 @@ namespace CsaposApi.Controllers
                     message = "An unexpected error occurred while updating the password.",
                 });
             }
+        }
+
+        private bool IsPasswordStrong(string password)
+        {
+            if (string.IsNullOrWhiteSpace(password))
+                return false;
+
+            var hasUpperCase = password.Any(char.IsUpper);
+            var hasLowerCase = password.Any(char.IsLower);
+            var hasDigit = password.Any(char.IsDigit);
+            var isLongEnough = password.Length >= 8;
+
+            return hasUpperCase && hasLowerCase && hasDigit && isLongEnough;
         }
 
     }

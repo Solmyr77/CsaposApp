@@ -2,7 +2,7 @@ import React, { forwardRef, useContext, useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import Context from "./Context";
 import BackButton from "./BackButton";
-import { CalendarIcon, PlusIcon, XMarkIcon } from "@heroicons/react/20/solid";
+import { CalendarIcon, CheckIcon, PlusIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import DatePicker, {registerLocale} from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { addDays, setHours, setMinutes } from 'date-fns';
@@ -75,6 +75,10 @@ const StyledDatePickerWrapper = styled.div`
   .react-datepicker__time-list-item:hover {
     background-color: #4c98ff !important;
   }
+  
+  .react-datepicker__time-list-item--disabled:hover {
+    background-color: unset !important;
+  }
 
   .react-datepicker__time-list-item--selected {
     background-color: #007AFF !important;
@@ -94,6 +98,8 @@ function ReserveTable() {
   const [startDate, setStartDate] = useState(new Date());
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [table, setTable] = useState({});
+  const [isBooked, setIsBooked] = useState(false);
+  const [remainingSeconds, setRemainingSeconds] = useState(3);
   const ExampleCustomInput = forwardRef(
     ({ value, onClick, className }, ref) => (
       <button className={className} onClick={onClick} ref={ref}>
@@ -102,9 +108,9 @@ function ReserveTable() {
     )
   );
 
-  async function handleAddToTable(userId, bookingId) {
-    console.log(localStorage.getItem("accessToken"));
+  async function handleAddToTable(bookingId) {
     try {
+      const userIds = Array.from(tableFriends.map(friend => friend.id));
       const config = {
         headers: { 
           Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
@@ -112,16 +118,17 @@ function ReserveTable() {
         }
       }
       const response = await axios.post(`https://backend.csaposapp.hu/api/bookings/add-to-table`, {
-        userId: userId,
+        userIds: userIds,
         bookingId: bookingId
       }, config);
       const data = response.data;
       console.log(data);
+      response.status === 200 && setIsBooked(true);
     }
     catch (error) {
       if (error.response?.status === 401) {
         if (await getAccessToken()) {
-          handleAddToTable(userId, bookingId);
+          handleAddToTable(bookingId);
         }
         else {
           await logout();
@@ -136,7 +143,7 @@ function ReserveTable() {
   }
 
   async function handleTableBooking() {
-    setStartDate(state => new Date(state.setHours(state.getHours() + 1)));
+    console.log(tableFriends);
     try {
       const config = {
         headers: { 
@@ -146,11 +153,14 @@ function ReserveTable() {
       }
       const response = await axios.post(`https://backend.csaposapp.hu/api/bookings/book-table`, {
         tableId: table.id,
-        bookedFrom: startDate,
+        bookedFrom: new Date(startDate.setHours(startDate.getHours() + 1)),
         bookedTo: new Date()
       }, config);
       const data = response.data;
       if (response.status === 200) {
+        tableFriends.length > 0 && await handleAddToTable(data.id);
+        setIsBooked(true);
+        updateTime();
         console.log(data);
       }
     }
@@ -172,8 +182,8 @@ function ReserveTable() {
   }
 
   function updateTime() {
-    const roundedMinutes = Math.ceil(startDate.getMinutes() / 15) * 15;
-    const newDate = new Date(startDate);
+    const roundedMinutes = Math.ceil(new Date().getMinutes() / 15) * 15;
+    const newDate = new Date();
     newDate.setMinutes(roundedMinutes);
     setStartDate(newDate);
   }
@@ -198,53 +208,75 @@ function ReserveTable() {
     }, 900000 - startDate.getMilliseconds());
   }, [locations, tables, number, name]);
 
+  useEffect(() => {
+    if (isBooked) {
+      if (remainingSeconds <= 0) navigate("/");
+      const interval = setInterval(() => {
+        setRemainingSeconds(prev => prev - 1);
+      }, 1000);
+      return () => clearInterval(interval); 
+    }
+  }, [isBooked, remainingSeconds]);
+
   return (
     <div className="flex flex-col min-h-screen overflow-y-hidden bg-grey text-white font-bold px-4 py-8 select-none">
-      <Link to={previousRoutes[previousRoutes.length - 1]} className="flex w-fit">
-        <BackButton/>
-      </Link>
-      <p className="text-center text-xxl">Asztal {number}</p>
-      <div className="flex flex-col flex-grow w-full mt-4">
-        <p className="text-lg mb-2">Időpont</p>
-        <div className="flex justify-center">
-          <StyledDatePickerWrapper>
-            <DatePicker 
-            selected={startDate} 
-            onChange={(date) => {
-              setStartDate(date);
-            }}
-            dateFormat={"yyyy.MM.dd HH:mm"} 
-            showTimeSelect 
-            timeFormat="HH:mm" 
-            timeIntervals={15}
-            minDate={new Date()} 
-            maxDate={addDays(new Date(), 7)}
-            minTime={new Date()}
-            maxTime={setHours(setMinutes(new Date(), 45), 23)}
-            locale={"hu"}
-            timeCaption="Idő"
-            className="font-play"
-            customInput={<ExampleCustomInput className="bg-dark-grey px-4 py-2 rounded-md text-lg flex flex-row items-center"/>}/>
-          </StyledDatePickerWrapper>
+      {
+      !isBooked ? 
+      <div className="">
+        <Link to={previousRoutes[previousRoutes.length - 1]} className="flex w-fit">
+          <BackButton/>
+        </Link>
+        <p className="text-center text-xxl">Asztal {number}</p>
+        <div className="flex flex-col flex-grow w-full mt-4">
+          <p className="text-lg mb-2">Időpont</p>
+          <div className="flex justify-center">
+            <StyledDatePickerWrapper>
+              <DatePicker 
+              selected={startDate} 
+              onChange={(date) => {
+                setStartDate(date);
+              }}
+              dateFormat={"yyyy.MM.dd HH:mm"} 
+              showTimeSelect 
+              timeFormat="HH:mm" 
+              timeIntervals={15}
+              minDate={new Date()} 
+              maxDate={addDays(new Date(), 7)}
+              minTime={new Date()}
+              maxTime={setHours(setMinutes(new Date(), 45), 23)}
+              locale={"hu"}
+              timeCaption="Idő"
+              className="font-play"
+              customInput={<ExampleCustomInput className="bg-dark-grey px-4 py-2 rounded-md text-lg flex flex-row items-center"/>}/>
+            </StyledDatePickerWrapper>
+          </div>
+          <p className="text-lg mt-8 mb-1">Barátok meghívása</p>
+          <p className="text-sm font-normal mb-4">Max: {Number(table.capacity) - 1} fő</p>
+          <div className="grid grid-cols-4 gap-2 place-items-center">
+            <AddFriendToTableModal isModalVisible={isModalVisible} setIsModalVisible={setIsModalVisible}/>
+            {
+              tableFriends.map(record => (
+                <div className="relative">
+                  <Friend record={record}/>
+                  <XMarkIcon className="w-6 bg-red-500 rounded-full absolute -top-1 right-0 hover:cursor-pointer" onClick={() => setTableFriends(tableFriends.filter(element => element.displayName !== record.displayName))}/>
+                </div>
+              ))
+            }
+            <PlusIcon className={`${tableFriends.length < Number(table.capacity) - 1 ? "block" : "hidden"} w-16 bg-dark-grey text-gray-500 rounded-full hover:cursor-pointer`} onClick={() => setIsModalVisible(state => !state)}/>
+          </div>
+          <div className="flex h-full justify-center items-center flex-grow mt-8">
+            <button className="w-64 h-20 bg-blue rounded flex justify-center items-center select-none hover:cursor-pointer text-xl" onClick={() => handleTableBooking()}>Foglalás</button>
+          </div>
         </div>
-        <p className="text-lg mt-8 mb-1">Barátok meghívása</p>
-        <p className="text-sm font-normal mb-4">Max: {Number(table.capacity) - 1} fő</p>
-        <div className="grid grid-cols-4 gap-2 place-items-center">
-          <AddFriendToTableModal isModalVisible={isModalVisible} setIsModalVisible={setIsModalVisible}/>
-          {
-            tableFriends.map(record => (
-              <div className="relative">
-                <Friend record={record}/>
-                <XMarkIcon className="w-6 bg-red-500 rounded-full absolute -top-1 right-0 hover:cursor-pointer" onClick={() => setTableFriends(tableFriends.filter(element => element.displayName !== record.displayName))}/>
-              </div>
-            ))
-          }
-          <PlusIcon className={`${tableFriends.length < Number(table.capacity) - 1 ? "block" : "hidden"} w-16 bg-dark-grey text-gray-500 rounded-full hover:cursor-pointer`} onClick={() => setIsModalVisible(state => !state)}/>
-        </div>
-        <div className="flex h-full justify-center items-center flex-grow">
-          <button className="w-64 h-20 bg-blue rounded flex justify-center items-center select-none hover:cursor-pointer text-xl" onClick={() => handleTableBooking()}>Foglalás</button>
+      </div> :
+      <div className="flex flex-col justify-center flex-grow items-center h-1/2 p-4">
+        <div className="flex flex-col items-center bg-dark-grey p-4 rounded-md text-green-500">
+          <p className="text-lg">Sikeres foglalás!</p>
+          <CheckIcon className="w-12"/>
+          <p className="mt-2 text-white font-normal">Vissza a főoldalra... {remainingSeconds}</p>
         </div>
       </div>
+      }
     </div>
   )
 }

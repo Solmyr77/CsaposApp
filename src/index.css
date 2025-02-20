@@ -11,6 +11,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-y: scroll;
+  padding-top: env(safe-area-inset-top, 10rem);
 }
 
 code {

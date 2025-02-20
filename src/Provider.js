@@ -17,6 +17,7 @@ function Provider({ children }) {
   const [friendRequests, setFriendRequests] = useState([]);
   const [tableFriends, setTableFriends] = useState([]);
   const [tables, setTables] = useState([]);
+  const [order, setOrder] = useState([]);
 
   async function getProfile(id, profile) {
     try {
@@ -162,7 +163,32 @@ function Provider({ children }) {
   }
 
   return (
-    <Context.Provider value={{ navState, setNavState, menuState, setMenuState, isAuthenticated, setIsAuthenticated, user, setUser, locations, setLocations, notificationFilter, setNotificationFilter, previousRoutes, setPreviousRoutes, friends, setFriends, friendRequests, setFriendRequests, tables, tableFriends, setTableFriends, getProfile, setUserId, logout }}>
+    <Context.Provider value={{ 
+      navState, 
+      setNavState, 
+      menuState, 
+      setMenuState, 
+      isAuthenticated, 
+      setIsAuthenticated, 
+      user, setUser, 
+      locations, 
+      setLocations, 
+      notificationFilter, 
+      setNotificationFilter, 
+      previousRoutes, 
+      setPreviousRoutes, 
+      friends, 
+      setFriends, 
+      friendRequests, 
+      setFriendRequests, 
+      tables, 
+      tableFriends, 
+      order, 
+      setOrder,
+      setTableFriends, 
+      getProfile, 
+      setUserId,
+      logout }}>
       {children}
     </Context.Provider>
   )

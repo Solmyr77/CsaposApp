@@ -67,7 +67,7 @@ namespace CsaposApi.Controllers
                 Guid senderId = GetUserIdFromToken();
                 var success = await _friendshipService.SendFriendRequest(senderId, receiverId);
                 return success ? Ok(new { message = "Friend request sent successfully" })
-                               : BadRequest(new { error = "Friend request already exists or failed to send" });
+                               : BadRequest(new { error = "Friend request already exists or failed to send"});
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -76,7 +76,7 @@ namespace CsaposApi.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error sending friend request");
-                return StatusCode(500, new { error = "An error occurred while sending the request" });
+                return StatusCode(500, new { error = "An error occurred while sending the request" + ex.Message});
             }
         }
 

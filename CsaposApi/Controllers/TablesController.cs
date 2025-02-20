@@ -66,6 +66,30 @@ namespace CsaposApi.Controllers
             return Ok(table);
         }
 
+        // GET: api/Tables/5
+        [HttpGet("location/{locationId}")]
+        [Authorize(Policy = "MustBeGuest")]
+        public async Task<ActionResult<TableResponseDTO>> GetTablesByLocation(Guid locationId)
+        {
+            var table = _context.Tables
+                .Where(t => t.LocationId == locationId)
+                .Select(t => new TableResponseDTO
+                {
+                    Id = t.Id,
+                    Number = t.Number,
+                    Capacity = t.Capacity,
+                    IsBooked = t.IsBooked,
+                    LocationId = t.LocationId
+                });
+
+            if (table == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(table);
+        }
+
         [HttpPost]
         [Authorize(Policy = "MustBeGuest")]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]

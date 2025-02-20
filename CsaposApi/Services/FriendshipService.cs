@@ -22,27 +22,49 @@ namespace CsaposApi.Services
         {
             try
             {
-                if (await _context.Friendships.AnyAsync(f =>
-                    (f.UserId1 == senderId && f.UserId2 == receiverId) ||
-                    (f.UserId1 == receiverId && f.UserId2 == senderId)))
+                // Look for an existing friendship record regardless of its status.
+                var friendship = await _context.Friendships.FirstOrDefaultAsync(f =>
+                    ((f.UserId1 == senderId && f.UserId2 == receiverId) ||
+                     (f.UserId1 == receiverId && f.UserId2 == senderId)));
+
+                if (friendship != null)
                 {
-                    _logger.LogWarning("Friend request already exists between {SenderId} and {ReceiverId}", senderId, receiverId);
-                    return false;
+                    // If a friendship exists with a "pending" or "accepted" status, then we don't allow a new request.
+                    if (friendship.Status == "pending" || friendship.Status == "accepted")
+                    {
+                        _logger.LogWarning("Friend request already exists between {SenderId} and {ReceiverId}", senderId, receiverId);
+                        return false;
+                    }
+                    // If the previous request was "rejected" (or any status that allows a new request),
+                    // update the existing record rather than creating a new one.
+                    else if (friendship.Status == "rejected")
+                    {
+                        friendship.Status = "pending";
+                        friendship.UpdatedAt = DateTime.UtcNow;
+                        await _context.SaveChangesAsync();
+                        return true;
+                    }
+                }
+                else
+                {
+                    // No existing record found - create a new friend request.
+                    friendship = new Friendship
+                    {
+                        Id = Guid.NewGuid(),
+                        UserId1 = senderId,
+                        UserId2 = receiverId,
+                        Status = "pending",
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+
+                    _context.Friendships.Add(friendship);
+                    await _context.SaveChangesAsync();
+                    return true;
                 }
 
-                var friendship = new Friendship
-                {
-                    Id = Guid.NewGuid(),
-                    UserId1 = senderId,
-                    UserId2 = receiverId,
-                    Status = "pending",
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
-                };
-
-                _context.Friendships.Add(friendship);
-                await _context.SaveChangesAsync();
-                return true;
+                // If no condition is met, return false (shouldn't normally reach here).
+                return false;
             }
             catch (Exception ex)
             {
@@ -50,6 +72,7 @@ namespace CsaposApi.Services
                 return false;
             }
         }
+
 
         public async Task<bool> AcceptFriendRequest(Guid friendshipId, Guid receiverId)
         {

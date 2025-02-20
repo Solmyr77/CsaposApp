@@ -1136,6 +1136,32 @@
     ]
   },
   {
+    "ContainingType": "CsaposApi.Controllers.TablesController",
+    "Method": "GetTablesByLocation",
+    "RelativePath": "api/Tables/location/{locationId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "locationId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "CsaposApi.Models.DTOs.TableDTO\u002BTableResponseDTO",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
     "ContainingType": "CsaposApi.Controllers.UsersController",
     "Method": "GetUsers",
     "RelativePath": "api/Users",

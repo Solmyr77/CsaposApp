@@ -1,11 +1,12 @@
 {
   "Version": 1,
-  "Hash": "l/YK8Krc8XZkcAuMxVUfBhgvRNc5yxYdcX7nnmu+VUA=",
+  "Hash": "sN1F93b08uGSisXAFgGSTTPSb5EJ2KsgFbASGMxmd/4=",
   "Source": "CsaposApi",
   "BasePath": "_content/CsaposApi",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
   "DiscoveryPatterns": [],
-  "Assets": []
+  "Assets": [],
+  "Endpoints": []
 }

@@ -1284,5 +1284,21 @@
         "StatusCode": 500
       }
     ]
+  },
+  {
+    "ContainingType": "CsaposApi.Controllers.UsersController",
+    "Method": "UpdateDisplayName",
+    "RelativePath": "api/Users/update-display-name",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "updateDisplayNameDTO",
+        "Type": "CsaposApi.Models.DTOs.UserDTO\u002BUpdateDisplayNameDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   }
 ]

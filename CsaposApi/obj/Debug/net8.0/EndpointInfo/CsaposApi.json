@@ -1987,6 +1987,37 @@
         }
       }
     },
+    "/api/Users/update-display-name": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDisplayNameDTO"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDisplayNameDTO"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDisplayNameDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/Users/profile/search/{displayName}": {
       "get": {
         "tags": [
@@ -2735,6 +2766,10 @@
             "type": "string",
             "nullable": true
           },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
           "password": {
             "type": "string",
             "nullable": true
@@ -3021,6 +3056,16 @@
         },
         "additionalProperties": false
       },
+      "UpdateDisplayNameDTO": {
+        "type": "object",
+        "properties": {
+          "displayName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "User": {
         "type": "object",
         "properties": {
@@ -3029,6 +3074,10 @@
             "format": "uuid"
           },
           "username": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
             "type": "string",
             "nullable": true
           },

@@ -70,7 +70,7 @@ namespace CsaposApi.Controllers
             return Ok(currentProfile);
         }
 
-        [HttpPut]
+        [HttpPut("update-display-name")]
         [Authorize(Policy = "MustBeGuest")]
         public async Task<ActionResult> UpdateDisplayName(UpdateDisplayNameDTO updateDisplayNameDTO)
         {
@@ -88,7 +88,8 @@ namespace CsaposApi.Controllers
                     return Unauthorized(new { message = "Invalid token." });
                 }
 
-                var currentUser = await _context.Users.FindAsync(userIdString);
+                var currentUser = await _context.Users.FindAsync(Guid.Parse(userIdString));
+
                 if (currentUser == null)
                 {
                     return NotFound(new { message = "User not found." });

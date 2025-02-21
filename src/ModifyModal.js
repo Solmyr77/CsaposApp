@@ -48,7 +48,6 @@ function ModifyModal({ isModifyModalVisible, setIsModifyModalVisible }) {
       setIsConversionFinished(false);
       if (file.type === "image/heic") {
         const blob = await heic2any({ blob: file, toType: "image/jpeg" });
-        console.log(file);
         file = new File([blob], file.name.replace(".heic", ".jpg"), {
           type: "image/jpeg",
         })
@@ -86,7 +85,7 @@ function ModifyModal({ isModifyModalVisible, setIsModifyModalVisible }) {
         }
       }
       const response = await axios.post("https://backend.csaposapp.hu/api/Images/upload/profile", formData, config);
-      if (response.status === 200) console.log("Sikeres képfeltöltés");
+      if (response.status === 200) setIsSucceeded(true);
     }
     catch (error) {
       if (error.response?.status === 401) {
@@ -110,7 +109,7 @@ function ModifyModal({ isModifyModalVisible, setIsModifyModalVisible }) {
         }
       }
       const response = await axios.put("https://backend.csaposapp.hu/api/Users/update-display-name", {displayName: newProfileName}, config);
-      if (response.status === 200) console.log("Sikeres névváltoztatás");
+      if (response.status === 200) setIsSucceeded(true);
     }
     catch (error) {
       if (error.response?.status === 401) {
@@ -135,7 +134,6 @@ function ModifyModal({ isModifyModalVisible, setIsModifyModalVisible }) {
       else if (newProfileName !== user.displayName) await handleDisplayNameUpdate();
       else if (previewProfilePicture !== user.imageUrl) await handleImageUpload();
       setUser({...user, displayName: newProfileName});
-      setIsSucceeded(true);
       setTimeout(async() => {
         setIsSucceeded(false);
         setIsModifyModalVisible(false);

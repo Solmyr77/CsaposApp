@@ -129,6 +129,16 @@ namespace CsaposApi.Controllers
                 ImgUrl = $"{userId}.webp"
             };
 
+            var response = new RegisterResponseDTO
+            {
+                Id = user.Id,
+                Username = user.Username,
+                LegalName = user.LegalName,
+                BirthDate = user.BirthDate,
+                Email = user.Email,
+                imgUrl = user.ImgUrl,
+            };
+
             // Add the user to the database context
             _context.Users.Add(user);
 
@@ -136,7 +146,7 @@ namespace CsaposApi.Controllers
             await _context.SaveChangesAsync();
 
             // Return the created response with the user object
-            return CreatedAtAction(nameof(Register), new { id = user.Id }, user);
+            return CreatedAtAction(nameof(Register), response);
         }
 
 

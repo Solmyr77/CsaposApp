@@ -502,3 +502,5 @@ C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\CsaposApi.staticweb
 C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\obj\Debug\net8.0\staticwebassets.build.endpoints.json
 C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\obj\Debug\net8.0\staticwebassets\msbuild.CsaposApi.Microsoft.AspNetCore.StaticWebAssetEndpoints.props
 C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\SixLabors.Fonts.dll
+C:\Users\Solmyr\Desktop\CsaposApp\CsaposApi\bin\Debug\net8.0\SixLabors.ImageSharp.Drawing.dll

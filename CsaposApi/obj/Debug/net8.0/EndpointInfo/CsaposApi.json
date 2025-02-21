@@ -393,7 +393,7 @@
         }
       }
     },
-    "/api/bookings": {
+    "/api/bookings/bookings-by-user": {
       "get": {
         "tags": [
           "Booking"
@@ -401,6 +401,20 @@
         "responses": {
           "200": {
             "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": { }
+              },
+              "application/json": {
+                "schema": { }
+              },
+              "text/json": {
+                "schema": { }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
             "content": {
               "text/plain": {
                 "schema": { }
@@ -444,34 +458,38 @@
         }
       }
     },
-    "/api/bookings/{bookerId}": {
+    "/api/bookings/bookings-containing-user": {
       "get": {
         "tags": [
           "Booking"
-        ],
-        "parameters": [
-          {
-            "name": "bookerId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
         ],
         "responses": {
           "200": {
             "description": "Success",
             "content": {
               "text/plain": {
-                "schema": { }
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BookingResponseDTO"
+                  }
+                }
               },
               "application/json": {
-                "schema": { }
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BookingResponseDTO"
+                  }
+                }
               },
               "text/json": {
-                "schema": { }
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BookingResponseDTO"
+                  }
+                }
               }
             }
           },
@@ -1232,7 +1250,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Location"
+                    "$ref": "#/components/schemas/LocationResponseDTO"
                   }
                 }
               },
@@ -1240,7 +1258,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Location"
+                    "$ref": "#/components/schemas/LocationResponseDTO"
                   }
                 }
               },
@@ -1248,7 +1266,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Location"
+                    "$ref": "#/components/schemas/LocationResponseDTO"
                   }
                 }
               }
@@ -1350,7 +1368,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
@@ -1647,14 +1666,22 @@
         }
       }
     },
-    "/api/TableGuests/{id}": {
+    "/api/TableGuests/{booking-id}": {
       "get": {
         "tags": [
           "TableGuests"
         ],
         "parameters": [
           {
-            "name": "id",
+            "name": "bookingId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "booking-id",
             "in": "path",
             "required": true,
             "schema": {
@@ -2178,6 +2205,31 @@
         },
         "additionalProperties": false
       },
+      "BookingResponseDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bookerId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "tableId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "bookedFrom": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "BusinessHour": {
         "type": "object",
         "properties": {
@@ -2271,6 +2323,10 @@
             "nullable": true
           },
           "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
             "type": "string",
             "nullable": true
           },
@@ -2509,6 +2565,51 @@
             "items": {
               "$ref": "#/components/schemas/Table"
             },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "LocationResponseDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "capacity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "numberOfTables": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "rating": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "isHighlighted": {
+            "type": "boolean"
+          },
+          "isOpen": {
+            "type": "boolean"
+          },
+          "imgUrl": {
+            "type": "string",
             "nullable": true
           }
         },

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CsaposApi.Models;
 using Microsoft.AspNetCore.Authorization;
+using static CsaposApi.Models.DTOs.TableGuestDTO;
 
 namespace CsaposApi.Controllers
 {
@@ -30,18 +31,25 @@ namespace CsaposApi.Controllers
         }
 
         // GET: api/TableGuests/5
-        [HttpGet("{id}")]
+        [HttpGet("{booking-id}")]
         [Authorize(Policy = "MustBeGuest")]
-        public async Task<ActionResult<TableGuest>> GetTableGuest(string id)
+        public async Task<ActionResult<TableGuest>> GetTableGuest(Guid bookingId)
         {
-            var tableGuest = await _context.TableGuests.FindAsync(id);
+            var tableGuest = await _context.TableGuests.FirstOrDefaultAsync(x => x.BookingId == bookingId);
 
             if (tableGuest == null)
             {
                 return NotFound();
             }
 
-            return Ok(tableGuest);
+            var response = new TableGuestResponseDTO
+            {
+                Id = tableGuest.Id,
+                UserId = tableGuest.UserId,
+                BookingId = tableGuest.BookingId,
+            };
+
+            return Ok(response);
         }
 
         private bool TableGuestExists(Guid id)

@@ -57,36 +57,18 @@ namespace CsaposApi.Controllers
             }
         }
 
-        [HttpGet]
-        [Authorize(Policy = "MustBeGuest")]
-        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(object), (int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<IEnumerable<BookingResponseDTO>>> GetTableBookings()
-        {
-            var bookings = await _context.TableBookings
-                .Select(tb => new BookingResponseDTO
-                {
-                    Id = tb.Id,
-                    BookerId = tb.BookerId,
-                    TableId = tb.TableId,
-                    BookedFrom = tb.BookedFrom,
-                })
-                .ToListAsync();
-
-            return Ok(bookings);
-        }
-
-        [HttpGet("{bookerId}")]
+        [HttpGet("bookings-by-user")]
         [Authorize(Policy = "MustBeGuest")]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<IEnumerable<BookingResponseDTO>>> GetTableBookings(Guid bookerId)
+        public async Task<ActionResult<IEnumerable<BookingResponseDTO>>> GetTableBookings()
         {
+            Guid currentUserId = GetUserIdFromToken();
+
             var bookings = await _context.TableBookings
-                .Where(tb => tb.BookerId == bookerId)
+                .Where(tb => tb.BookerId == currentUserId)
                 .Select(tb => new BookingResponseDTO
                 {
                     Id = tb.Id,
@@ -101,6 +83,35 @@ namespace CsaposApi.Controllers
 
             return Ok(bookings);
         }
+
+        [HttpGet("bookings-containing-user")]
+        [Authorize(Policy = "MustBeGuest")]
+        [ProducesResponseType(typeof(IEnumerable<BookingResponseDTO>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<IEnumerable<BookingResponseDTO>>> GetBookingsWhereUserIsGuest()
+        {
+            Guid currentUserId = GetUserIdFromToken();
+
+            var bookings = await _context.TableBookings
+                .Where(tb => _context.TableGuests.Any(tg => tg.BookingId == tb.Id && tg.UserId == currentUserId) &&
+                             tb.BookerId != currentUserId)
+                .Select(tb => new BookingResponseDTO
+                {
+                    Id = tb.Id,
+                    BookerId = tb.BookerId,
+                    TableId = tb.TableId,
+                    BookedFrom = tb.BookedFrom,
+                })
+                .ToListAsync();
+
+            if (bookings.Count == 0)
+                return NotFound(new { Message = "No bookings where the user is a guest." });
+
+            return Ok(bookings);
+        }
+
 
         [HttpPost("book-table")]
         [Authorize(Policy = "MustBeGuest")]

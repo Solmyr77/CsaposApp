@@ -68,12 +68,17 @@ namespace CsaposApi
             {
                 options.AddPolicy("MustBeGuest", policy =>
                 {
-                    policy.RequireRole("guest", "admin");
+                    policy.RequireRole("guest", "admin", "manager");
                 });
 
                 options.AddPolicy("MustBeAdmin", policy =>
                 {
                     policy.RequireRole("admin");
+                });
+
+                options.AddPolicy("MustBeManagar", policy =>
+                {
+                    policy.RequireRole("manager");
                 });
             });
 

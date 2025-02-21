@@ -27,15 +27,32 @@ namespace CsaposApi.Controllers
         // GET: api/Locations
         [HttpGet]
         [Authorize(Policy = "MustBeGuest")]
-        public async Task<ActionResult<IEnumerable<Location>>> GetLocations()
+        public async Task<ActionResult<IEnumerable<LocationResponseDTO>>> GetLocations()
         {
-            return Ok(await _context.Locations.ToListAsync());
+            var locations = await _context.Locations.ToListAsync();
+
+            var response = locations.Select(location => new LocationResponseDTO
+            {
+                Id = location.Id,
+                Name = location.Name,
+                Description = location.Description,
+                Address = location.Address,
+                Capacity = location.Capacity,
+                NumberOfTables = location.NumberOfTables,
+                Rating = location.Rating,
+                IsOpen = location.IsOpen,
+                IsHighlighted = location.IsHighlighted,
+                ImgUrl = location.ImgUrl
+            }).ToList();
+
+            return Ok(response);
         }
+
 
         // GET: api/Locations/5
         [HttpGet("{id}")]
         [Authorize(Policy = "MustBeGuest")]
-        public async Task<ActionResult<Location>> GetLocation(string id)
+        public async Task<ActionResult<Location>> GetLocation(Guid id)
         {
             var location = await _context.Locations.FindAsync(id);
 
@@ -44,7 +61,21 @@ namespace CsaposApi.Controllers
                 return NotFound();
             }
 
-            return Ok(location);
+            var response = new LocationResponseDTO
+            {
+                Id = location.Id,
+                Name = location.Name,
+                Description = location.Description,
+                Address = location.Address,
+                Capacity = location.Capacity,
+                NumberOfTables = location.NumberOfTables,
+                Rating = location.Rating,
+                IsOpen = location.IsOpen,
+                IsHighlighted = location.IsHighlighted,
+                ImgUrl = location.ImgUrl
+            };
+
+            return Ok(response);
         }
 
         [HttpPost]
@@ -71,10 +102,11 @@ namespace CsaposApi.Controllers
                 var currentLocation = new Location
                 {
                     Id = locationId,
-                    Name = createLocationDTO.name,
-                    Description = createLocationDTO.description,
-                    Capacity = createLocationDTO.capacity,
-                    NumberOfTables = createLocationDTO.numberOfTables,
+                    Name = createLocationDTO.Name,
+                    Description = createLocationDTO.Description,
+                    Address = createLocationDTO.Address,
+                    Capacity = createLocationDTO.Capacity,
+                    NumberOfTables = createLocationDTO.NumberOfTables,
                     Rating = -1,
                     IsHighlighted = false,
                     IsOpen = true,
@@ -85,7 +117,21 @@ namespace CsaposApi.Controllers
                 await _context.Locations.AddAsync(currentLocation);
                 await _context.SaveChangesAsync();
 
-                return Ok();
+                var response = new LocationResponseDTO
+                {
+                    Id = currentLocation.Id,
+                    Name = currentLocation.Name,
+                    Description = currentLocation.Description,
+                    Address = currentLocation.Address,
+                    Capacity = currentLocation.Capacity,
+                    NumberOfTables = currentLocation.NumberOfTables,
+                    Rating = currentLocation.Rating,
+                    IsOpen = currentLocation.IsOpen,
+                    IsHighlighted = currentLocation.IsHighlighted,
+                    ImgUrl = currentLocation.ImgUrl
+                };
+
+                return CreatedAtAction(nameof(CreateLocation), response);
             }
             catch (Exception e)
             {

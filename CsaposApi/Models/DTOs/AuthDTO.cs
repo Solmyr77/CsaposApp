@@ -23,5 +23,15 @@ namespace CsaposApi.Models.DTOs
             [Required]
             public string NewPassword { get; set; }
         }
+
+        public class RegisterResponseDTO
+        {
+            public Guid Id { get; set; }
+            public string Username { get; set; }
+            public string LegalName { get; set; }
+            public string Email { get; set; }
+            public DateTime BirthDate { get; set; }
+            public string imgUrl { get; set; }
+        }
     }
 }

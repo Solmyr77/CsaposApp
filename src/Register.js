@@ -41,10 +41,12 @@ function Register() {
   }
 
   async function handleRegister() {
+    console.log(email);
     try {
       const response = await axios.post("https://backend.csaposapp.hu/api/auth/register",
         {
           username: username,
+          email: email,
           password: password1,
           legalName: legalName,
           birthDate: birthDate
@@ -58,6 +60,11 @@ function Register() {
       {
         setErrorMessage("Ez a felhasználónév már foglalt!");
         setUsername("");
+      }
+      if (error.response?.status === 400) {
+        setErrorMessage("A jelszó minimum hossza 8 karakter, tartalmaznia kell nagybetűt, kisbetűt valamint egy számot!")
+        setPassword1("");
+        setPassword2("");
       }
       return false;
     }

@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CsaposApi.Models;
 using Microsoft.AspNetCore.Authorization;
+using CsaposApi.Models.DTOs;
+using static CsaposApi.Models.DTOs.BusinessHoursDTO;
 
 namespace CsaposApi.Controllers
 {
@@ -24,24 +26,69 @@ namespace CsaposApi.Controllers
         // GET: api/BusinessHours
         [HttpGet]
         [Authorize(Policy = "MustBeGuest")]
-        public async Task<ActionResult<IEnumerable<BusinessHour>>> GetBusinessHours()
+        public async Task<ActionResult<IEnumerable<BusinessHoursResponseDTO>>> GetBusinessHours()
         {
-            return Ok(await _context.BusinessHours.ToListAsync());
+            var businessHours = await _context.BusinessHours
+                .Select(bh => new BusinessHoursResponseDTO
+                {
+                    Id = bh.Id,
+                    MondayOpen = bh.MondayOpen,
+                    MondayClose = bh.MondayClose,
+                    TuesdayOpen = bh.TuesdayOpen,
+                    TuesdayClose = bh.TuesdayClose,
+                    WednesdayOpen = bh.WednesdayOpen,
+                    WednesdayClose = bh.WednesdayClose,
+                    ThursdayOpen = bh.ThursdayOpen,
+                    ThursdayClose = bh.ThursdayClose,
+                    FridayOpen = bh.FridayOpen,
+                    FridayClose = bh.FridayClose,
+                    SaturdayOpen = bh.SaturdayOpen,
+                    SaturdayClose = bh.SaturdayClose,
+                    SundayOpen = bh.SundayOpen,
+                    SundayClose = bh.SundayClose,
+                    LocationId = bh.LocationId,
+                    Name = bh.Name,
+                })
+                .ToListAsync();
+
+            return Ok(businessHours);
         }
 
+
         // GET: api/BusinessHours/5
-        [HttpGet("{id}")]
+        [HttpGet("{locationId}")]
         [Authorize(Policy = "MustBeGuest")]
-        public async Task<ActionResult<BusinessHour>> GetBusinessHour(string id)
+        public async Task<ActionResult<BusinessHour>> GetBusinessHour(Guid locationId)
         {
-            var businessHour = await _context.BusinessHours.FindAsync(id);
+            var businessHour = await _context.BusinessHours.FirstOrDefaultAsync(x => x.LocationId == locationId);
 
             if (businessHour == null)
             {
                 return NotFound();
             }
 
-            return Ok(businessHour);
+            var response = new BusinessHoursResponseDTO
+            {
+                Id = businessHour.Id,
+                MondayOpen = businessHour.MondayOpen,
+                MondayClose = businessHour.MondayClose,
+                TuesdayOpen = businessHour.TuesdayOpen,
+                TuesdayClose = businessHour.TuesdayClose,
+                WednesdayOpen = businessHour.WednesdayOpen,
+                WednesdayClose = businessHour.WednesdayClose,
+                ThursdayOpen = businessHour.ThursdayOpen,
+                ThursdayClose = businessHour.ThursdayClose,
+                FridayOpen = businessHour.FridayOpen,
+                FridayClose = businessHour.FridayClose,
+                SaturdayOpen = businessHour.SaturdayOpen,
+                SaturdayClose = businessHour.SaturdayClose,
+                SundayOpen = businessHour.SundayOpen,
+                SundayClose = businessHour.SundayClose,
+                LocationId = businessHour.LocationId,
+                Name = businessHour.Name,
+            };
+
+            return Ok(response);
         }
 
         private bool BusinessHourExists(Guid id)

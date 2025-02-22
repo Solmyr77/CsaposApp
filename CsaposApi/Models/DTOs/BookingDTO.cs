@@ -16,12 +16,16 @@
             public DateTime BookedFrom { get; set; }
         }
 
+        public class DeleteBookingDTO
+        {
+            public Guid BookingId { get; set; }
+        }
+
         public class AddToTableDTO
         {
             public List<Guid> userIds { get; set; } = new List<Guid>();
             public Guid bookingId { get; set; }
         }
-
 
         public class RemoveFromTableDTO
         {

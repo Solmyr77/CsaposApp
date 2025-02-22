@@ -28,7 +28,13 @@ namespace CsaposApi.Services.IService
         /// <summary>
         /// Gets user id (sub) from access token
         /// </summary>
-        /// <param name="token">The refresh token to revoke.</param>
+        /// <param name="token">The access token to get the user id from.</param>
         string GetUserId(string token);
+
+        /// <summary>
+        /// Gets user id (sub) from access token
+        /// </summary>
+        /// <param name="token">The access token to get the role from.</param>
+        string GetUserRole(string token);
     }
 }

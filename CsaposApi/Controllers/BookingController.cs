@@ -57,6 +57,37 @@ namespace CsaposApi.Controllers
             }
         }
 
+        // Extract user role from JWT token using AuthService
+        private string GetUserRoleFromToken()
+        {
+            try
+            {
+                var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                if (string.IsNullOrEmpty(token))
+                {
+                    throw new UnauthorizedAccessException("Missing Authorization token.");
+                }
+
+                var userRole = _authService.GetUserRole(token);
+                return userRole;
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning(ex, "Unauthorized access attempt due to missing token.");
+                throw;
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(ex, "Invalid token format.");
+                throw new UnauthorizedAccessException("Invalid token format: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to extract role from token.");
+                throw new UnauthorizedAccessException("Failed to extract role from token.");
+            }
+        }
+
         [HttpGet("bookings-by-user")]
         [Authorize(Policy = "MustBeGuest")]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
@@ -142,6 +173,11 @@ namespace CsaposApi.Controllers
                     BookedFrom = createBookingDTO.BookedFrom,
                 };
 
+                var currentTable = await _context.Tables.FindAsync(currentBooking.TableId);
+
+                currentTable.IsBooked = true;
+
+                _context.Tables.Update(currentTable);
                 await _context.TableBookings.AddAsync(currentBooking);
                 await _context.SaveChangesAsync();
 
@@ -156,6 +192,82 @@ namespace CsaposApi.Controllers
                 });
             }
         }
+
+        [HttpDelete("remove-booking")]
+        [Authorize(Policy = "MustBeGuest")]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.NoContent)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.Forbidden)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult> RemoveBooking(DeleteBookingDTO deleteBookingDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    error = "invalid_request",
+                    message = "Request body is missing, malformed, or incomplete."
+                });
+            }
+
+            try
+            {
+                Guid bookerId = GetUserIdFromToken();
+                string userRole = GetUserRoleFromToken();
+
+                // Retrieve the booking once
+                var currentBooking = await _context.TableBookings.FindAsync(deleteBookingDTO.BookingId);
+
+                if (currentBooking == null)
+                {
+                    return NotFound(new
+                    {
+                        error = "not_found",
+                        message = "Booking not found."
+                    });
+                }
+
+                // Verify the booking belongs to the user or user is admin or manager
+                if (currentBooking.BookerId != bookerId && userRole != "admin" && userRole != "manager")
+                {
+                    return Forbid();
+                }
+
+                // Retrieve the associated table
+                var currentTable = await _context.Tables.FindAsync(currentBooking.TableId);
+
+                if (currentTable == null)
+                {
+                    return NotFound(new
+                    {
+                        error = "not_found",
+                        message = "Associated table not found."
+                    });
+                }
+
+                // Mark the table as available
+                currentTable.IsBooked = false;
+                _context.Tables.Update(currentTable);
+
+                // Remove the booking
+                _context.TableBookings.Remove(currentBooking);
+
+                await _context.SaveChangesAsync();
+
+                return NoContent(); // HTTP 204
+            }
+            catch (Exception)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, new
+                {
+                    error = "server_error",
+                    message = "An unexpected error occurred while removing the booking."
+                });
+            }
+        }
+
 
         [HttpPost("add-to-table")]
         [Authorize(Policy = "MustBeGuest")]

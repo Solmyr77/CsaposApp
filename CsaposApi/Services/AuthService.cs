@@ -93,11 +93,17 @@ public class AuthService : IAuthService
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(_jwtSettings.SecretKey);
 
+        var user = _context.Users.FirstOrDefault(x => x.Id == userId);
+        if (user == null)
+        {
+            throw new Exception("User not found");
+        }
+
         var claims = new List<Claim>
         {
             new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.Role, _context.Users.FirstOrDefault(x => x.Id == userId).Role)
+            new Claim("role", user.Role)
         };
 
         var credentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
@@ -124,6 +130,23 @@ public class AuthService : IAuthService
         if (!string.IsNullOrEmpty(subject))
         {
             return subject;
+        }
+        else
+        {
+            throw new ArgumentException("Token is malformed.");
+        }
+    }
+
+    public string GetUserRole(string token)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var jwtToken = handler.ReadJwtToken(token);
+
+        var role = jwtToken.Claims.FirstOrDefault(c => c.Type == "role")?.Value;
+
+        if (!string.IsNullOrEmpty(role))
+        {
+            return role;
         }
         else
         {

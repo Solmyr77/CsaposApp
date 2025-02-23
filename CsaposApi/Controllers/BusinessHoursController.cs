@@ -12,7 +12,7 @@ using static CsaposApi.Models.DTOs.BusinessHoursDTO;
 
 namespace CsaposApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/business-hours")]
     [ApiController]
     public class BusinessHoursController : ControllerBase
     {

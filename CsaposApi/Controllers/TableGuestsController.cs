@@ -11,7 +11,7 @@ using static CsaposApi.Models.DTOs.TableGuestDTO;
 
 namespace CsaposApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/table-guests")]
     [ApiController]
     public class TableGuestsController : ControllerBase
     {

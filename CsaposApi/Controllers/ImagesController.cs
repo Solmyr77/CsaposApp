@@ -9,7 +9,7 @@ using CsaposApi.Services.IService;
 
 namespace CsaposApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/images")]
     [ApiController]
     public class ImagesController : ControllerBase
     {

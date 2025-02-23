@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace CsaposApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/orders")]
     [ApiController]
     public class OrdersController : ControllerBase
     {
@@ -32,7 +32,7 @@ namespace CsaposApi.Controllers
         // GET: api/Orders/5
         [HttpGet("{id}")]
         [Authorize(Policy = "MustBeGuest")]
-        public async Task<ActionResult<Order>> GetOrder(string id)
+        public async Task<ActionResult<Order>> GetOrder(Guid id)
         {
             var order = await _context.Orders.FindAsync(id);
 

@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace CsaposApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/event-attendances")]
     [ApiController]
     public class EventAttendancesController : ControllerBase
     {

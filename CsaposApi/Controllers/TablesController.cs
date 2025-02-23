@@ -13,7 +13,7 @@ using System.Net;
 
 namespace CsaposApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/tables")]
     [ApiController]
     public class TablesController : ControllerBase
     {

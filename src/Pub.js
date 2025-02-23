@@ -8,17 +8,49 @@ import { Rating } from "@mui/material";
 import { ChevronRightIcon, MapPinIcon } from "@heroicons/react/20/solid";
 import Context from "./Context";
 import EventSwiper from "./EventSwiper";
+import axios from "axios";
+import getAccessToken from "./refreshToken";
 
 function Pub() {
-  const { locations, previousRoutes, setPreviousRoutes } = useContext(Context);
+  const { locations, previousRoutes, setPreviousRoutes, logout } = useContext(Context);
   const { name } = useParams();
   const location = useLocation();
   const [record, setRecord] = useState({});
   const [isBusinessHoursVisible, setIsBusinessHoursVisible] = useState(false);
   const [isDescriptionWrapped, setIsDescriptionWrapped] = useState(true);
   const [isClamped, setIsClamped] = useState(false);
+  const [businessHours, setBusinessHours] = useState({});
   const textRef = useRef(null);
   const navigate = useNavigate();
+
+  async function getBusinessHours(id) {
+    try {
+      const config = {
+        headers: { 
+          Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+          "Cache-Content": "no-cache"
+        }
+      }
+      const response = await axios.get(`https://backend.csaposapp.hu/api/business-hours/${id}`, config);
+      const data = await response.data;
+      if (response.status === 200) setBusinessHours(data);
+    }
+    catch (error) {
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) {
+          getBusinessHours(id);
+        }
+        else {
+          await logout();
+          window.location.reload();
+          return false;
+        }
+      } 
+      else {
+        return false;
+      }
+    }
+  }
 
   const checkIfClamped = () => {
     const element = textRef.current;
@@ -33,11 +65,15 @@ function Pub() {
   useEffect(() => {
     if (locations.length > 0) {
         setRecord(locations.find((record) => record.name === name));
+        const run = async () => {
+            Object.hasOwn(record, "id") && await getBusinessHours(record.id);
+        }
+        run();
     }
     checkIfClamped();
     window.addEventListener('resize', checkIfClamped);
     return () => window.removeEventListener('resize', checkIfClamped);
-  }, [locations]);
+  }, [locations, record]);
 
   return (
     <div className="min-h-screen bg-grey text-white flex flex-col">
@@ -78,13 +114,13 @@ function Pub() {
                 <ChevronRightIcon className={`w-6 ${isBusinessHoursVisible ? "rotate-90" : "rotate-0"}`} onClick={() => setIsBusinessHoursVisible((state) => !state)}/>
             </div>
             <div className={`flex flex-col transition-opacity max-w-full mb-2 ${isBusinessHoursVisible ? "" : "hidden"}`}>
-                <ListItem title={"Hétfő"} openingHours={"13:30 - 22:00"}/>
-                <ListItem title={"Kedd"} openingHours={"13:30 - 22:00"}/>
-                <ListItem title={"Szerda"} openingHours={"13:30 - 22:00"}/>
-                <ListItem title={"Csütörtök"} openingHours={"13:30 - 22:00"}/>
-                <ListItem title={"Péntek"} openingHours={"13:30 - 22:00"}/>
-                <ListItem title={"Szombat"} openingHours={"13:30 - 22:00"}/>
-                <ListItem title={"Vasárnap"} openingHours={"13:30 - 22:00"}/>
+                <ListItem title={"Hétfő"} openingHours={Object.hasOwn(businessHours, "id") ? `${Object.values(businessHours)[1].substring(0, 5)} - ${Object.values(businessHours)[2].substring(0, 5)}` : "13:00 - 20:00"}/>
+                <ListItem title={"Kedd"} openingHours={Object.hasOwn(businessHours, "id") ?`${Object.values(businessHours)[3].substring(0, 5)} - ${Object.values(businessHours)[4].substring(0, 5)} ` : "13:00 - 20:00"}/>
+                <ListItem title={"Szerda"} openingHours={Object.hasOwn(businessHours, "id") ?`${Object.values(businessHours)[5].substring(0, 5)} - ${Object.values(businessHours)[6].substring(0, 5)} ` : "13:00 - 20:00"}/>
+                <ListItem title={"Csütörtök"} openingHours={Object.hasOwn(businessHours, "id") ? `${Object.values(businessHours)[7].substring(0, 5)} - ${Object.values(businessHours)[8].substring(0, 5)} ` : "13:00 - 20:00"}/>
+                <ListItem title={"Péntek"} openingHours={Object.hasOwn(businessHours, "id") ? `${Object.values(businessHours)[9].substring(0, 5)} - ${Object.values(businessHours)[10].substring(0, 5)} ` : "13:00 - 20:00"}/>
+                <ListItem title={"Szombat"} openingHours={Object.hasOwn(businessHours, "id") ? `${Object.values(businessHours)[11].substring(0, 5)} - ${Object.values(businessHours)[12].substring(0, 5)} ` : "13:00 - 20:00"}/>
+                <ListItem title={"Vasárnap"} openingHours={Object.hasOwn(businessHours, "id") ? `${Object.values(businessHours)[13].substring(0, 5)} - ${Object.values(businessHours)[14].substring(0, 5)} ` : "13:00 - 20:00"}/>
             </div>
             <TitleDivider title={"Leírás"}/>
             <p ref={textRef} className={`max-w-full text-wrap ${isDescriptionWrapped ? "line-clamp-5" : "line-clamp-none"} mb-2`}>{record.description}</p>            

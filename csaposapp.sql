@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Generation Time: Feb 21, 2025 at 08:24 AM
+-- Generation Time: Feb 23, 2025 at 01:20 AM
 -- Server version: 5.7.44
 -- PHP Version: 8.2.27
 
@@ -134,6 +134,20 @@ CREATE TABLE `locations` (
   `is_open` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `img_url` varchar(255) DEFAULT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `manager_mapping`
+--
+
+CREATE TABLE `manager_mapping` (
+  `id` char(36) NOT NULL,
+  `user_id` char(36) NOT NULL,
+  `location_id` char(36) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -331,6 +345,14 @@ ALTER TABLE `locations`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `manager_mapping`
+--
+ALTER TABLE `manager_mapping`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_manager_mapping_user` (`user_id`),
+  ADD KEY `fk_manager_mapping_location` (`location_id`);
+
+--
 -- Indexes for table `orders`
 --
 ALTER TABLE `orders`
@@ -428,6 +450,13 @@ ALTER TABLE `event_attendance`
 ALTER TABLE `friendships`
   ADD CONSTRAINT `fk_friendship_user1` FOREIGN KEY (`user_id1`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_friendship_user2` FOREIGN KEY (`user_id2`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `manager_mapping`
+--
+ALTER TABLE `manager_mapping`
+  ADD CONSTRAINT `fk_manager_mapping_location` FOREIGN KEY (`location_id`) REFERENCES `locations` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_manager_mapping_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `orders`

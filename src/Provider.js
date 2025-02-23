@@ -18,6 +18,7 @@ function Provider({ children }) {
   const [tableFriends, setTableFriends] = useState([]);
   const [tables, setTables] = useState([]);
   const [order, setOrder] = useState([]);
+  const [bookings, setBookings] = useState([]);
 
   async function getProfile(id, profile) {
     try {
@@ -123,7 +124,48 @@ function Provider({ children }) {
       if (response.status === 200 && data.length > 0) setTables(data);
     }
     catch (error) {
-      console.log(error.data?.status);
+      console.log(error.response?.status);
+      console.log(error.message);
+    }
+  }
+
+  async function getBookings() {
+    try {
+      const config = {
+        headers: { 
+          Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+          "Cache-Content": "no-cache"
+        }
+      }
+      const response = await axios.get(`https://backend.csaposapp.hu/api/bookings/bookings-by-user`, config);
+      const data = await response.data;
+      if (response.status === 200 && data.length > 0) {
+        setBookings(data);
+        console.log(data);
+      }
+    }
+    catch (error) {
+      console.log(error.response?.status);
+      console.log(error.message);
+    }
+  }
+
+  async function getTableGuests(id) {
+    try {
+      const config = {
+        headers: { 
+          Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+          "Cache-Content": "no-cache"
+        }
+      }
+      const response = await axios.get(`https://backend.csaposapp.hu/api/table-guests/${id}?bookingId=${id}`, config);
+      const data = response.data;
+      if (response.status === 200) {
+        return data;
+      }
+    }
+    catch (error) {
+      console.log(error.response?.status);
       console.log(error.message);
     }
   }
@@ -137,6 +179,7 @@ function Provider({ children }) {
       localStorage.removeItem("user");
       setUserId("");
       setFriends([]);
+      setBookings([]);
     }
   }
 
@@ -150,6 +193,7 @@ function Provider({ children }) {
           await getFriendRequests();
           await getLocations();
           await getTables();
+          await getBookings();
         }
         fetch()
       }
@@ -185,6 +229,7 @@ function Provider({ children }) {
       tableFriends, 
       order, 
       setOrder,
+      bookings,
       setTableFriends, 
       getProfile, 
       setUserId,

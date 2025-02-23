@@ -24,7 +24,6 @@ function Tables() {
       if (response.status === 200 && data.length > 0) {
         setLocationTables(data);
       }
-      console.log(data);
     }
     catch (error) {
       console.log(error.data?.status);
@@ -36,7 +35,6 @@ function Tables() {
     if (locations.length > 0) {
       setRecord(locations.find(record => record.name === name));
       if (Object.hasOwn(record, "id")) {
-        console.log(record)
         getLocationTables(record.id);
       }
     }

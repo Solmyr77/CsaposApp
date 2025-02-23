@@ -12,6 +12,7 @@ import AddFriendModal from "./AddFriendModal";
 import PasswordModal from "./PasswordModal";
 import FriendModal from "./FriendModal";
 
+
 function Profile() {
   const { setMenuState, user, friends, logout } = useContext(Context);
   const [isModifyModalVisible, setIsModifyModalVisible] = useState(false);

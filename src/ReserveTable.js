@@ -205,7 +205,7 @@ function ReserveTable() {
     }
     setInterval(() => {
       updateTime();
-    }, 900000 - startDate.getMilliseconds());
+    }, 900000 - new Date().getMilliseconds());
   }, [locations, tables, number, name]);
 
   useEffect(() => {
@@ -270,7 +270,7 @@ function ReserveTable() {
         </div>
       </div> :
       <div className="flex flex-col justify-center flex-grow items-center h-1/2 p-4">
-        <div className="flex flex-col items-center bg-dark-grey p-4 rounded-md text-green-500">
+        <div className="flex flex-col items-center bg-dark-grey p-4 rounded-md text-green-500 shadow-md">
           <p className="text-lg">Sikeres foglalás!</p>
           <CheckIcon className="w-12"/>
           <p className="mt-2 text-white font-normal">Vissza a főoldalra... {remainingSeconds}</p>

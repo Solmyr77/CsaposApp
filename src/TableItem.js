@@ -27,7 +27,7 @@ function TableItem({ name, record }) {
           <UserIcon className="w-6"/>
         </div>
       </div>
-      <button className="basis-1/3 aspect-square max-h-full bg-blue rounded-md text-md px-1" onClick={() => {
+      <button className="basis-1/3 aspect-square max-h-full bg-blue rounded-md text-md px-1" disabled={record.isBooked} onClick={() => {
         setPreviousRoutes((state) => {
           if (!state.includes(location.pathname)) return [...state, location.pathname];
           return state;

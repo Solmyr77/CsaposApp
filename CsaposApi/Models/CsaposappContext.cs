@@ -27,6 +27,8 @@ public partial class CsaposappContext : DbContext
 
     public virtual DbSet<Location> Locations { get; set; }
 
+    public virtual DbSet<ManagerMapping> ManagerMappings { get; set; }
+
     public virtual DbSet<Order> Orders { get; set; }
 
     public virtual DbSet<OrderItem> OrderItems { get; set; }
@@ -305,6 +307,38 @@ public partial class CsaposappContext : DbContext
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("timestamp")
                 .HasColumnName("updated_at");
+        });
+
+        modelBuilder.Entity<ManagerMapping>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("manager_mapping");
+
+            entity.HasIndex(e => e.LocationId, "fk_manager_mapping_location");
+
+            entity.HasIndex(e => e.UserId, "fk_manager_mapping_user");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("created_at");
+            entity.Property(e => e.LocationId).HasColumnName("location_id");
+            entity.Property(e => e.UpdatedAt)
+                .ValueGeneratedOnAddOrUpdate()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("updated_at");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.Location).WithMany(p => p.ManagerMappings)
+                .HasForeignKey(d => d.LocationId)
+                .HasConstraintName("fk_manager_mapping_location");
+
+            entity.HasOne(d => d.User).WithMany(p => p.ManagerMappings)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("fk_manager_mapping_user");
         });
 
         modelBuilder.Entity<Order>(entity =>

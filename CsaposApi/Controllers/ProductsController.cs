@@ -22,18 +22,45 @@ namespace CsaposApi.Controllers
             _context = context;
         }
 
-        // GET: api/Products
         [HttpGet]
         [Authorize(Policy = "MustBeGuest")]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+        public async Task<ActionResult<IEnumerable<ProductResponseDTO>>> GetProducts()
         {
-            return Ok(await _context.Products.ToListAsync());
+            return Ok(await _context.Products.Select(pd => new ProductResponseDTO
+            {
+                Id = pd.Id,
+                LocationId = pd.LocationId,
+                Name = pd.Name,
+                Category = pd.Category,
+                Price = pd.Price,
+                DiscountPercentage = pd.DiscountPercentage,
+                StockQuantity = pd.StockQuantity,
+                IsActive = pd.IsActive,
+                ImgUrl = pd.ImgUrl
+            }).ToListAsync());
         }
 
-        // GET: api/Products/5
+        [HttpGet("location/{locationId}")]
+        [Authorize(Policy = "MustBeGuest")]
+        public async Task<ActionResult<IEnumerable<ProductResponseDTO>>> GetProductsForLocation(Guid locationId)
+        {
+            return Ok(await _context.Products.Where(x => x.LocationId == locationId).Select(pd => new ProductResponseDTO
+            {
+                Id = pd.Id,
+                LocationId = pd.LocationId,
+                Name = pd.Name,
+                Category = pd.Category,
+                Price = pd.Price,
+                DiscountPercentage = pd.DiscountPercentage,
+                StockQuantity = pd.StockQuantity,
+                IsActive = pd.IsActive,
+                ImgUrl = pd.ImgUrl
+            }).ToListAsync());
+        }
+
         [HttpGet("{id}")]
         [Authorize(Policy = "MustBeGuest")]
-        public async Task<ActionResult<Product>> GetProduct(Guid id)
+        public async Task<ActionResult<ProductResponseDTO>> GetProduct(Guid id)
         {
             var product = await _context.Products.FindAsync(id);
 
@@ -42,7 +69,55 @@ namespace CsaposApi.Controllers
                 return NotFound();
             }
 
-            return Ok(product);
+            var response = new ProductResponseDTO
+            {
+                Id = product.Id,
+                LocationId = product.LocationId,
+                Name = product.Name,
+                Category = product.Category,
+                Price = product.Price,
+                DiscountPercentage = product.DiscountPercentage,
+                StockQuantity = product.StockQuantity,
+                IsActive = product.IsActive,
+                ImgUrl = product.ImgUrl
+            };
+
+            return Ok(response);
+        }
+
+        [HttpPost]
+        [Authorize(Policy = "MustBeManager")]
+        public async Task<ActionResult<ProductResponseDTO>> CreateProduct(CreateProductDTO createProductDTO)
+        {
+            Guid productId = Guid.NewGuid();
+
+            var product = new Product
+            {
+                Id = productId,
+                LocationId = createProductDTO.LocationId,
+                Name = createProductDTO.Name,
+                Category = createProductDTO.Category,
+                Price = createProductDTO.Price,
+                DiscountPercentage = 0,
+                StockQuantity = createProductDTO.StockQuantity,
+                IsActive = true,
+                ImgUrl = $"{productId}.webp",
+            };
+
+            var response = new ProductResponseDTO
+            {
+                Id = product.Id,
+                LocationId = product.LocationId,
+                Name = product.Name,
+                Category = product.Category,
+                Price = product.Price,
+                DiscountPercentage = product.DiscountPercentage,
+                StockQuantity = product.StockQuantity,
+                IsActive = product.IsActive,
+                ImgUrl = product.ImgUrl
+            };
+
+            return CreatedAtAction(nameof(CreateProduct), response);
         }
 
         private bool ProductExists(Guid id)

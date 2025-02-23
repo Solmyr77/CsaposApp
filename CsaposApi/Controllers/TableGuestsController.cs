@@ -31,7 +31,7 @@ namespace CsaposApi.Controllers
         }
 
         // GET: api/TableGuests/5
-        [HttpGet("{booking-id}")]
+        [HttpGet("{bookingId}")]
         [Authorize(Policy = "MustBeGuest")]
         public async Task<ActionResult<TableGuest>> GetTableGuest(Guid bookingId)
         {

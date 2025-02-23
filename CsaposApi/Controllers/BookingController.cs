@@ -150,7 +150,7 @@ namespace CsaposApi.Controllers
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult> CreateBooking(CreateBookingDTO createBookingDTO)
+        public async Task<ActionResult<BookingResponseDTO>> CreateBooking(CreateBookingDTO createBookingDTO)
         {
             if (!ModelState.IsValid)
             {
@@ -173,6 +173,14 @@ namespace CsaposApi.Controllers
                     BookedFrom = createBookingDTO.BookedFrom,
                 };
 
+                var response = new BookingResponseDTO
+                {
+                    Id = currentBooking.Id,
+                    BookerId = currentBooking.BookerId,
+                    TableId = currentBooking.TableId,
+                    BookedFrom = currentBooking.BookedFrom,
+                };
+
                 var currentTable = await _context.Tables.FindAsync(currentBooking.TableId);
 
                 currentTable.IsBooked = true;
@@ -181,7 +189,7 @@ namespace CsaposApi.Controllers
                 await _context.TableBookings.AddAsync(currentBooking);
                 await _context.SaveChangesAsync();
 
-                return Ok(currentBooking);
+                return Ok(response);
             }
             catch (Exception)
             {

@@ -1,13 +1,27 @@
-﻿namespace CsaposApi.Models.DTOs
+﻿using static CsaposApi.Models.DTOs.UserDTO;
+
+namespace CsaposApi.Models.DTOs
 {
     public class BookingDTO
     {
+        public class BookingResponseWithGuestsDTO
+        {
+            public Guid Id { get; set; }
+            public Guid? BookerId { get; set; }
+            public Guid? TableId { get; set; }
+            public Guid LocationId { get; set; }
+            public DateTime? BookedFrom { get; set; }
+            public List<GetProfileDTO> TableGuests { get; set; } = new List<GetProfileDTO>();
+        }
+
         public class BookingResponseDTO
         {
             public Guid Id { get; set; }
             public Guid? BookerId { get; set; }
             public Guid? TableId { get; set; }
+            public Guid LocationId { get; set; }
             public DateTime? BookedFrom { get; set; }
+            public List<GetProfileDTO> TableGuests { get; set; } = new List<GetProfileDTO>();
         }
 
         public class CreateBookingDTO

@@ -602,7 +602,7 @@ public partial class CsaposappContext : DbContext
 
             entity.HasOne(d => d.Booking).WithMany(p => p.TableGuests)
                 .HasForeignKey(d => d.BookingId)
-                .OnDelete(DeleteBehavior.Restrict)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("table_guests_ibfk_2");
 
             entity.HasOne(d => d.User).WithMany(p => p.TableGuests)

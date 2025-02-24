@@ -426,6 +426,77 @@
   },
   {
     "ContainingType": "CsaposApi.Controllers.BookingController",
+    "Method": "RemoveBooking",
+    "RelativePath": "api/bookings/remove-booking",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "deleteBookingDTO",
+        "Type": "CsaposApi.Models.DTOs.BookingDTO\u002BDeleteBookingDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Object",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 204
+      },
+      {
+        "Type": "System.Object",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      },
+      {
+        "Type": "System.Object",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      },
+      {
+        "Type": "System.Object",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 401
+      },
+      {
+        "Type": "System.Object",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 403
+      },
+      {
+        "Type": "System.Object",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 500
+      }
+    ]
+  },
+  {
+    "ContainingType": "CsaposApi.Controllers.BookingController",
     "Method": "RemoveFromTable",
     "RelativePath": "api/bookings/remove-from-table",
     "HttpMethod": "DELETE",
@@ -489,14 +560,14 @@
   {
     "ContainingType": "CsaposApi.Controllers.BusinessHoursController",
     "Method": "GetBusinessHours",
-    "RelativePath": "api/BusinessHours",
+    "RelativePath": "api/business-hours",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[CsaposApi.Models.BusinessHour, CsaposApi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[CsaposApi.Models.DTOs.BusinessHoursDTO\u002BBusinessHoursResponseDTO, CsaposApi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -509,14 +580,14 @@
   {
     "ContainingType": "CsaposApi.Controllers.BusinessHoursController",
     "Method": "GetBusinessHour",
-    "RelativePath": "api/BusinessHours/{id}",
+    "RelativePath": "api/business-hours/{locationId}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "id",
-        "Type": "System.String",
+        "Name": "locationId",
+        "Type": "System.Guid",
         "IsRequired": true
       }
     ],
@@ -535,7 +606,7 @@
   {
     "ContainingType": "CsaposApi.Controllers.EventAttendancesController",
     "Method": "GetEventAttendances",
-    "RelativePath": "api/EventAttendances",
+    "RelativePath": "api/event-attendances",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -555,7 +626,7 @@
   {
     "ContainingType": "CsaposApi.Controllers.EventAttendancesController",
     "Method": "GetEventAttendance",
-    "RelativePath": "api/EventAttendances/{id}",
+    "RelativePath": "api/event-attendances/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -581,7 +652,7 @@
   {
     "ContainingType": "CsaposApi.Controllers.EventsController",
     "Method": "GetEvents",
-    "RelativePath": "api/Events",
+    "RelativePath": "api/events",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -601,7 +672,7 @@
   {
     "ContainingType": "CsaposApi.Controllers.EventsController",
     "Method": "GetEvent",
-    "RelativePath": "api/Events/{id}",
+    "RelativePath": "api/events/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -727,7 +798,23 @@
   {
     "ContainingType": "CsaposApi.Controllers.ImagesController",
     "Method": "UploadLocation",
-    "RelativePath": "api/Images/upload/location",
+    "RelativePath": "api/images/upload/location",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "file",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CsaposApi.Controllers.ImagesController",
+    "Method": "UploadProduct",
+    "RelativePath": "api/images/upload/product",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -743,7 +830,7 @@
   {
     "ContainingType": "CsaposApi.Controllers.ImagesController",
     "Method": "UploadProfile",
-    "RelativePath": "api/Images/upload/profile",
+    "RelativePath": "api/images/upload/profile",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -759,7 +846,7 @@
   {
     "ContainingType": "CsaposApi.Controllers.LocationsController",
     "Method": "GetLocations",
-    "RelativePath": "api/Locations",
+    "RelativePath": "api/locations",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -779,7 +866,7 @@
   {
     "ContainingType": "CsaposApi.Controllers.LocationsController",
     "Method": "CreateLocation",
-    "RelativePath": "api/Locations",
+    "RelativePath": "api/locations",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -832,7 +919,7 @@
   {
     "ContainingType": "CsaposApi.Controllers.LocationsController",
     "Method": "GetLocation",
-    "RelativePath": "api/Locations/{id}",
+    "RelativePath": "api/locations/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -858,7 +945,7 @@
   {
     "ContainingType": "CsaposApi.Controllers.OrderItemsController",
     "Method": "GetOrderItems",
-    "RelativePath": "api/OrderItems",
+    "RelativePath": "api/order-items",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -878,14 +965,14 @@
   {
     "ContainingType": "CsaposApi.Controllers.OrderItemsController",
     "Method": "GetOrderItem",
-    "RelativePath": "api/OrderItems/{id}",
+    "RelativePath": "api/order-items/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
         "Name": "id",
-        "Type": "System.String",
+        "Type": "System.Guid",
         "IsRequired": true
       }
     ],
@@ -904,14 +991,14 @@
   {
     "ContainingType": "CsaposApi.Controllers.OrdersController",
     "Method": "GetOrders",
-    "RelativePath": "api/Orders",
+    "RelativePath": "api/orders",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[CsaposApi.Models.Order, CsaposApi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[CsaposApi.Models.DTOs.OrderDTO\u002BOrderResponseDTO, CsaposApi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -924,20 +1011,118 @@
   {
     "ContainingType": "CsaposApi.Controllers.OrdersController",
     "Method": "GetOrder",
-    "RelativePath": "api/Orders/{id}",
+    "RelativePath": "api/orders/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
         "Name": "id",
-        "Type": "System.String",
+        "Type": "System.Guid",
         "IsRequired": true
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "CsaposApi.Models.Order",
+        "Type": "CsaposApi.Models.DTOs.OrderDTO\u002BOrderResponseDTO",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "CsaposApi.Controllers.OrdersController",
+    "Method": "CreateOrder",
+    "RelativePath": "api/orders/create-order",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "orderCreateDto",
+        "Type": "CsaposApi.Models.DTOs.OrderDTO\u002BOrderCreateDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "CsaposApi.Models.DTOs.OrderDTO\u002BOrderResponseDTO",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "CsaposApi.Controllers.OrdersController",
+    "Method": "GetOrdersByLocation",
+    "RelativePath": "api/orders/location/{locationId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "locationId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[CsaposApi.Models.DTOs.OrderDTO\u002BOrderResponseDTO, CsaposApi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "CsaposApi.Controllers.OrdersController",
+    "Method": "GetOrdersForTable",
+    "RelativePath": "api/orders/orders-by-table/{tableId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "tableId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[CsaposApi.Models.DTOs.OrderDTO\u002BOrderResponseDTO, CsaposApi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "CsaposApi.Controllers.OrdersController",
+    "Method": "GetOrdersForUser",
+    "RelativePath": "api/orders/orders-by-user",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[CsaposApi.Models.DTOs.OrderDTO\u002BOrderResponseDTO, CsaposApi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -950,14 +1135,40 @@
   {
     "ContainingType": "CsaposApi.Controllers.ProductsController",
     "Method": "GetProducts",
-    "RelativePath": "api/Products",
+    "RelativePath": "api/products",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[CsaposApi.Models.Product, CsaposApi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[CsaposApi.Models.DTOs.ProductDTO\u002BProductResponseDTO, CsaposApi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "CsaposApi.Controllers.ProductsController",
+    "Method": "CreateProduct",
+    "RelativePath": "api/products",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "createProductDTO",
+        "Type": "CsaposApi.Models.DTOs.ProductDTO\u002BCreateProductDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "CsaposApi.Models.DTOs.ProductDTO\u002BProductResponseDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -970,20 +1181,46 @@
   {
     "ContainingType": "CsaposApi.Controllers.ProductsController",
     "Method": "GetProduct",
-    "RelativePath": "api/Products/{id}",
+    "RelativePath": "api/products/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
         "Name": "id",
-        "Type": "System.String",
+        "Type": "System.Guid",
         "IsRequired": true
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "CsaposApi.Models.Product",
+        "Type": "CsaposApi.Models.DTOs.ProductDTO\u002BProductResponseDTO",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "CsaposApi.Controllers.ProductsController",
+    "Method": "GetProductsForLocation",
+    "RelativePath": "api/products/location/{locationId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "locationId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[CsaposApi.Models.DTOs.ProductDTO\u002BProductResponseDTO, CsaposApi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -996,7 +1233,7 @@
   {
     "ContainingType": "CsaposApi.Controllers.TableGuestsController",
     "Method": "GetTableGuests",
-    "RelativePath": "api/TableGuests",
+    "RelativePath": "api/table-guests",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1016,7 +1253,7 @@
   {
     "ContainingType": "CsaposApi.Controllers.TableGuestsController",
     "Method": "GetTableGuest",
-    "RelativePath": "api/TableGuests/{booking-id}",
+    "RelativePath": "api/table-guests/{bookingId}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1024,11 +1261,6 @@
       {
         "Name": "bookingId",
         "Type": "System.Guid",
-        "IsRequired": false
-      },
-      {
-        "Name": "booking-id",
-        "Type": "",
         "IsRequired": true
       }
     ],
@@ -1047,7 +1279,7 @@
   {
     "ContainingType": "CsaposApi.Controllers.TablesController",
     "Method": "GetTables",
-    "RelativePath": "api/Tables",
+    "RelativePath": "api/tables",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1067,7 +1299,7 @@
   {
     "ContainingType": "CsaposApi.Controllers.TablesController",
     "Method": "CreateTable",
-    "RelativePath": "api/Tables",
+    "RelativePath": "api/tables",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -1120,7 +1352,7 @@
   {
     "ContainingType": "CsaposApi.Controllers.TablesController",
     "Method": "GetTable",
-    "RelativePath": "api/Tables/{id}",
+    "RelativePath": "api/tables/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1146,7 +1378,7 @@
   {
     "ContainingType": "CsaposApi.Controllers.TablesController",
     "Method": "GetTablesByLocation",
-    "RelativePath": "api/Tables/location/{locationId}",
+    "RelativePath": "api/tables/location/{locationId}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1172,7 +1404,7 @@
   {
     "ContainingType": "CsaposApi.Controllers.UsersController",
     "Method": "GetUsers",
-    "RelativePath": "api/Users",
+    "RelativePath": "api/users",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1192,7 +1424,7 @@
   {
     "ContainingType": "CsaposApi.Controllers.UsersController",
     "Method": "GetUser",
-    "RelativePath": "api/Users/{id}",
+    "RelativePath": "api/users/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1218,7 +1450,7 @@
   {
     "ContainingType": "CsaposApi.Controllers.UsersController",
     "Method": "GetProfile",
-    "RelativePath": "api/Users/profile/{id}",
+    "RelativePath": "api/users/profile/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1234,7 +1466,7 @@
   {
     "ContainingType": "CsaposApi.Controllers.UsersController",
     "Method": "GetProfile",
-    "RelativePath": "api/Users/profile/search/{displayName}",
+    "RelativePath": "api/users/profile/search/{displayName}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -1296,7 +1528,7 @@
   {
     "ContainingType": "CsaposApi.Controllers.UsersController",
     "Method": "UpdateDisplayName",
-    "RelativePath": "api/Users/update-display-name",
+    "RelativePath": "api/users/update-display-name",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,

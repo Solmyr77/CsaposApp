@@ -5,9 +5,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Net;
 using static CsaposApi.Models.DTOs.AuthDTO;
 using static CsaposApi.Models.DTOs.BookingDTO;
+using static CsaposApi.Models.DTOs.TableGuestDTO;
+using static CsaposApi.Models.DTOs.UserDTO;
 
 namespace CsaposApi.Controllers
 {
@@ -94,18 +97,25 @@ namespace CsaposApi.Controllers
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<IEnumerable<BookingResponseDTO>>> GetTableBookings()
+        public async Task<ActionResult<IEnumerable<BookingResponseWithGuestsDTO>>> GetTableBookings()
         {
             Guid currentUserId = GetUserIdFromToken();
 
             var bookings = await _context.TableBookings
                 .Where(tb => tb.BookerId == currentUserId)
-                .Select(tb => new BookingResponseDTO
+                .Select(tb => new BookingResponseWithGuestsDTO
                 {
                     Id = tb.Id,
                     BookerId = tb.BookerId,
                     TableId = tb.TableId,
                     BookedFrom = tb.BookedFrom,
+                    LocationId = tb.Table.LocationId,
+                    TableGuests = tb.TableGuests.Select(tg => new GetProfileDTO
+                    {
+                        Id = tg.User.Id,
+                        DisplayName = tg.User.DisplayName,
+                        ImageUrl = tg.User.ImgUrl
+                    }).ToList()
                 })
                 .ToListAsync();
 
@@ -121,19 +131,26 @@ namespace CsaposApi.Controllers
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<IEnumerable<BookingResponseDTO>>> GetBookingsWhereUserIsGuest()
+        public async Task<ActionResult<IEnumerable<BookingResponseWithGuestsDTO>>> GetBookingsWhereUserIsGuest()
         {
             Guid currentUserId = GetUserIdFromToken();
 
             var bookings = await _context.TableBookings
                 .Where(tb => _context.TableGuests.Any(tg => tg.BookingId == tb.Id && tg.UserId == currentUserId) &&
                              tb.BookerId != currentUserId)
-                .Select(tb => new BookingResponseDTO
+                .Select(tb => new BookingResponseWithGuestsDTO
                 {
                     Id = tb.Id,
                     BookerId = tb.BookerId,
                     TableId = tb.TableId,
                     BookedFrom = tb.BookedFrom,
+                    LocationId = tb.Table.LocationId,
+                    TableGuests = tb.TableGuests.Select(tg => new GetProfileDTO
+                    {
+                        Id = tg.User.Id,
+                        DisplayName = tg.User.DisplayName,
+                        ImageUrl = tg.User.ImgUrl
+                    }).ToList()
                 })
                 .ToListAsync();
 
@@ -266,12 +283,12 @@ namespace CsaposApi.Controllers
 
                 return NoContent(); // HTTP 204
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError, new
                 {
                     error = "server_error",
-                    message = "An unexpected error occurred while removing the booking."
+                    message = "An unexpected error occurred while removing the booking." + ex.Message
                 });
             }
         }
@@ -300,8 +317,10 @@ namespace CsaposApi.Controllers
 
                 // Check if all users are friends
                 var friendsList = await _context.Friendships
-                    .Where(x => x.UserId1 == bookerId && addToTableDTO.userIds.Contains(x.UserId2))
-                    .Select(x => x.UserId2)
+                    .Where(x =>
+                        (x.UserId1 == bookerId && addToTableDTO.userIds.Contains(x.UserId2)) ||
+                        (x.UserId2 == bookerId && addToTableDTO.userIds.Contains(x.UserId1)))
+                    .Select(x => x.UserId1 == bookerId ? x.UserId2 : x.UserId1)
                     .ToListAsync();
 
                 var notFriends = addToTableDTO.userIds.Except(friendsList).ToList();
@@ -316,6 +335,22 @@ namespace CsaposApi.Controllers
                     });
                 }
 
+                // Check if any of these users have already been added to the table
+                var alreadyAddedUserIds = await _context.TableGuests
+                    .Where(x => x.BookingId == addToTableDTO.bookingId && addToTableDTO.userIds.Contains((Guid)x.UserId))
+                    .Select(x => x.UserId)
+                    .ToListAsync();
+
+                if (alreadyAddedUserIds.Any())
+                {
+                    return BadRequest(new
+                    {
+                        error = "duplicate_request",
+                        message = "Some users have already been added to the table.",
+                        alreadyAddedUserIds
+                    });
+                }
+
                 var guestsToAdd = addToTableDTO.userIds.Select(userId => new TableGuest
                 {
                     Id = Guid.NewGuid(),
@@ -326,7 +361,22 @@ namespace CsaposApi.Controllers
                 await _context.TableGuests.AddRangeAsync(guestsToAdd);
                 await _context.SaveChangesAsync();
 
-                return Ok(guestsToAdd);
+                var profiles = await _context.TableGuests
+                    .Where(x => x.BookingId == addToTableDTO.bookingId && addToTableDTO.userIds.Contains((Guid)x.UserId))
+                    .Include(x => x.User) // eagerly load the User navigation property
+                    .Select(g => new GetProfileDTO
+                    {
+                        Id = (Guid)g.UserId,
+                        DisplayName = g.User.DisplayName,
+                        ImageUrl = g.User.ImgUrl
+                    })
+                    .ToListAsync();
+
+                return Ok(new
+                {
+                    BookingId = addToTableDTO.bookingId,
+                    Profiles = profiles
+                });
             }
             catch (Exception)
             {
@@ -337,6 +387,7 @@ namespace CsaposApi.Controllers
                 });
             }
         }
+
 
 
         [HttpDelete("remove-from-table")]

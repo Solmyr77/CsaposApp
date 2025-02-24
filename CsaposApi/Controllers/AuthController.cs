@@ -268,6 +268,12 @@ namespace CsaposApi.Controllers
                     return Unauthorized("Token is malformed.");
                 }
 
+                // Validate password strength
+                if (!IsPasswordStrong(passwordUpdateDTO.NewPassword))
+                {
+                    return BadRequest(new { Message = "Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, and a number." });
+                }
+
                 Guid userId = Guid.Parse(_authService.GetUserId(token));
 
                 var user = await _context.Users.FirstOrDefaultAsync(usr => usr.Id == userId);

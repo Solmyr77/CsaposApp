@@ -35,7 +35,7 @@ function Footer() {
               <stop offset="100%" stopColor="#38bdf8" /> {/* Sky-400 */}
             </linearGradient>
           </defs>
-      </svg>
+        </svg>
     </div>
   )
 }

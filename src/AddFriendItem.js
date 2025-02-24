@@ -6,7 +6,7 @@ import getAccessToken from "./refreshToken";
 import { useNavigate } from "react-router-dom";
 
 function AddFriendItem({ record, plusIcon }) {
-  const { tableFriends, setTableFriends, currentTable, logout } = useContext(Context);
+  const { tableFriends, setTableFriends, currentTable, friends, logout } = useContext(Context);
   const [isFriendRequestSent, setIsFriendRequestSent] = useState(Boolean(localStorage.getItem(record.displayName)) || false);
   const [isAddedToTable, setIsAddedToTable] = useState(false);
   const navigate = useNavigate();
@@ -40,19 +40,31 @@ function AddFriendItem({ record, plusIcon }) {
     }
   }
 
+  useEffect(() => {
+    friends.length > 0 && setIsFriendRequestSent(friends.some(friend => friend.id === record.id));
+  }, [friends])
+
   return (
     !plusIcon ? (
-      <div className="w-full flex flex-row justify-between">
+      <div className="w-full flex flex-row justify-between relative">
         <div className="flex flex-row justify-center items-center select-none">
             <img src={`https://assets.csaposapp.hu/assets/images/${record.imageUrl}`} alt="kép" className="w-12 aspect-square rounded-full object-cover"/>
             <p className="text-md ml-2 font-normal">{record.displayName}</p>
         </div>
-        <div className={`flex items-center ${isFriendRequestSent ? "hover:cursor-default" : "hover:cursor-pointer"}`} onClick={() => !isFriendRequestSent && handleFriendRequest(record.id)}>
-          { isFriendRequestSent ? 
+        <div className={`flex absolute right-0 top-1/2 -translate-y-1/2 items-center ${isFriendRequestSent ? "hover:cursor-default" : "hover:cursor-pointer"}`} onClick={() => !isFriendRequestSent && handleFriendRequest(record.id)}>
+          { isFriendRequestSent ?
             <CheckIcon className="w-6 text-green-500"/> : 
-            <UserPlusIcon className="w-6 text-blue p-0"/>
+            <UserPlusIcon className="w-6 p-0 fill-[url(#gradient)] stroke-none"/>
           }
         </div>
+        <svg width="0" height="0">
+          <defs>
+            <linearGradient id="gradient" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#3b82f6" /> {/* Blue-500 */}
+              <stop offset="100%" stopColor="#38bdf8" /> {/* Sky-400 */}
+            </linearGradient>
+          </defs>
+        </svg>
       </div>
     ) : 
     (

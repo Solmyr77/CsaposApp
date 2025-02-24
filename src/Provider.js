@@ -17,6 +17,7 @@ function Provider({ children }) {
   const [friendRequests, setFriendRequests] = useState([]);
   const [tableFriends, setTableFriends] = useState([]);
   const [tables, setTables] = useState([]);
+  const [currentTable, setCurrentTable] = useState([]);
   const [order, setOrder] = useState([]);
   const [bookings, setBookings] = useState([]);
 
@@ -141,7 +142,6 @@ function Provider({ children }) {
       const data = await response.data;
       if (response.status === 200 && data.length > 0) {
         setBookings(data);
-        console.log(data);
       }
     }
     catch (error) {
@@ -227,9 +227,12 @@ function Provider({ children }) {
       setFriendRequests, 
       tables, 
       tableFriends, 
+      currentTable,
+      setCurrentTable,
       order, 
       setOrder,
       bookings,
+      getBookings,
       setTableFriends, 
       getProfile, 
       setUserId,

@@ -92,12 +92,11 @@ const StyledDatePickerWrapper = styled.div`
 `;
 
 function ReserveTable() {
-  const { locations, tables, previousRoutes, tableFriends, setTableFriends, logout } = useContext(Context);  
+  const { locations, tables, currentTable, setCurrentTable, previousRoutes, tableFriends, setTableFriends, bookings, getBookings, logout } = useContext(Context);  
   const { name, number } = useParams(); 
   const navigate = useNavigate();
   const [startDate, setStartDate] = useState(new Date());
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [table, setTable] = useState({});
   const [isBooked, setIsBooked] = useState(false);
   const [remainingSeconds, setRemainingSeconds] = useState(3);
   const ExampleCustomInput = forwardRef(
@@ -152,7 +151,7 @@ function ReserveTable() {
         }
       }
       const response = await axios.post(`https://backend.csaposapp.hu/api/bookings/book-table`, {
-        tableId: table.id,
+        tableId: currentTable.id,
         bookedFrom: new Date(startDate.setHours(startDate.getHours() + 1)),
         bookedTo: new Date()
       }, config);
@@ -160,6 +159,7 @@ function ReserveTable() {
       if (response.status === 200) {
         tableFriends.length > 0 && await handleAddToTable(data.id);
         setIsBooked(true);
+        getBookings();
         updateTime();
         console.log(data);
       }
@@ -195,9 +195,10 @@ function ReserveTable() {
       const location = locations.find(location => location.name === name);
       if (location) {
         if (tables.length > 0) {
-          const foundTable = tables.find(table => table.locationId === location.id && table.number === Number(number));
+          const foundTable = tables.find(table => table.locationId === location.id && table.number === Number(number) && !table.isBooked);
           if (foundTable) {
-            setTable(foundTable);
+            setCurrentTable(foundTable);
+            console.log(foundTable);
           }
           else navigate("/");
         }
@@ -221,7 +222,7 @@ function ReserveTable() {
   return (
     <div className="flex flex-col min-h-screen overflow-y-hidden bg-grey text-white font-bold px-4 py-8 select-none">
       {
-      !isBooked ? 
+      !isBooked && bookings ? 
       <div className="">
         <Link to={previousRoutes[previousRoutes.length - 1]} className="flex w-fit">
           <BackButton/>
@@ -251,7 +252,7 @@ function ReserveTable() {
             </StyledDatePickerWrapper>
           </div>
           <p className="text-lg mt-8 mb-1">Barátok meghívása</p>
-          <p className="text-sm font-normal mb-4">Max: {Number(table.capacity) - 1} fő</p>
+          <p className="text-sm font-normal mb-4">Max: {Number(currentTable.capacity) - 1} fő</p>
           <div className="grid grid-cols-4 gap-2 place-items-center">
             <AddFriendToTableModal isModalVisible={isModalVisible} setIsModalVisible={setIsModalVisible}/>
             {
@@ -262,7 +263,7 @@ function ReserveTable() {
                 </div>
               ))
             }
-            <PlusIcon className={`${tableFriends.length < Number(table.capacity) - 1 ? "block" : "hidden"} w-16 bg-dark-grey text-gray-500 rounded-full hover:cursor-pointer`} onClick={() => setIsModalVisible(state => !state)}/>
+            <PlusIcon className={`${tableFriends.length < Number(currentTable.capacity) - 1 ? "block" : "hidden"} w-16 bg-dark-grey text-gray-500 rounded-full hover:cursor-pointer`} onClick={() => setIsModalVisible(state => !state)}/>
           </div>
           <div className="flex h-full justify-center items-center flex-grow mt-8">
             <button className="w-64 h-20 bg-blue rounded flex justify-center items-center select-none hover:cursor-pointer text-xl" onClick={() => handleTableBooking()}>Foglalás</button>

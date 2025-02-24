@@ -17,9 +17,10 @@ function ReservationsSwiper() {
     const { bookings } = useContext(Context);
     
   return (
-    <StyledSwipers speed={500} spaceBetween={10} pagination={{dynamicBullets: true}} modules={[Pagination]} direction="vertical" className="mySwiper mb-3 drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)] max-h-28">
+    <StyledSwipers speed={500} spaceBetween={10} pagination={{dynamicBullets: true}} modules={[Pagination]} className="mySwiper mb-3 drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)] max-h-28">
         {
-            bookings.map(booking => <SwiperSlide key={booking.id}><ReservationItem/></SwiperSlide>)
+            bookings.length > 0 &&
+            bookings.sort((a,b) => new Date(b.bookedFrom) - new Date(a.bookedFrom)).map(booking => <SwiperSlide key={booking.id}><ReservationItem booking={booking}/></SwiperSlide>)
         }
     </StyledSwipers>
   )

@@ -1,10 +1,10 @@
 import React from "react";
 
-function AvatarGroupItem({ image }) {
+function AvatarGroupItem({ imageUrl }) {
   return (
     <div className="avatar h-10 aspect-square border-2">
         <div className="w-12">
-            <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+            <img src={`https://assets.csaposapp.hu/assets/images/${imageUrl}`} />
         </div>
     </div>
   )

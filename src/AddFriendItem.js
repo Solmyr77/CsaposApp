@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { UserPlusIcon, CheckIcon, PlusIcon } from "@heroicons/react/20/solid";
 import Context from "./Context";
 import axios from "axios";
@@ -6,7 +6,7 @@ import getAccessToken from "./refreshToken";
 import { useNavigate } from "react-router-dom";
 
 function AddFriendItem({ record, plusIcon }) {
-  const { tableFriends, setTableFriends, logout } = useContext(Context);
+  const { tableFriends, setTableFriends, currentTable, logout } = useContext(Context);
   const [isFriendRequestSent, setIsFriendRequestSent] = useState(Boolean(localStorage.getItem(record.displayName)) || false);
   const [isAddedToTable, setIsAddedToTable] = useState(false);
   const navigate = useNavigate();
@@ -63,7 +63,7 @@ function AddFriendItem({ record, plusIcon }) {
         </div>
         <div className={`flex items-center ${isAddedToTable ? "hover:cursor-default" : "hover:cursor-pointer"}`} onClick={() => {
           setIsAddedToTable(true);
-          if (tableFriends.some(element => element.id === record.id) === false && tableFriends.length < 3) {
+          if (tableFriends.some(element => element.id === record.id) === false && tableFriends.length < currentTable.capacity - 1) {
             setTableFriends(state => [...state, record]);
           }
           }}>

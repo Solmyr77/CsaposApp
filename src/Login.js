@@ -52,7 +52,7 @@ function Login() {
       <form className="flex flex-col mt-8 justify-evenly items-center" onSubmit={(event) => validateLogin(event)}>
           <label className="text-left w-full">Felhasználónév</label>
           <div className="relative mt-0.5 mb-4">
-            <input name="username" type="text" value={username} className="w-full shadow-dark-grey shadow-md bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none" required onChange={(event) => {
+            <input name="username" type="text" value={username} className="w-full shadow-[0px_2px_2px_rgba(0,0,0,.5)] bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none" required onChange={(event) => {
               setErrorMessage("");
               setUsername(event.target.value);
             }}/>
@@ -60,7 +60,7 @@ function Login() {
           </div>
           <label className="text-left w-full">Jelszó</label>
           <div className="relative mt-0.5 mb-4">
-            <input name="password" type={`${isPasswordVisible ? "text" : "password"}`} value={password} className="w-full shadow-dark-grey shadow-md bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none" required onChange={(event) => {
+            <input name="password" type={`${isPasswordVisible ? "text" : "password"}`} value={password} className="w-full shadow-[0px_2px_2px_rgba(0,0,0,.5)] bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none" required onChange={(event) => {
               setErrorMessage("");
               password === "" && setIsPasswordVisible(false);
               setPassword(event.target.value);
@@ -76,10 +76,10 @@ function Login() {
             }
           </div>
           <p id="errorText" className={`text-center text-red-500 text-wrap max-w-40 ${errorMessage !== "" ? "visible" : "invisible"}`}>{errorMessage}</p>
-          <button type="submit" className="w-full h-16 bg-blue rounded font-bold text-lg mt-4 select-none shadow-xl">Bejelentkezés</button>
+          <button type="submit" className="btn bg-blue hover:bg-blue disabled:bg-blue disabled:text-white disabled:opacity-50 border-0 text-white text-lg h-16 w-44 shadow-[0px_2px_2px_rgba(0,0,0,.5)] mt-2" disabled={errorMessage}>Bejelentkezés</button>
       </form>
-      <p className="mt-8">Még nincs fiókod?</p>
-      <Link to="/register"><button className="w-full bg-dark-grey text-blue py-2 px-4 rounded-md mt-1 select-none">Regisztráció</button></Link>
+      <p className="mt-8 text-gray-300">Még nincs fiókod?</p>
+      <Link to="/register"><button className="btn bg-dark-grey text-blue mt-1 border-0 shadow-[0px_2px_2px_rgba(0,0,0,.5)] hover:bg-dark-grey">Regisztráció</button></Link>
     </div>
   );
 }

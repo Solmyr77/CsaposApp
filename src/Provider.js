@@ -103,7 +103,7 @@ function Provider({ children }) {
         }
         else {
           await logout();
-          window.location.reload();
+          <Navigate to={"/login"}/>
           return false;
         }
       } 
@@ -146,8 +146,15 @@ function Provider({ children }) {
       }
     }
     catch (error) {
-      console.log(error.data?.status);
-      console.log(error.message);
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) {
+          getLocationTables(id);
+        }
+        else {
+          await logout();
+          <Navigate to={"/login"}/>
+        }
+    }
     }
   }
 

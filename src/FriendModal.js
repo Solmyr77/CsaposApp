@@ -1,11 +1,11 @@
-import React, { useContext, useState } from "react";
+import React, { forwardRef, useContext, useEffect, useState } from "react";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import getAccessToken from "./refreshToken";
 import axios from "axios";
 import Context from "./Context";
 import { useNavigate } from "react-router-dom";
 
-function FriendModal({ record, isFriendModalVisible, setIsFriendModalVisible}) {
+const FriendModal = forwardRef(({ record }, ref) => {
   const { setFriends, logout } = useContext(Context);
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
@@ -39,32 +39,33 @@ function FriendModal({ record, isFriendModalVisible, setIsFriendModalVisible}) {
     }
     setTimeout(() => {
       setMessage("");
-      setIsFriendModalVisible(false);
+      ref.current.close();
     }, 1000);
   }
 
   return (
-    <div className={`w-full min-h-screen h-full absolute top-0 left-0 bg-opacity-65 bg-black ${isFriendModalVisible ? "flex" : "hidden"} justify-center`}>
+    <dialog className="modal overflow-y-scroll" ref={ref}>
       {
         message === "" ?
-        <div className="w-80 min-h-80 h-80 bg-grey rounded-xl flex flex-col items-center px-4 sticky top-1/2 -translate-y-1/2">
-          <XMarkIcon className="absolute left-0 top-0 w-9 text-red-500 font-bold bg-dark-grey p-1 rounded-tl-md rounded-tr-none rounded-bl-none rounded-br-md hover:cursor-pointer" onClick={() => setIsFriendModalVisible(false)}/>
-          <p className="text-md pt-4 text-center mb-6">Barát kezelése</p>
+        <div className="w-80 h-80 bg-grey rounded-xl flex flex-col items-center sticky modal-box py-2 px-4">
+          <XMarkIcon className="absolute left-0 top-0 w-9 text-red-500 font-bold bg-dark-grey p-1 rounded-tl-md rounded-tr-none rounded-bl-none rounded-br-md hover:cursor-pointer" onClick={() => ref.current.close()}/>
+          <p className="text-md text-center mb-6">Barát kezelése</p>
           <div className="flex flex-col items-center">
             <img src={`https://assets.csaposapp.hu/assets/images/${record.imageUrl}`} className="rounded-full object-cover aspect-square w-28"/>
             <p className="font-bold text-md mt-1">{record.displayName}</p>
-            <p className="font-normal text-small mt-2"> Barátod 2024.12.03. óta</p>
+            <p className="font-normal text-sm text-gray-300 mt-1"> Barátod 2024.12.03. óta</p>
           </div>
           <div className="h-full w-full justify-center items-center flex">
-            <button className="w-1/2 h-fit bg-dark-grey text-red-500 p-2 rounded-md" onClick={() => handleUnfriend(record.id)}>Barát törlése</button>
+            <button className="btn bg-dark-grey text-red-500 border-0 hover:bg-dark-grey shadow-[0px_2px_2px_rgba(0,0,0,.5)]" onClick={() => handleUnfriend(record.id)}>Barát törlése</button>
           </div>
         </div> :
         <div className="w-80 min-h-80 h-80 bg-grey rounded-xl flex flex-col items-center sticky top-1/2 -translate-y-1/2 px-4 justify-center">
           <p className="text-green-500">{message}</p>
         </div>
       }
-    </div>
+      <form method="dialog" className="modal-backdrop"><button></button></form>
+    </dialog>
   )
-}
+})
 
 export default FriendModal;

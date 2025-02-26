@@ -16,9 +16,10 @@ function ReservationItem({ booking }) {
             expiryTime.setMinutes(bookedFrom.getMinutes() + 20, 0);
             if (new Date().getTime() >= expiryTime.getTime()) removeBooking(booking.id);
             else {
-                setTimeout(async () => {
+                const timeout = setTimeout(async () => {
                     await removeBooking(booking.id);
                 }, expiryTime.getTime() - new Date().getTime());
+                return () => clearTimeout(timeout);
             }
         }
     }, [])

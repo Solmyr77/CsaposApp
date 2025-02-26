@@ -1,18 +1,18 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import SearchBar from "./SearchBar";
 import { useState } from "react";
 import TitleDivider from "./TitleDivider";
 import AddFriendItem from "./AddFriendItem";
 
-function AddFriendModal({ isAddFriendModalVisible, setIsAddFriendModalVisible }) {
+const AddFriendModal = forwardRef((props, ref) => {
   const [recordsToDisplay, setRecordsToDisplay] = useState([]);
 
   return (
-    <div className={`w-full min-h-screen h-full absolute top-0 left-0 bg-opacity-65 bg-black ${isAddFriendModalVisible ? "flex" : "hidden"} justify-center items-center`}>
-      <div className={`w-80 min-h-80 h-96 bg-grey rounded-xl flex flex-col px-4 sticky top-1/2 -translate-y-1/2`}>
-        <XMarkIcon className="absolute left-0 top-0 w-9 text-red-500 font-bold bg-dark-grey p-1 rounded-tl-md rounded-tr-none rounded-bl-none rounded-br-md hover:cursor-pointer" onClick={() => setIsAddFriendModalVisible(false)}/>
-        <p className="text-md pt-4 text-center mb-6">Barát hozzáadása</p>
+    <dialog className="modal" ref={ref}>
+      <div className={`w-80 min-h-80 h-96 bg-grey rounded-xl flex flex-col sticky modal-box py-2 px-4`}>
+        <XMarkIcon className="absolute left-0 top-0 w-9 text-red-500 font-bold bg-dark-grey p-1 rounded-tl-md rounded-tr-none rounded-bl-none rounded-br-md hover:cursor-pointer" onClick={() => ref.current.close()}/>
+        <p className="text-md text-center mb-6">Barát hozzáadása</p>
         <SearchBar displayTitle={false} setRecordsToDisplay={setRecordsToDisplay} friendSearch/>
         <TitleDivider title={"Találatok"}/>
         <div className="overflow-y-scroll pl-2">
@@ -41,8 +41,9 @@ function AddFriendModal({ isAddFriendModalVisible, setIsAddFriendModalVisible })
           }
         </div>
       </div>
-    </div>
+      <form method="dialog" className="modal-backdrop"><button></button></form>
+    </dialog>
   )
-}
+})
 
 export default AddFriendModal;

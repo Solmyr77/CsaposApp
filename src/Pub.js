@@ -132,7 +132,7 @@ function Pub() {
                 <EventSwiper/>
             </div>
             <div className="flex justify-center items-center self-center h-full py-10">
-                <div className={`w-64 h-20 bg-blue ${record.isOpen === true ? "opacity-1 hover:cursor-pointer" : "opacity-50"} rounded flex justify-center items-center select-none`} onClick={() => {
+                <button className={`btn bg-blue text-white border-0 w-56 h-20 hover:bg-blue disabled:bg-blue disabled:text-white disabled:opacity-50 shadow-[0_4px_4px_rgba(0,0,0,.5)]`} disabled={!record.isOpen} onClick={() => {
                     if (record.isOpen) {
                         setPreviousRoutes((state) => {
                             if (!state.includes(location.pathname)) return [...state, location.pathname];
@@ -142,7 +142,7 @@ function Pub() {
                     }
                 }}>
                     <p className="font-bold text-xl">Foglalok</p>
-                </div>
+                </button>
             </div>
         </div>
     </div>

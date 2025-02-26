@@ -27,13 +27,22 @@ function Tables() {
       <Link to={previousRoutes[previousRoutes.length - 1]} className="flex w-fit">
         <BackButton/>
       </Link>
-      <p className="font-bold text-xxl text-center">Asztalok</p>
-      <div className="flex flex-col w-full max-h-full gap-y-3 mt-8 overflow-y-scroll">
+      <p className="font-bold text-xl text-center">{name}</p>
+      <p className="text-lg mb-2 bg-grey mt-8">Asztalok</p>
+      <div className="flex flex-col w-full flex-grow max-h-full gap-y-3 overflow-y-scroll">
         {
-          locationTables?.length > 0 ?
-          locationTables.sort((a,b) => a.number - b.number).map(record => <TableItem name={name} record={record}/>) :
+          locationTables?.length > 0 && locationTables?.some(table => table.isBooked === false) === true ?
+          locationTables.sort((a,b) => {
+            if (a.isBooked === b.isBooked) {
+              if (a.capacity === b.capacity) {
+                return a.number - b.number;
+              }
+              return a.capacity - b.capacity;
+            }
+            return a.isBooked - b.isBooked;
+          }).map(record => <TableItem name={name} record={record}/>) :
           <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2">
-            <p className="font-normal text-center">Jelenleg nincsenek szabad asztalok</p>
+            <p className="font-normal text-center">Jelenleg nincsenek szabad asztalok.</p>
           </div>
         }
       </div>

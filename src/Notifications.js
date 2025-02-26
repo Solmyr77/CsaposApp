@@ -35,7 +35,7 @@ function Notifications() {
             <NavItem title={"Események"} isNotificationPage={true}/>
             <NavItem title={"Barát felkérések"} isNotificationPage={true}/>
         </div>
-        <div className="flex flex-col mt-4 gap-y-2 pr-1 overflow-y-auto">
+        <div className="flex flex-grow flex-col mt-4 gap-y-2 pr-1 overflow-y-auto">
             {
                 recordsToDisplay.map(record => Object.hasOwn(record, "id") ? (
                     <div>

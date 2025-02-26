@@ -70,9 +70,10 @@ function Reservation() {
                     }, expiryTime.getTime() - new Date().getTime());
                 }
                 else {
-                    setTimeout(() => {
+                    const timeout = setTimeout(() => {
                         setIsActive(true);
                     }, bookedFrom.getTime() - new Date().getTime());
+                    return () => clearTimeout(timeout);
                 }
             }
         }

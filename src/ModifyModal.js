@@ -20,7 +20,6 @@ const ModifyModal = forwardRef((props, ref) => {
 
   useEffect(() => {
     if (user.imageUrl) setPreviewProfilePicture(user.imageUrl);
-    console.log(ref);
   }, [user.imageUrl]);
 
   function triggerFileInputClick() {
@@ -142,8 +141,8 @@ const ModifyModal = forwardRef((props, ref) => {
   }
 
   return (
-      <dialog className="modal" ref={ref} autoFocus={false} tabIndex="-1">
-        <div className={`modal-box w-80 h-80 aspect-square bg-grey rounded-xl flex flex-col justify-between sticky`}>
+      <dialog className="modal" ref={ref}>
+        <div className={`modal-box max-w-80 max-h-80 aspect-square bg-grey rounded-xl flex flex-col justify-between sticky py-2 px-4`}>
           <XMarkIcon className="absolute left-0 top-0 w-9 text-red-500 font-bold bg-dark-grey p-1 rounded-tl-md rounded-tr-none rounded-bl-none rounded-br-md hover:cursor-pointer" onClick={() => {
             document.getElementById("profilename").value = user.displayName;
             setNewProfileName(user.displayName);
@@ -156,9 +155,9 @@ const ModifyModal = forwardRef((props, ref) => {
           }}/>
           {
             isSucceeded === false ?
-            <div className="h-full">
-              <p className="text-md pt-4 text-center mb-6">Profil szerkesztése</p>
-              <form className="flex flex-col justify-between h-3/4 items-center px-2" onSubmit={(event) => handleSubmit(event)}>
+            <div className="h-full flex flex-col">
+              <p className="text-md text-center mb-6">Profil szerkesztése</p>
+              <form className="flex flex-col justify-between h-full items-center" onSubmit={(event) => handleSubmit(event)}>
               {
                 isConversionFinished === false ?
                 <span className="loading loading-spinner text-blue w-20"></span> :
@@ -168,19 +167,16 @@ const ModifyModal = forwardRef((props, ref) => {
                   <input ref={imageInput} id="fileInput" type="file" style={{"display" : "none"}} onChange={(event) => showImagePreview(event)}/>
                 </div>
               }
-                <div className="flex flex-col justify-between items-center w-full mt-2">
-                  <label className="text-left w-full font-normal">Profilnév</label>
-                  <input defaultValue={user.displayName} id="profilename" name="profilename" type="text" className="w-full bg-dark-grey px-5 py-2 rounded-md font-normal mt-0.5 focus:outline-none" onChange={(event) => {
-                    setNewProfileName(event.target.value.trim());
-                    setErrorMessage("");
-                    }} required/>
-
+                <div className="flex flex-col flex-grow h-full justify-between items-center w-full mt-4">
+                  <div>
+                    <label className="text-left w-full font-normal">Profilnév</label>
+                    <input defaultValue={user.displayName} id="profilename" name="profilename" type="text" className="w-full bg-dark-grey px-5 py-2 rounded-md font-normal mt-0.5 focus:outline-none drop-shadow-[0px_2px_2px_rgba(0,0,0,.5)]" onChange={(event) => {
+                      setNewProfileName(event.target.value.trim());
+                      setErrorMessage("");
+                      }} required/>
+                  </div>
                   <p className={`text-red-500 text-center font-normal ${errorMessage !== "" ? "visible" : "invisible"}`}>{errorMessage}</p>
-                  {
-                    user.displayName !== newProfileName || previewProfilePicture !== user.imageUrl ?
-                    <input type="submit" value="Mentés" className="bg-dark-grey w-fit py-2 px-3 mt-2 rounded-md text-blue drop-shadow-[0px_2px_2px_rgba(0,0,0,.5)] hover:cursor-pointer" /> :
-                    <input type="submit" value="Mentés" className="bg-dark-grey w-fit py-2 px-3 mt-2 rounded-md text-blue drop-shadow-[0px_2px_2px_rgba(0,0,0,.5)] opacity-50" disabled/>
-                  }
+                  <input type="submit" value="Mentés" className="btn bg-dark-grey text-blue border-0 shadow-[0px_2px_2px_rgba(0,0,0,.5)] hover:bg-dark-grey disabled:opacity-50 disabled:bg-dark-grey disabled:text-blue" disabled={!(user.displayName !== newProfileName || previewProfilePicture !== user.imageUrl)}/>
                 </div>
               </form>
             </div> :
@@ -189,6 +185,7 @@ const ModifyModal = forwardRef((props, ref) => {
             </div>
           }
         </div>
+        <form method="dialog" className="modal-backdrop"><button></button></form>
       </dialog>
   );
 })

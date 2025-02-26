@@ -1,4 +1,4 @@
-import React, { forwardRef, useContext, useEffect, useState } from "react";
+import React, { forwardRef, useContext, useEffect, useRef, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import Context from "./Context";
 import BackButton from "./BackButton";
@@ -12,6 +12,7 @@ import Friend from "./Friend";
 import AddFriendToTableModal from "./AddFriendToTableModal";
 import axios from "axios";
 import getAccessToken from "./refreshToken";
+import { MapPinIcon } from "@heroicons/react/24/outline";
 registerLocale('hu', hu);
 
 
@@ -96,7 +97,7 @@ function ReserveTable() {
   const { name, number } = useParams(); 
   const navigate = useNavigate();
   const [startDate, setStartDate] = useState(new Date());
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const modalRef = useRef();
   const [isBooked, setIsBooked] = useState(false);
   const [remainingSeconds, setRemainingSeconds] = useState(3);
   const ExampleCustomInput = forwardRef(
@@ -183,12 +184,13 @@ function ReserveTable() {
     const newDate = new Date();
     newDate.setMinutes(roundedMinutes);
     setStartDate(newDate);
+    return newDate;
   }
 
   useEffect(() => {
     setTableFriends([]);
     if (locations.length > 0 && name) {
-      updateTime();
+      const compareTime = updateTime();
       const location = locations.find(location => location.name === name);
       if (location) {
         if (tables.length > 0) {
@@ -202,10 +204,13 @@ function ReserveTable() {
           run();
         }
       }
+      let interval;
+      setTimeout(() => {
+        updateTime();
+        interval = setInterval(updateTime, 15 * 60 * 1000);
+      }, compareTime.getTime() - new Date().getTime());
+      return () => clearInterval(interval);
     }
-    setInterval(() => {
-      updateTime();
-    }, 900000 - new Date().getMilliseconds());
   }, [locations, tables, number, name]);
 
   useEffect(() => {
@@ -226,12 +231,12 @@ function ReserveTable() {
         <Link to={previousRoutes[previousRoutes.length - 1]} className="flex w-fit">
           <BackButton/>
         </Link>
-        <p className="text-center text-xxl">Asztal {number}</p>
+        <p className="text-center text-xl">Asztal <span className="text-gray-300">#{number}</span></p>
         <div className="flex flex-col flex-grow w-full mt-4">
           <p className="text-lg mb-2">Időpont</p>
           <div className="flex justify-center">
             <StyledDatePickerWrapper>
-              <DatePicker 
+              <DatePicker
               selected={startDate} 
               onChange={(date) => {
                 setStartDate(date);
@@ -247,13 +252,13 @@ function ReserveTable() {
               locale={"hu"}
               timeCaption="Idő"
               className="font-play"
-              customInput={<ExampleCustomInput className="bg-dark-grey px-4 py-2 rounded-md text-lg flex flex-row items-center"/>}/>
+              customInput={<ExampleCustomInput className="bg-dark-grey px-4 py-2 rounded-md text-lg flex flex-row items-center shadow-[0_4px_4px_rgba(0,0,0,.5)]"/>}/>
             </StyledDatePickerWrapper>
           </div>
           <p className="text-lg mt-8 mb-1">Barátok meghívása</p>
           <p className="text-sm font-normal mb-4">Max: {Number(currentTable.capacity) - 1} fő</p>
           <div className="grid grid-cols-4 gap-2 place-items-center">
-            <AddFriendToTableModal isModalVisible={isModalVisible} setIsModalVisible={setIsModalVisible}/>
+            <AddFriendToTableModal ref={modalRef}/>
             {
               tableFriends.map(record => (
                 <div className="relative">
@@ -262,10 +267,10 @@ function ReserveTable() {
                 </div>
               ))
             }
-            <PlusIcon className={`${tableFriends.length < Number(currentTable.capacity) - 1 ? "block" : "hidden"} w-16 bg-dark-grey text-gray-500 rounded-full hover:cursor-pointer`} onClick={() => setIsModalVisible(state => !state)}/>
+            <PlusIcon className={`${tableFriends.length < Number(currentTable.capacity) - 1 ? "block" : "hidden"} w-16 bg-dark-grey text-gray-500 rounded-full hover:cursor-pointer`} onClick={() => modalRef.current.showModal()}/>
           </div>
           <div className="flex h-full justify-center items-center flex-grow mt-8">
-            <button className="w-64 h-20 bg-blue rounded flex justify-center items-center select-none hover:cursor-pointer text-xl" onClick={() => handleTableBooking()}>Foglalás</button>
+            <button className="btn bg-blue text-white border-0 hover:bg-blue w-56 h-20 text-lg shadow-[0_4px_4px_rgba(0,0,0,.5)]" onClick={() => handleTableBooking()}>Foglalás</button>
           </div>
         </div>
       </div> :

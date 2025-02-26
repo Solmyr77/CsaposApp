@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import BackButton from "./BackButton";
 import { AtSymbolIcon } from "@heroicons/react/20/solid";
-import { UserCircleIcon, EyeIcon, EyeSlashIcon, LockClosedIcon, IdentificationIcon } from "@heroicons/react/24/outline";
+import { UserCircleIcon, EyeIcon, EyeSlashIcon, LockClosedIcon, IdentificationIcon, CheckIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
 
 function Register() {
@@ -13,6 +13,9 @@ function Register() {
   const [username, setUsername] = useState("");
   const [password1, setPassword1] = useState("");
   const [password2, setPassword2] = useState("");
+  const [usernameError, setUsernameError] = useState(false);
+  const [password1Error, setPassword1Error] = useState(false);
+  const [password2Error, setPassword2Error] = useState(false);
   const [isPassword1Visible, setIsPassword1Visible] = useState(false);
   const [isPassword2Visible, setIsPassword2Visible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -65,6 +68,8 @@ function Register() {
         setErrorMessage("A jelszó minimum hossza 8 karakter, tartalmaznia kell nagybetűt, kisbetűt valamint egy számot!")
         setPassword1("");
         setPassword2("");
+        setPassword1Error(true);
+        setPassword2Error(true);
       }
       return false;
     }
@@ -94,35 +99,37 @@ function Register() {
       setErrorMessage("A megadott jelszavak nem egyeznek!");
       setPassword1("");
       setPassword2("");
+      setPassword1Error(true);
+      setPassword2Error(true);
     }
   }
 
   return (
-    <div className="min-h-screen w-full bg-grey text-white px-4 py-8">
+    <div className="min-h-screen w-full bg-grey text-white px-4 py-8 flex flex-col">
       <Link to={"/login"} className="flex w-fit">
         <BackButton/>
       </Link>
-      <div className="flex items-center flex-col">
+      <div className="flex items-center flex-grow flex-col">
         <h1 className="font-bold text-3xl">Regisztráció</h1>
         {
-          isSucceeded === false ?
+          !isSucceeded ?
           <form className="flex flex-col mt-8 justify-evenly items-center" onSubmit={(event) => validateForm(event)}>
           <label className="text-left w-full">Teljes név</label>
           <div className="relative mt-0.5 mb-4">
-            <input type="text" name="fullname" value={legalName} className="w-full bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none" required onChange={(event) => {
+            <input type="text" name="fullname" value={legalName} className="w-full bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none shadow-[0px_2px_2px_rgba(0,0,0,.5)]" required onChange={(event) => {
               setLegalName(event.target.value);
               setErrorMessage("");
             }}/>
             <IdentificationIcon className="w-5 absolute top-1/2 right-2 -translate-y-1/2"/>
           </div>
           <label className="text-left w-full">Születési idő</label>
-          <input id="date" name="birthdate" value={birthDate} type="date" className="bg-dark-grey px-5 rounded-md py-2 text-white mt-0.5 mb-4 w-full focus:outline-none" max={date.getFullYear()} required onChange={(event) => {
+          <input id="date" name="birthdate" value={birthDate} type="date" className="bg-dark-grey px-5 rounded-md py-2 text-white mt-0.5 mb-4 w-full focus:outline-none shadow-[0px_2px_2px_rgba(0,0,0,.5)]" max={date.getFullYear()} required onChange={(event) => {
               setBirthDate(event.target.value);
               setErrorMessage("");
             }}/>
           <label className="text-left w-full">Email cím</label>
           <div className="relative mt-0.5 mb-4">
-            <input type="email" value={email} className="w-full bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none" required onChange={(event) => {
+            <input type="email" value={email} className="w-full bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none shadow-[0px_2px_2px_rgba(0,0,0,.5)]" required onChange={(event) => {
               setEmail(event.target.value);
               setErrorMessage("");
             }}/>
@@ -130,18 +137,19 @@ function Register() {
           </div>
           <label className="text-left w-full">Felhasználónév</label>
           <div className="relative mt-0.5 mb-4">
-            <input type="text" name="username" value={username} className="w-full bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none" required onChange={(event) => {
+            <input type="text" name="username" value={username} className="w-full bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none shadow-[0px_2px_2px_rgba(0,0,0,.5)]" required onChange={(event) => {
               setUsername(event.target.value);
               setErrorMessage("");
             }}/>
             <UserCircleIcon className="w-6 absolute top-1/2 right-2 -translate-y-1/2"/>
           </div>
-          <label className="text-left w-full">Jelszó</label>
+          <label className={`text-left w-full ${password1Error ? "text-red-500" : "text-white"}`}>Jelszó</label>
           <div className="relative mt-0.5 mb-4">
-            <input type={`${isPassword1Visible ? "text" : "password"}`} id="password1" name="password1" value={password1} className="w-full bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none" required onChange={(event) => {
+            <input type={`${isPassword1Visible ? "text" : "password"}`} id="password1" name="password1" value={password1} className={`w-full bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none shadow-[0px_2px_2px_rgba(0,0,0,.5)] ${password1Error ? "border-red-500 border-2" : "border-0"}`} required onChange={(event) => {
               setPassword1(event.target.value);
               if (event.target.value === "") setIsPassword1Visible(false);
               setErrorMessage("");
+              setPassword1Error(false);
             }}/>
             {
               password1 === "" ? 
@@ -152,12 +160,13 @@ function Register() {
               </div>
             }
           </div>
-          <label className="text-left w-full">Jelszó újra</label>
+          <label className={`text-left w-full ${password2Error ? "text-red-500" : "text-white"}`}>Jelszó újra</label>
           <div className="relative mt-0.5 mb-4">
-            <input type={`${isPassword2Visible ? "text" : "password"}`} name="password2" value={password2} className="w-full bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none" required onChange={(event) => {
+            <input type={`${isPassword2Visible ? "text" : "password"}`} name="password2" value={password2} className={`w-full bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none shadow-[0px_2px_2px_rgba(0,0,0,.5)] ${password2Error ? "border-red-500 border-2" : "border-0"}`} required onChange={(event) => {
               setPassword2(event.target.value);
               if (event.target.value === "") setIsPassword2Visible(false);
               setErrorMessage("");
+              setPassword2Error(false);
             }}/>
             {
               password2 === "" ? 
@@ -169,10 +178,14 @@ function Register() {
             }
           </div>
           <p id="errorText" className="text-center text-red-500 invisible text-wrap max-w-44" style={{"visibility" : `${errorMessage !== "" ? "visible" : "hidden"}`}}>{errorMessage}</p>
-          <button type="submit" className="w-full h-16 bg-blue rounded font-bold text-lg mt-4">Regisztráció</button>
+          <button type="submit" className="btn hover:bg-blue border-0 bg-blue text-white text-lg mt-4 shadow-[0px_2px_2px_rgba(0,0,0,.5)] h-16 w-48">Regisztráció</button>
         </form> :
-        <div>
-          <p className="text-green-500 text-xl font-bold absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center">Sikeres regisztráció!</p>
+        //<p className="text-green-500 text-xl font-bold absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center">Sikeres regisztráció!</p>
+        <div className="flex flex-col justify-center flex-grow items-center h-full p-4">
+          <div className="flex flex-col items-center bg-dark-grey p-4 rounded-md text-green-500 shadow-[0px_2px_2px_rgba(0,0,0,.5)]">
+            <p className="text-lg">Sikeres regisztráció!</p>
+            <CheckIcon className="w-12"/>
+          </div>
         </div>
         }
       </div>

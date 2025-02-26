@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { forwardRef, useContext, useState } from "react";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import axios from "axios";
 import { LockClosedIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
@@ -6,7 +6,7 @@ import Context from "./Context";
 import { useNavigate } from "react-router-dom";
 import getAccessToken from "./refreshToken";
 
-function PasswordModal( { isPasswordModalVisible, setIsPasswordModalVisible } ) {
+const PasswordModal = forwardRef((props, ref) =>  {
   const { logout } = useContext(Context);
   const navigate = useNavigate();
   const [currentPassword, setCurrentPassword] = useState("");
@@ -77,7 +77,7 @@ function PasswordModal( { isPasswordModalVisible, setIsPasswordModalVisible } ) 
             setIsSucceeded(true);
             setTimeout(() => {
               setIsSucceeded(false);
-              setIsPasswordModalVisible(false);
+              ref.current.close();
             }, 1000)
           }
         }
@@ -102,24 +102,28 @@ function PasswordModal( { isPasswordModalVisible, setIsPasswordModalVisible } ) 
     }
   }
 
+  function resetForm() {
+    setCurrentPassword("");
+    setPassword1("");
+    setPassword2("");
+    setCurrentPasswordError(false);
+    setPassword1Error(false);
+    setPassword2Error(false);
+  }
+
   return (
-    <div className={`w-full min-h-screen h-full absolute top-0 left-0 bg-opacity-65 bg-black ${isPasswordModalVisible ? "flex" : "hidden"} justify-center items-center` }>
-      <div className={`w-80 min-h-80 max-h-[28rem] bg-grey rounded-xl flex flex-col justify-between sticky top-1/2 -translate-y-1/2`}>
+    <dialog className="modal" ref={ref}>
+      <div className={`w-80 min-h-80 max-h-[28rem] bg-grey rounded-xl flex flex-col justify-between sticky py-2 px-4 modal-box`}>
         <XMarkIcon className="absolute left-0 top-0 w-9 text-red-500 font-bold bg-dark-grey p-1 rounded-tl-md rounded-tr-none rounded-bl-none rounded-br-md hover:cursor-pointer" onClick={(event) => {
-          setIsPasswordModalVisible(false);
+          ref.current.close();
           if (!isSucceeded) {
-            setCurrentPassword("");
-            setPassword1("");
-            setPassword2("");
-            setCurrentPasswordError(false);
-            setPassword1Error(false);
-            setPassword2Error(false);
+            resetForm();
           }
         }}/>
         {
         !isSucceeded ?  
           <form id="passwordform" className="flex flex-col h-full justify-between gap-y-3 items-center px-2 select-none" onSubmit={(event) => handleSubmit(event)}>
-              <p className="text-md pt-4 text-center mb-6 select-none">Jelszó módosítása</p>
+              <p className="text-md text-center mb-6 select-none">Jelszó módosítása</p>
               <div className="w-full">
                   <label className={`text-left min-w-full font-normal ${currentPasswordError && "text-red-500"}`}>Jelenlegi jelszó</label>
                   <div className="relative">
@@ -176,7 +180,7 @@ function PasswordModal( { isPasswordModalVisible, setIsPasswordModalVisible } ) 
               </div>
               <div className="flex flex-col items-center">
                 <p className={`text-red-500 text-center font-normal ${errorMessage !== "" ? "visible" : "invisible"}`}>{errorMessage}</p>
-                <input type="submit" value="Mentés" className="bg-dark-grey w-fit py-2 px-3 my-2 rounded-md text-blue drop-shadow-[0px_2px_2px_rgba(0,0,0,.5)] hover:cursor-pointer"/>
+                <input type="submit" value="Mentés" className="btn bg-dark-grey rounded-md text-blue drop-shadow-[0px_2px_2px_rgba(0,0,0,.5)] hover:bg-dark-grey border-0 disabled:bg-dark-grey disabled:opacity-50 disabled:text-blue" disabled={!(currentPassword && password1 && password2)}/>
               </div>
           </form> : 
           <div className="flex flex-grow w-full justify-center items-center">
@@ -184,8 +188,9 @@ function PasswordModal( { isPasswordModalVisible, setIsPasswordModalVisible } ) 
           </div>
         }
       </div>
-    </div>
+      <form method="dialog" className="modal-backdrop"><button onClick={() => resetForm()}></button></form>
+    </dialog>
   );
-}
+})
 
 export default PasswordModal;

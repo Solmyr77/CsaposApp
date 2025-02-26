@@ -16,9 +16,9 @@ import FriendModal from "./FriendModal";
 function Profile() {
   const { setMenuState, user, friends, logout } = useContext(Context);
   const modifyModalRef = useRef();
-  const [isAddFriendModalVisible, setIsAddFriendModalVisible] = useState(false);
-  const [isFriendModalVisible, setIsFriendModalVisible] = useState(false);
-  const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
+  const friendModalRef = useRef();
+  const addfriendModalRef = useRef();
+  const passwordModalRef = useRef();
   const [selectedFriend, setSelectedFriend] = useState({});
   const navigate = useNavigate();
 
@@ -43,7 +43,9 @@ function Profile() {
               if(friend === friends[friends.length-1]) {
                 return (
                   <div className="flex hover:cursor-pointer" onClick={() => {
-                    setIsFriendModalVisible(true);
+                    friendModalRef.current.inert = true;
+                    friendModalRef.current.showModal();
+                    friendModalRef.current.inert = false;
                     setSelectedFriend(friend);
                     }}>
                     <Friend record={friend} isVertical={true}/>
@@ -52,7 +54,9 @@ function Profile() {
               }
               return (
                 <div className="flex items-center hover:cursor-pointer" onClick={()=> {
-                  setIsFriendModalVisible(true);
+                  friendModalRef.current.inert = true;
+                  friendModalRef.current.showModal();
+                  friendModalRef.current.inert = false;
                   setSelectedFriend(friend);
                   }}>
                   <Friend record={friend} isVertical={true}/>
@@ -72,25 +76,32 @@ function Profile() {
         modifyModalRef.current.inert = true;
         modifyModalRef.current.showModal();
         modifyModalRef.current.inert = false;
-        console.log(modifyModalRef.current.inert);
         }}>
         Profil szerkesztése
         <PencilSquareIcon className="h-6"/>
       </div>
-      <div className="w-full h-10 font-normal bg-dark-grey rounded-md flex flex-row justify-between items-center px-2 drop-shadow-[0_2px_2px_rgba(0,0,0,.5)] mb-2 select-none hover:cursor-pointer" onClick={() => setIsAddFriendModalVisible(true)}>
+      <div className="w-full h-10 font-normal bg-dark-grey rounded-md flex flex-row justify-between items-center px-2 drop-shadow-[0_2px_2px_rgba(0,0,0,.5)] mb-2 select-none hover:cursor-pointer" onClick={() => {
+        addfriendModalRef.current.inert = true;
+        addfriendModalRef.current.showModal();
+        addfriendModalRef.current.inert = false;
+      }}>
         Barát hozzáadása
         <UserPlusIcon className="h-6"/>
       </div>
-      <div className="w-full h-10 font-normal bg-dark-grey rounded-md flex flex-row justify-between items-center px-2 drop-shadow-[0_2px_2px_rgba(0,0,0,.5)] mb-2 select-none hover:cursor-pointer" onClick={() => setIsPasswordModalVisible(true)}>
+      <div className="w-full h-10 font-normal bg-dark-grey rounded-md flex flex-row justify-between items-center px-2 drop-shadow-[0_2px_2px_rgba(0,0,0,.5)] mb-2 select-none hover:cursor-pointer" onClick={() => {
+        passwordModalRef.current.inert = true;
+        passwordModalRef.current.showModal();
+        passwordModalRef.current.inert = false;
+      }}>
         Jelszó módosítása
         <LockClosedIcon className="h-6"/>
       </div>
-      <button className="w-1/2 bg-dark-grey text-red-500 py-2 px-4 rounded-md mt-2 drop-shadow-[0_4px_4px_rgba(0,0,0,.5)] select-none" onClick={handleLogout}>Kijelentkezés</button>
+      <button className="btn border-0 mt-2 hover:bg-dark-grey bg-dark-grey text-red-500 drop-shadow-[0_4px_4px_rgba(0,0,0,.5)] select-none" onClick={handleLogout}>Kijelentkezés</button>
       <div className="h-[12vh]"></div>
-      <FriendModal record={Object.hasOwn(selectedFriend, "id") === true && selectedFriend} isFriendModalVisible={isFriendModalVisible} setIsFriendModalVisible={setIsFriendModalVisible}/>
+      <FriendModal record={Object.hasOwn(selectedFriend, "id") === true && selectedFriend} ref={friendModalRef}/>
       <ModifyModal ref={modifyModalRef}/>
-      <AddFriendModal isAddFriendModalVisible={isAddFriendModalVisible} setIsAddFriendModalVisible={setIsAddFriendModalVisible}/>
-      <PasswordModal isPasswordModalVisible={isPasswordModalVisible} setIsPasswordModalVisible={setIsPasswordModalVisible}/>
+      <AddFriendModal ref={addfriendModalRef}/>
+      <PasswordModal ref={passwordModalRef}/>
       <Footer/>
     </div>
   )

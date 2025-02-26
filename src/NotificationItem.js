@@ -80,7 +80,6 @@ function NotificationItem({ record, isFriendRequest }) {
   useEffect(() => {
     const run = async () => {
       if (record) {
-        console.log(await getProfile(record.userId1));
         setProfile(await getProfile(record.userId1));
       }
     }
@@ -89,22 +88,22 @@ function NotificationItem({ record, isFriendRequest }) {
 
   if (isFriendRequest === true) {
     return(
-      <div className="w-full min-h-16 bg-dark-grey rounded-md flex flex-col p-4 pb-2">
+      <div className="w-full min-h-16 bg-dark-grey rounded-md flex flex-col p-4 pb-2 drop-shadow-[0px_4px_4px_rgba(0,0,0,.5)]">
         <div className="flex flex-row basis-2/3 items-center">
           <img src={`https://assets.csaposapp.hu/assets/images/${profile.imageUrl}`} alt="" className="h-10 aspect-square rounded-full object-cover mr-2"/>
           <p className="flex flex-row items-center text-sm text-left text-nowrap basis-4/5"><span className="truncate inline-block max-w-20 mr-1 font-bold">{profile.displayName}</span> barátnak jelölt!</p>
         </div>
-        <div className="flex flex-row justify-end gap-2 basis-1/3 h-24 items-end">
-          <button className={`bg-green-500 px-4 py-1 rounded-md h-8 ${isAccepted !== null && "invisible"}`} onClick={() => handleAccept(record.id)}>Elfogadás</button>
-          <button className={`bg-red-500 px-4 py-1 rounded-md h-8 ${isAccepted !== null && "invisible"}`} onClick={() => handleReject(record.id)}>Elutasítás</button>
-          <button className={`bg-green-500 px-4 py-1 rounded-md h-8 ${isAccepted === true ? "flex" : "hidden"}`}>Elfogadva <CheckIcon/></button>
-          <button className={`bg-red-500 px-4 py-1 rounded-md h-8 ${isAccepted === false ? "flex" : "hidden"}`}>Elutasításva <XMarkIcon/></button>
+        <div className="flex flex-row justify-center flex-grow gap-2 basis-1/3 h-24 items-end mt-2">
+          <button className={`bg-green-500 btn border-0 text-white hover:bg-green-500 w-1/2 min-h-10 h-10 ${isAccepted !== null && "hidden"}`} onClick={() => handleAccept(record.id)}>Elfogadás</button>
+          <button className={`bg-red-500 btn border-0 text-white hover:bg-red-500 w-1/2 min-h-10 h-10 ${isAccepted !== null && "hidden"}`} onClick={() => handleReject(record.id)}>Elutasítás</button>
+          <button className={`bg-green-500 btn border-0 text-white hover:bg-green-500 w-full min-h-10 h-10 ${isAccepted === true ? "" : "hidden"}`}>Elfogadva <CheckIcon className="w-6"/></button>
+          <button className={`bg-red-500 btn border-0 text-white hover:bg-red-500 w-full min-h-10 h-10 ${isAccepted === false ? "" : "hidden"}`}>Elutasításva <XMarkIcon className="w-6"/></button>
         </div>
       </div>
     )
   }
   return (
-    <div className="w-full h-16 bg-dark-grey rounded-md flex flex-row items-center p-4 hover:cursor-pointer" onClick={() => {
+    <div className="w-full h-16 bg-dark-grey rounded-md flex flex-row items-center p-4 hover:cursor-pointer drop-shadow-[0px_4px_4px_rgba(0,0,0,.5)]" onClick={() => {
       setIsRead(true);
       setPreviousRoutes((state) => {
         if (!state.includes(location.pathname)) return [...state, location.pathname];

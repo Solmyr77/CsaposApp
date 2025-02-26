@@ -33,9 +33,7 @@ function SearchBar({ displayTitle, setRecordsToDisplay, friendSearch, locationSe
         };
         const response = await axios.get(`https://backend.csaposapp.hu/api/Users/profile/search/${value}`, config);
         const data = await response.data;
-        console.log(data);
         const filteredRecords = data.filter(record => record.id !== user.id);
-        console.log(filteredRecords);
         filteredRecords.length > 0 ? setRecordsToDisplay(filteredRecords) : setRecordsToDisplay([]);
       }
       catch (error) {

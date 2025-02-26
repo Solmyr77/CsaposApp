@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import TitleDivider from "./TitleDivider";
 import Footer from "./Footer";
 import Friend from "./Friend";
@@ -15,7 +15,7 @@ import FriendModal from "./FriendModal";
 
 function Profile() {
   const { setMenuState, user, friends, logout } = useContext(Context);
-  const [isModifyModalVisible, setIsModifyModalVisible] = useState(false);
+  const modifyModalRef = useRef();
   const [isAddFriendModalVisible, setIsAddFriendModalVisible] = useState(false);
   const [isFriendModalVisible, setIsFriendModalVisible] = useState(false);
   const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
@@ -68,7 +68,12 @@ function Profile() {
         <Badge image={img1} title={"Nagy ivó"}/>
       </div>
       <TitleDivider title={"Beállítások"} isNormal={true}/>
-      <div className="w-full h-10 font-normal bg-dark-grey rounded-md flex flex-row justify-between items-center px-2 drop-shadow-[0_2px_2px_rgba(0,0,0,.5)] mb-2 select-none hover:cursor-pointer" onClick={() => setIsModifyModalVisible(true)}>
+      <div className="w-full h-10 font-normal bg-dark-grey rounded-md flex flex-row justify-between items-center px-2 drop-shadow-[0_2px_2px_rgba(0,0,0,.5)] mb-2 select-none hover:cursor-pointer" onClick={() => {
+        modifyModalRef.current.inert = true;
+        modifyModalRef.current.showModal();
+        modifyModalRef.current.inert = false;
+        console.log(modifyModalRef.current.inert);
+        }}>
         Profil szerkesztése
         <PencilSquareIcon className="h-6"/>
       </div>
@@ -83,7 +88,7 @@ function Profile() {
       <button className="w-1/2 bg-dark-grey text-red-500 py-2 px-4 rounded-md mt-2 drop-shadow-[0_4px_4px_rgba(0,0,0,.5)] select-none" onClick={handleLogout}>Kijelentkezés</button>
       <div className="h-[12vh]"></div>
       <FriendModal record={Object.hasOwn(selectedFriend, "id") === true && selectedFriend} isFriendModalVisible={isFriendModalVisible} setIsFriendModalVisible={setIsFriendModalVisible}/>
-      <ModifyModal isModifyModalVisible={isModifyModalVisible} setIsModifyModalVisible={setIsModifyModalVisible}/>
+      <ModifyModal ref={modifyModalRef}/>
       <AddFriendModal isAddFriendModalVisible={isAddFriendModalVisible} setIsAddFriendModalVisible={setIsAddFriendModalVisible}/>
       <PasswordModal isPasswordModalVisible={isPasswordModalVisible} setIsPasswordModalVisible={setIsPasswordModalVisible}/>
       <Footer/>

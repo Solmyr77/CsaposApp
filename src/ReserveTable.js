@@ -92,7 +92,7 @@ const StyledDatePickerWrapper = styled.div`
 `;
 
 function ReserveTable() {
-  const { locations, tables, currentTable, setCurrentTable, previousRoutes, tableFriends, setTableFriends, bookings, getBookings, logout } = useContext(Context);  
+  const { locations, tables, currentTable, setCurrentTable, previousRoutes, tableFriends, setTableFriends, bookings, getBookings, getLocationTables, logout } = useContext(Context);  
   const { name, number } = useParams(); 
   const navigate = useNavigate();
   const [startDate, setStartDate] = useState(new Date());
@@ -121,7 +121,6 @@ function ReserveTable() {
         bookingId: bookingId
       }, config);
       const data = response.data;
-      console.log(data);
       response.status === 200 && setIsBooked(true);
     }
     catch (error) {
@@ -142,7 +141,6 @@ function ReserveTable() {
   }
 
   async function handleTableBooking() {
-    console.log(tableFriends);
     try {
       const config = {
         headers: { 
@@ -161,7 +159,6 @@ function ReserveTable() {
         setIsBooked(true);
         getBookings();
         updateTime();
-        console.log(data);
       }
     }
     catch (error) {
@@ -195,12 +192,14 @@ function ReserveTable() {
       const location = locations.find(location => location.name === name);
       if (location) {
         if (tables.length > 0) {
-          const foundTable = tables.find(table => table.locationId === location.id && table.number === Number(number) && !table.isBooked);
-          if (foundTable) {
-            setCurrentTable(foundTable);
-            console.log(foundTable);
+          const run = async () => {
+            const foundTable = (await getLocationTables(location.id)).find(table => table.number === Number(number) && !table.isBooked);
+            if (foundTable) {
+              setCurrentTable(foundTable);
+            }
+            else navigate("/");
           }
-          else navigate("/");
+          run();
         }
       }
     }

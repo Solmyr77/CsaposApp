@@ -38,7 +38,7 @@ function Pub() {
     catch (error) {
       if (error.response?.status === 401) {
         if (await getAccessToken()) {
-          getBusinessHours(id);
+          await getBusinessHours(id);
         }
         else {
           await logout();

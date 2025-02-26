@@ -3,6 +3,7 @@ import Context from "./Context";
 import axios from "axios";
 import getAccessToken from "./refreshToken";
 import IsEqual from "react-fast-compare";
+import { Navigate } from "react-router-dom";
 
 function Provider({ children }) {
   const [navState, setNavState] = useState("Összes");
@@ -130,6 +131,26 @@ function Provider({ children }) {
     }
   }
 
+  async function getLocationTables(id) {
+    try {
+      const config = {
+        headers: { 
+          Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+          "Cache-Content": "no-cache"
+        }
+      }
+      const response = await axios.get(`https://backend.csaposapp.hu/api/Tables/location/${id}`, config);
+      const data = await response.data;
+      if (response.status === 200 && data.length > 0) {
+        return data;
+      }
+    }
+    catch (error) {
+      console.log(error.data?.status);
+      console.log(error.message);
+    }
+  }
+
   async function getBookings() {
     try {
       const config = {
@@ -149,6 +170,35 @@ function Provider({ children }) {
       console.log(error.message);
     }
   }
+
+  async function removeBooking(id) {
+    try {
+        const config = {
+            headers: {
+                Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+                "Content-Type" : "application/json"
+            },
+            data: {
+                bookingId: id
+            }
+        }
+        const response = await axios.delete(`https://backend.csaposapp.hu/api/bookings/remove-booking`, config);
+        if (response.status === 204) setBookings(state => state.filter(record => record.id !== id));
+        return true;
+    } 
+    catch (error) {
+        console.log(error.message);
+        if (error.response?.status === 401) {
+            if (await getAccessToken()) {
+                await removeBooking(id);
+            }
+            else {
+              await logout();
+              <Navigate to={"/login"}/>
+            }
+        }
+    }
+}
 
   async function getTableGuests(id) {
     try {
@@ -188,12 +238,12 @@ function Provider({ children }) {
       setUserId(decodeJWT(localStorage.getItem("accessToken")).sub);
       if (userId) {
        const fetch = async () => {
-          await getProfile(userId, "user");
-          await getFriends();
-          await getFriendRequests();
-          await getLocations();
-          await getTables();
-          await getBookings();
+          getProfile(userId, "user");
+          getFriends();
+          getFriendRequests();
+          getLocations();
+          getTables();
+          getBookings();
         }
         fetch()
       }
@@ -214,7 +264,8 @@ function Provider({ children }) {
       setMenuState, 
       isAuthenticated, 
       setIsAuthenticated, 
-      user, setUser, 
+      user,
+      setUser, 
       locations, 
       setLocations, 
       notificationFilter, 
@@ -233,6 +284,8 @@ function Provider({ children }) {
       setOrder,
       bookings,
       getBookings,
+      removeBooking,
+      getLocationTables,
       setTableFriends, 
       getProfile, 
       setUserId,

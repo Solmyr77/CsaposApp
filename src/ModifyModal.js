@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useRef } from "react";
+import React, { useContext, useState, useEffect, useRef, forwardRef } from "react";
 import { PencilSquareIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import Context from "./Context";
 import axios from "axios";
@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import heic2any from "heic2any";
 import imageCompression from "browser-image-compression";
 
-function ModifyModal({ isModifyModalVisible, setIsModifyModalVisible }) {
+const ModifyModal = forwardRef((props, ref) => {
   const { user, setUser, getProfile, logout } = useContext(Context);
   const [newProfileName, setNewProfileName] = useState(user.displayName);
   const [previewProfilePicture, setPreviewProfilePicture] = useState(user.imageUrl);
@@ -19,15 +19,9 @@ function ModifyModal({ isModifyModalVisible, setIsModifyModalVisible }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isModifyModalVisible) {
-      document.getElementById("profilename").value = user.displayName;
-      setNewProfileName(user.displayName);
-      setPreviewProfilePicture(user.imageUrl);
-      setErrorMessage("");
-      setIsConversionFinished(null);
-      setFormData(new FormData());
-    }
-  }, [isModifyModalVisible])
+    if (user.imageUrl) setPreviewProfilePicture(user.imageUrl);
+    console.log(ref);
+  }, [user.imageUrl]);
 
   function triggerFileInputClick() {
     document.getElementById("fileInput").click();
@@ -136,7 +130,7 @@ function ModifyModal({ isModifyModalVisible, setIsModifyModalVisible }) {
       setUser({...user, displayName: newProfileName});
       setTimeout(async() => {
         setIsSucceeded(false);
-        setIsModifyModalVisible(false);
+        ref.current.close();
         await getProfile(user.id, "user");
       }, 1000);
     }
@@ -148,48 +142,55 @@ function ModifyModal({ isModifyModalVisible, setIsModifyModalVisible }) {
   }
 
   return (
-    <div className={`w-full min-h-screen h-full absolute top-0 left-0 bg-opacity-65 bg-black ${isModifyModalVisible ? "flex" : "hidden"} justify-center items-center` }>
-      <div className={`w-80 h-80 aspect-square bg-grey rounded-xl flex flex-col justify-between sticky top-1/2 -translate-y-1/2`}>
-        <XMarkIcon className="absolute left-0 top-0 w-9 text-red-500 font-bold bg-dark-grey p-1 rounded-tl-md rounded-tr-none rounded-bl-none rounded-br-md hover:cursor-pointer" onClick={() => {
-          setIsModifyModalVisible(false);
-          imageInput.current.value = "";
-        }}/>
-        {
-          isSucceeded === false ? 
-          <div className="h-full">
-            <p className="text-md pt-4 text-center mb-6">Profil szerkesztése</p>
-            <form className="flex flex-col justify-between h-3/4 items-center px-2" onSubmit={(event) => handleSubmit(event)}>
-            {
-              isConversionFinished === false ?
-              <span className="loading loading-spinner text-blue w-20"></span> :
-              <div className="relative select-none hover:cursor-pointer" onClick={triggerFileInputClick}>
-                <img src={previewProfilePicture} className="rounded-full object-cover aspect-square w-24 opacity-50"/>
-                <PencilSquareIcon className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-12"/>
-                <input ref={imageInput} id="fileInput" type="file" style={{"display" : "none"}} onChange={(event) => showImagePreview(event)}/>
-              </div>
-            }
-              <div className="flex flex-col justify-between items-center w-full mt-2">
-                <label className="text-left w-full font-normal">Profilnév</label>
-                <input defaultValue={user.displayName} id="profilename" name="profilename" type="text" className="w-full bg-dark-grey px-5 py-2 rounded-md font-normal mt-0.5 focus:outline-none" onChange={(event) => {
-                  setNewProfileName(event.target.value.trim());
-                  setErrorMessage("");
-                  }} required/>
-                <p className={`text-red-500 text-center font-normal ${errorMessage !== "" ? "visible" : "invisible"}`}>{errorMessage}</p>
-                {
-                  user.displayName !== newProfileName || previewProfilePicture !== user.imageUrl ?
-                  <input type="submit" value="Mentés" className="bg-dark-grey w-fit py-2 px-3 mt-2 rounded-md text-blue drop-shadow-[0px_2px_2px_rgba(0,0,0,.5)] hover:cursor-pointer" /> :
-                  <input type="submit" value="Mentés" className="bg-dark-grey w-fit py-2 px-3 mt-2 rounded-md text-blue drop-shadow-[0px_2px_2px_rgba(0,0,0,.5)] opacity-50" disabled/>
-                }
-              </div>
-            </form>
-          </div> : 
-          <div className="flex h-full w-full justify-center items-center">
-            {errorMessage === "" ? <p className="text-green-500">Sikeres módosítás</p> : <p className="text-red-500">{errorMessage}</p>}
-          </div>
-        }
-      </div>
-    </div>
+      <dialog className="modal" ref={ref} autoFocus={false} tabIndex="-1">
+        <div className={`modal-box w-80 h-80 aspect-square bg-grey rounded-xl flex flex-col justify-between sticky`}>
+          <XMarkIcon className="absolute left-0 top-0 w-9 text-red-500 font-bold bg-dark-grey p-1 rounded-tl-md rounded-tr-none rounded-bl-none rounded-br-md hover:cursor-pointer" onClick={() => {
+            document.getElementById("profilename").value = user.displayName;
+            setNewProfileName(user.displayName);
+            setPreviewProfilePicture(user.imageUrl);
+            setErrorMessage("");
+            setIsConversionFinished(null);
+            setFormData(new FormData());
+            imageInput.current.value = "";
+            ref.current.close();
+          }}/>
+          {
+            isSucceeded === false ?
+            <div className="h-full">
+              <p className="text-md pt-4 text-center mb-6">Profil szerkesztése</p>
+              <form className="flex flex-col justify-between h-3/4 items-center px-2" onSubmit={(event) => handleSubmit(event)}>
+              {
+                isConversionFinished === false ?
+                <span className="loading loading-spinner text-blue w-20"></span> :
+                <div className="relative select-none hover:cursor-pointer" onClick={triggerFileInputClick}>
+                  <img src={previewProfilePicture} className="rounded-full object-cover aspect-square w-24 opacity-50"/>
+                  <PencilSquareIcon className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-12"/>
+                  <input ref={imageInput} id="fileInput" type="file" style={{"display" : "none"}} onChange={(event) => showImagePreview(event)}/>
+                </div>
+              }
+                <div className="flex flex-col justify-between items-center w-full mt-2">
+                  <label className="text-left w-full font-normal">Profilnév</label>
+                  <input defaultValue={user.displayName} id="profilename" name="profilename" type="text" className="w-full bg-dark-grey px-5 py-2 rounded-md font-normal mt-0.5 focus:outline-none" onChange={(event) => {
+                    setNewProfileName(event.target.value.trim());
+                    setErrorMessage("");
+                    }} required/>
+
+                  <p className={`text-red-500 text-center font-normal ${errorMessage !== "" ? "visible" : "invisible"}`}>{errorMessage}</p>
+                  {
+                    user.displayName !== newProfileName || previewProfilePicture !== user.imageUrl ?
+                    <input type="submit" value="Mentés" className="bg-dark-grey w-fit py-2 px-3 mt-2 rounded-md text-blue drop-shadow-[0px_2px_2px_rgba(0,0,0,.5)] hover:cursor-pointer" /> :
+                    <input type="submit" value="Mentés" className="bg-dark-grey w-fit py-2 px-3 mt-2 rounded-md text-blue drop-shadow-[0px_2px_2px_rgba(0,0,0,.5)] opacity-50" disabled/>
+                  }
+                </div>
+              </form>
+            </div> :
+            <div className="flex h-full w-full justify-center items-center">
+              {errorMessage === "" ? <p className="text-green-500">Sikeres módosítás</p> : <p className="text-red-500">{errorMessage}</p>}
+            </div>
+          }
+        </div>
+      </dialog>
   );
-}
+})
 
 export default ModifyModal;

@@ -10,7 +10,7 @@ background-color: white;
 
 function EventSwiper() {
   return (
-    <StyledSwipers pagination={{dynamicBullets: true}} modules={[Pagination, Autoplay]} className="mySwiper mb-3 drop-shadow-[0_4px_4px_rgba(0,0,0,0.25)] w-full">
+    <StyledSwipers pagination={{dynamicBullets: true}} modules={[Pagination, Autoplay]} spaceBetween={10} className="mySwiper mb-3 drop-shadow-[0_4px_4px_rgba(0,0,0,0.25)] w-full">
         <SwiperSlide><EventCard/></SwiperSlide>
         <SwiperSlide><EventCard/></SwiperSlide>
         <SwiperSlide><EventCard/></SwiperSlide>

@@ -1,8 +1,8 @@
 import React from "react";
 
-function AvatarGroupItem({ imageUrl }) {
+function AvatarGroupItem({ height, imageUrl }) {
   return (
-    <div className="avatar h-10 aspect-square border-2">
+    <div className={`avatar ${height} aspect-square border-2`}>
         <div className="w-12">
             <img src={`https://assets.csaposapp.hu/assets/images/${imageUrl}`} />
         </div>

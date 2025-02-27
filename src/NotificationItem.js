@@ -93,9 +93,9 @@ function NotificationItem({ record, isFriendRequest }) {
           <img src={`https://assets.csaposapp.hu/assets/images/${profile.imageUrl}`} alt="" className="h-10 aspect-square rounded-full object-cover mr-2"/>
           <p className="flex flex-row items-center text-sm text-left text-nowrap basis-4/5"><span className="truncate inline-block max-w-20 mr-1 font-bold">{profile.displayName}</span> barátnak jelölt!</p>
         </div>
-        <div className="flex flex-row justify-center flex-grow gap-2 basis-1/3 h-24 items-end mt-2">
-          <button className={`bg-green-500 btn border-0 text-white hover:bg-green-500 w-1/2 min-h-10 h-10 ${isAccepted !== null && "hidden"}`} onClick={() => handleAccept(record.id)}>Elfogadás</button>
+        <div className="flex flex-row justify-center flex-grow gap-2 basis-1/3 h-24 items-end mt-2 text-sm">
           <button className={`bg-red-500 btn border-0 text-white hover:bg-red-500 w-1/2 min-h-10 h-10 ${isAccepted !== null && "hidden"}`} onClick={() => handleReject(record.id)}>Elutasítás</button>
+          <button className={`bg-green-500 btn border-0 text-white hover:bg-green-500 w-1/2 min-h-10 h-10 ${isAccepted !== null && "hidden"}`} onClick={() => handleAccept(record.id)}>Elfogadás</button>
           <button className={`bg-green-500 btn border-0 text-white hover:bg-green-500 w-full min-h-10 h-10 ${isAccepted === true ? "" : "hidden"}`}>Elfogadva <CheckIcon className="w-6"/></button>
           <button className={`bg-red-500 btn border-0 text-white hover:bg-red-500 w-full min-h-10 h-10 ${isAccepted === false ? "" : "hidden"}`}>Elutasításva <XMarkIcon className="w-6"/></button>
         </div>

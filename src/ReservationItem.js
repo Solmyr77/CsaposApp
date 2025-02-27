@@ -1,14 +1,19 @@
 import React, { useContext, useEffect, useState } from "react";
-import { CalendarIcon, ClockIcon }  from "@heroicons/react/24/outline"
 import AvatarGroupItem from "./AvatarGroupItem";
 import Context from "./Context";
 import { Link } from "react-router-dom";
+import { LuCalendar, LuClock, LuMapPin, LuUsers } from "react-icons/lu"
 
-function ReservationItem({ booking }) {
-    const { locations, removeBooking } = useContext(Context);
+function ReservationItem({ booking, isGuest }) {
+    const { locations, getProfile, removeBooking } = useContext(Context);
     const [tableGuests, setTableGuests] = useState([]);
+    const [currentLocation, setCurrentLocation] = useState({});
+    const [bookerProfile, setBookerProfile] = useState({});
 
     useEffect(() => {
+        const run = async () => setBookerProfile(await getProfile(booking.bookerId));
+        isGuest && run();
+        if (locations.length > 0) setCurrentLocation(locations.find(location => location.id === booking.locationId));
         if (booking.tableGuests) {
             setTableGuests(booking.tableGuests);
             const bookedFrom = new Date(booking.bookedFrom);
@@ -22,16 +27,43 @@ function ReservationItem({ booking }) {
                 return () => clearTimeout(timeout);
             }
         }
-    }, [])
+    }, [locations])
 
     return (
         <Link to={`/reservation/${booking.id}`}>
-            <div className="flex items-center w-full h-28 bg-gradient-to-tr from-blue to-sky-400 rounded-md pl-4 pr-5 pt-3 pb-2 select-none">
-                <p className="text-lg basis-3/5 line-clamp-2">{locations.length > 0 && locations.find(location => location.id === booking.locationId).name}</p>
-                <div className="flex flex-col basis-2/5 h-full justify-between">
-                    <div className="flex font-normal text-md gap-x-2 justify-end">
-                        <p className="flex flex-nowrap"><CalendarIcon className="w-6 mr-1"/>{booking.bookedFrom.split("-")[1]}.{booking.bookedFrom.split("-")[2].split("T")[0]}.</p>
-                        <p className="flex flex-nowrap"><ClockIcon className="w-6 mr-1"/>{String(booking.bookedFrom.split("-")[2].split("T")[1]).substring(0, 5)}</p>
+            <div className="flex items-start w-full h-32 bg-gradient-to-tr from-blue to-sky-400 rounded-md pl-4 pr-5 pt-3 pb-2 select-none">
+                <div className="flex flex-col h-full basis-2/3 justify-between">
+                    <div>
+                        <div className={`${isGuest ? "flex" : "hidden"} items-center gap-1 text-xs`}>
+                            <span className="badge bg-opacity-20 border-0 text-white text-xs">Foglalta:</span>
+                            <div className="avatar border-2 rounded-full border-white">
+                                <div className="w-4 rounded-full">
+                                    <img src={`https://assets.csaposapp.hu/assets/images/${bookerProfile?.imageUrl}`} alt="kép" />
+                                </div>
+                            </div>
+                            <p>{bookerProfile.displayName}</p>
+                        </div>
+                        <p className="text-lg line-clamp-2">{currentLocation.name}</p>
+                        <div className="flex text-gray-300 text-sm items-center font-normal gap-1">
+                            <LuMapPin/>
+                            <p className="line-clamp-1">{currentLocation.address?.split(" ")[1].replace(",", "")}</p>
+                        </div>
+                    </div>
+                    <div className="flex text-gray-300 items-center font-normal gap-1 text-sm">
+                        <LuUsers/>
+                        <p>{tableGuests.length + 1} fő</p>
+                    </div>
+                </div>
+                <div className="flex flex-col basis-1/3 h-full justify-between">
+                    <div className="flex flex-col items-end justify-center">
+                        <div className="flex items-center gap-1">
+                            <LuCalendar/>
+                            <p className="">{booking.bookedFrom.split("-")[1]}.{booking.bookedFrom.split("-")[2].split("T")[0]}.</p>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <LuClock/>
+                            <p className="">{booking.bookedFrom.split("T")[1].substring(0, 5)}</p>
+                        </div>
                     </div>
                     <div className="avatar-group -space-x-4 rtl:space-x-reverse justify-end">
                         {

@@ -21,6 +21,8 @@ function Provider({ children }) {
   const [currentTable, setCurrentTable] = useState([]);
   const [order, setOrder] = useState([]);
   const [bookings, setBookings] = useState([]);
+  const [bookingsContainingUser, setBookingsContainingUser] = useState([]);
+  
 
   async function getProfile(id, profile) {
     try {
@@ -158,7 +160,7 @@ function Provider({ children }) {
     }
   }
 
-  async function getBookings() {
+  async function getBookingsByUser() {
     try {
       const config = {
         headers: { 
@@ -170,6 +172,27 @@ function Provider({ children }) {
       const data = await response.data;
       if (response.status === 200 && data.length > 0) {
         setBookings(data);
+      }
+    }
+    catch (error) {
+      console.log(error.response?.status);
+      console.log(error.message);
+    }
+  }
+
+  async function getBookingsContainingUser() {
+    try {
+      const config = {
+        headers: { 
+          Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+          "Cache-Content": "no-cache"
+        }
+      }
+      const response = await axios.get(`https://backend.csaposapp.hu/api/bookings/bookings-containing-user`, config);
+      const data = await response.data;
+      if (response.status === 200 && data.length > 0) {
+        setBookingsContainingUser(data);
+        console.log(data);
       }
     }
     catch (error) {
@@ -237,6 +260,7 @@ function Provider({ children }) {
       setUserId("");
       setFriends([]);
       setBookings([]);
+      setBookingsContainingUser([]);
     }
   }
 
@@ -245,12 +269,13 @@ function Provider({ children }) {
       setUserId(decodeJWT(localStorage.getItem("accessToken")).sub);
       if (userId) {
        const fetch = async () => {
+          await getLocations();
           getProfile(userId, "user");
           getFriends();
           getFriendRequests();
-          getLocations();
           getTables();
-          getBookings();
+          getBookingsByUser();
+          getBookingsContainingUser();
         }
         fetch()
       }
@@ -290,13 +315,15 @@ function Provider({ children }) {
       order, 
       setOrder,
       bookings,
-      getBookings,
+      bookingsContainingUser,
       removeBooking,
       getLocationTables,
       setTableFriends, 
-      getProfile, 
+      getProfile,
+      getBookingsByUser,
       setUserId,
-      logout }}>
+      logout
+      }}>
       {children}
     </Context.Provider>
   )

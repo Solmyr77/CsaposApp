@@ -93,7 +93,7 @@ const StyledDatePickerWrapper = styled.div`
 `;
 
 function ReserveTable() {
-  const { locations, tables, currentTable, setCurrentTable, previousRoutes, tableFriends, setTableFriends, bookings, getBookings, getLocationTables, logout } = useContext(Context);  
+  const { locations, tables, currentTable, setCurrentTable, previousRoutes, tableFriends, setTableFriends, bookings, getBookingsByUser, getLocationTables, logout } = useContext(Context);  
   const { name, number } = useParams(); 
   const navigate = useNavigate();
   const [startDate, setStartDate] = useState(new Date());
@@ -158,7 +158,7 @@ function ReserveTable() {
       if (response.status === 200) {
         tableFriends.length > 0 && await handleAddToTable(data.id);
         setIsBooked(true);
-        getBookings();
+        await getBookingsByUser();
         updateTime();
       }
     }
@@ -267,10 +267,14 @@ function ReserveTable() {
                 </div>
               ))
             }
-            <PlusIcon className={`${tableFriends.length < Number(currentTable.capacity) - 1 ? "block" : "hidden"} w-16 bg-dark-grey text-gray-500 rounded-full hover:cursor-pointer`} onClick={() => modalRef.current.showModal()}/>
+            <PlusIcon className={`${tableFriends.length < Number(currentTable.capacity) - 1 ? "block" : "hidden"} w-16 bg-dark-grey text-gray-500 rounded-full hover:cursor-pointer`} onClick={() => {
+              modalRef.current.inert = true;
+              modalRef.current.showModal();
+              modalRef.current.inert = false;
+            }}/>
           </div>
           <div className="flex h-full justify-center items-center flex-grow mt-8">
-            <button className="btn bg-blue text-white border-0 hover:bg-blue w-56 h-20 text-lg shadow-[0_4px_4px_rgba(0,0,0,.5)]" onClick={() => handleTableBooking()}>Foglalás</button>
+            <button className="btn bg-blue text-white border-0 hover:bg-blue w-56 h-20 text-lg shadow-[0_4px_4px_rgba(0,0,0,.25)]" onClick={() => handleTableBooking()}>Foglalás</button>
           </div>
         </div>
       </div> :

@@ -1,9 +1,9 @@
 import React, { useState, useContext, useEffect } from "react";
-import { EnvelopeIcon, CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Context from "./Context";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import getAccessToken from "./refreshToken";
+import { LuMail } from "react-icons/lu"
 
 function NotificationItem({ record, isFriendRequest }) {
   const { getProfile, setFriendRequests, setFriends, setPreviousRoutes, logout } = useContext(Context);
@@ -96,8 +96,8 @@ function NotificationItem({ record, isFriendRequest }) {
         <div className="flex flex-row justify-center flex-grow gap-2 basis-1/3 h-24 items-end mt-2 text-sm">
           <button className={`bg-red-500 btn border-0 text-white hover:bg-red-500 w-1/2 min-h-10 h-10 ${isAccepted !== null && "hidden"}`} onClick={() => handleReject(record.id)}>Elutasítás</button>
           <button className={`bg-green-500 btn border-0 text-white hover:bg-green-500 w-1/2 min-h-10 h-10 ${isAccepted !== null && "hidden"}`} onClick={() => handleAccept(record.id)}>Elfogadás</button>
-          <button className={`bg-green-500 btn border-0 text-white hover:bg-green-500 w-full min-h-10 h-10 ${isAccepted === true ? "" : "hidden"}`}>Elfogadva <CheckIcon className="w-6"/></button>
-          <button className={`bg-red-500 btn border-0 text-white hover:bg-red-500 w-full min-h-10 h-10 ${isAccepted === false ? "" : "hidden"}`}>Elutasításva <XMarkIcon className="w-6"/></button>
+          <button className={`bg-green-500 btn border-0 text-white hover:bg-green-500 w-full min-h-10 h-10 ${isAccepted === true ? "" : "hidden"}`}>Elfogadva</button>
+          <button className={`bg-red-500 btn border-0 text-white hover:bg-red-500 w-full min-h-10 h-10 ${isAccepted === false ? "" : "hidden"}`}>Elutasításva</button>
         </div>
       </div>
     )
@@ -112,7 +112,7 @@ function NotificationItem({ record, isFriendRequest }) {
       navigate("/event");
       }}>
         <div className="relative">
-          <EnvelopeIcon className="h-10"/>
+          <LuMail className="h-10 w-10"/>
           <div className={`absolute top-0.5 -right-[.125rem] rounded-full w-3 aspect-square bg-red-500 ${isRead ? "invisible" : "visible"}`}></div>
         </div>
         <div className="flex flex-col w-full pl-4">

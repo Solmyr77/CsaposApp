@@ -5,11 +5,11 @@ import BackButton from "./BackButton";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import img1 from "./img/pub.webp"
 import { Rating } from "@mui/material";
-import { ChevronRightIcon, MapPinIcon } from "@heroicons/react/20/solid";
 import Context from "./Context";
 import EventSwiper from "./EventSwiper";
 import axios from "axios";
 import getAccessToken from "./refreshToken";
+import { LuMapPin, LuChevronRight } from "react-icons/lu";
 
 function Pub() {
   const { locations, previousRoutes, setPreviousRoutes, logout } = useContext(Context);
@@ -87,31 +87,34 @@ function Pub() {
             </div>
         </div>
         <div className="rounded-b-md bg-gradient-to-b from-dark-grey pt-0.5 px-4">
-            <div className="flex flex-row justify-center items-center mb-2">
-                <MapPinIcon className="h-[14px] mr-1"/>
+            <div className="flex flex-row justify-center items-center mb-2 text-gray-300">
+                <LuMapPin className="h-[14px] w-[14px] mr-1 cursor-pointer"/>
                 <p className="text-center text-[14px]">3599 Sajószöged, Petőfi út 2.</p>
             </div>
             {
                 Number(record.rating) > 0 ?
                 (
-                    <div className="flex flex-row justify-between w-full" onLoad={()=> console.log(record.rating)}>
+                    <div className="flex flex-row justify-between w-full">
                         <Rating readOnly precision={0.5} value={Number(record.rating)}/>
                         <p>1 értékelés</p>
                     </div>
                 ) :
                 (
                     <div className="flex flex-row justify-between w-full">
-                        <Rating readOnly value={0} sx={{"& .MuiSvgIcon-root" : { fill: "grey" }}}/>
-                        <p>Nincs értékelés</p>
+                        <Rating readOnly value={0} sx={{"& .MuiSvgIcon-root" : { fill: "#d1d5db" }}}/>
+                        <p className="text-gray-300">Nincs értékelés</p>
                     </div>
                 )
             }
             <div className="flex flex-row justify-between items-center max-w-full mb-2 pt-2">
                 <div className="flex flex-row items-center">
-                    <div className={`w-3 aspect-square rounded-full ${record.isOpen ? "bg-green-500" : "bg-red-500"} mr-1`}/>
-                    <p className="leading-none"><span className="font-bold">{record.isOpen ? "Nyitva" : "Zárva"}</span> 23:00-ig</p>
+                  {
+                    record.isOpen ?
+                    <p className="flex items-center gap-1 leading-none"><span className="badge bg-gradient-to-tr from-blue to-sky-400 border-0 text-white font-bold">Nyitva</span> 23:00-ig</p> :
+                    <p className="flex items-center gap-1 leading-none"><span className="badge bg-transparent border-2 border-red-500 text-red-500 font-bold">Zárva</span> 23:00-ig</p>
+                  }
                 </div>
-                <ChevronRightIcon className={`w-6 ${isBusinessHoursVisible ? "rotate-90" : "rotate-0"}`} onClick={() => setIsBusinessHoursVisible((state) => !state)}/>
+                <LuChevronRight className={`w-6 h-6 ${isBusinessHoursVisible ? "rotate-90" : "rotate-0"}`} onClick={() => setIsBusinessHoursVisible((state) => !state)}/>
             </div>
             <div className={`flex flex-col transition-opacity max-w-full mb-2 ${isBusinessHoursVisible ? "" : "hidden"}`}>
                 <ListItem title={"Hétfő"} openingHours={Object.hasOwn(businessHours, "id") ? `${Object.values(businessHours)[1].substring(0, 5)} - ${Object.values(businessHours)[2].substring(0, 5)}` : "13:00 - 20:00"}/>
@@ -125,14 +128,14 @@ function Pub() {
             <TitleDivider title={"Leírás"}/>
             <p ref={textRef} className={`max-w-full text-wrap ${isDescriptionWrapped ? "line-clamp-5" : "line-clamp-none"} mb-2`}>{record.description}</p>            
             <div className="flex w-full justify-center">
-                <ChevronRightIcon className={`w-10 ${isDescriptionWrapped ? "rotate-90" : "-rotate-90"} ${isClamped ? "flex" : "hidden"}`} onClick={() => setIsDescriptionWrapped((state) => !state)}/>
+                <LuChevronRight className={`w-10 h-10 ${isDescriptionWrapped ? "rotate-90" : "-rotate-90"} ${isClamped ? "flex" : "hidden"}`} onClick={() => setIsDescriptionWrapped((state) => !state)}/>
             </div>
             <TitleDivider title={"Események"}/>
             <div className="flex flex-col gap-y-2">
                 <EventSwiper/>
             </div>
             <div className="flex justify-center items-center self-center h-full py-10">
-                <button className={`btn bg-blue text-white border-0 w-56 h-20 hover:bg-blue disabled:bg-blue disabled:text-white disabled:opacity-50 shadow-[0_4px_4px_rgba(0,0,0,.25)]`} disabled={!record.isOpen} onClick={() => {
+                <button className={`btn bg-gradient-to-tr from-blue to-sky-400 text-white border-0 w-56 h-20 hover:bg-blue disabled:bg-blue disabled:text-white disabled:opacity-50 shadow-[0_4px_4px_rgba(0,0,0,.25)]`} disabled={!record.isOpen} onClick={() => {
                     if (record.isOpen) {
                         setPreviousRoutes((state) => {
                             if (!state.includes(location.pathname)) return [...state, location.pathname];

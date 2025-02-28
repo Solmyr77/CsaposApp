@@ -1,8 +1,8 @@
 import React, { useContext, useState } from "react";
-import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Context from "./Context";
 import axios from "axios";
 import getAccessToken from "./refreshToken";
+import { LuSearch, LuX } from "react-icons/lu";
 
 function SearchBar({ displayTitle, setRecordsToDisplay, friendSearch, locationSearch }) {
   const { user, locations, friends, logout } = useContext(Context);
@@ -60,8 +60,8 @@ function SearchBar({ displayTitle, setRecordsToDisplay, friendSearch, locationSe
         <div className="relative">
             {
               searchValue.trim() === "" ? 
-              <MagnifyingGlassIcon className="h-6 absolute right-3 top-1/2 -translate-y-1/2"/> :
-              <XMarkIcon className="h-6 absolute right-3 top-1/2 -translate-y-1/2 text-red-500 hover:cursor-pointer" onClick={() => {
+              <LuSearch className="h-6 w-6 absolute right-3 top-1/2 -translate-y-1/2"/> :
+              <LuX className="h-6 w-6 absolute right-3 top-1/2 -translate-y-1/2 text-red-500 hover:cursor-pointer" onClick={() => {
                 setSearchValue("");
                 if (friendSearch) setRecordsToDisplay([]);
                 else if (locationSearch) setRecordsToDisplay(locations);

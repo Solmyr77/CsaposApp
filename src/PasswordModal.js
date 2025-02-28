@@ -1,10 +1,9 @@
 import React, { forwardRef, useContext, useState } from "react";
-import { XMarkIcon } from "@heroicons/react/20/solid";
 import axios from "axios";
-import { LockClosedIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import Context from "./Context";
 import { useNavigate } from "react-router-dom";
 import getAccessToken from "./refreshToken";
+import { LuX, LuKeyRound, LuEyeClosed, LuEye } from "react-icons/lu";
 
 const PasswordModal = forwardRef((props, ref) =>  {
   const { logout } = useContext(Context);
@@ -114,7 +113,7 @@ const PasswordModal = forwardRef((props, ref) =>  {
   return (
     <dialog className="modal" ref={ref}>
       <div className={`w-80 min-h-80 max-h-[28rem] bg-grey rounded-xl flex flex-col justify-between sticky py-2 px-4 modal-box`}>
-        <XMarkIcon className="absolute left-0 top-0 w-9 text-red-500 font-bold bg-dark-grey p-1 rounded-tl-md rounded-tr-none rounded-bl-none rounded-br-md hover:cursor-pointer" onClick={(event) => {
+        <LuX className="absolute left-0 top-0 w-9 h-9 text-red-500 font-bold bg-dark-grey p-1 rounded-tl-md rounded-tr-none rounded-bl-none rounded-br-md hover:cursor-pointer" onClick={(event) => {
           ref.current.close();
           if (!isSucceeded) {
             resetForm();
@@ -134,10 +133,10 @@ const PasswordModal = forwardRef((props, ref) =>  {
                     }} required/>
                     {
                       currentPassword === "" ?
-                      <LockClosedIcon className="w-6 absolute top-1/2 right-2 -translate-y-1/2"/> :
+                      <LuKeyRound className="w-6 h-6 absolute top-1/2 right-2 -translate-y-1/2"/> :
                       <div>
-                        <EyeIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2 ${isCurrentPasswordVisible ? "invisible" : "visible"} hover:cursor-pointer`} onClick={() => setIsCurrentPasswordVisible(true)}/>
-                        <EyeSlashIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2 ${isCurrentPasswordVisible ? "visible" : "invisible"} hover:cursor-pointer`} onClick={() =>setIsCurrentPasswordVisible(false)}/>
+                        <LuEye className={`w-6 h-6 absolute top-1/2 right-2 -translate-y-1/2 ${isCurrentPasswordVisible ? "invisible" : "visible"} hover:cursor-pointer`} onClick={() => setIsCurrentPasswordVisible(true)}/>
+                        <LuEyeClosed className={`w-6 h-6 absolute top-1/2 right-2 -translate-y-1/2 ${isCurrentPasswordVisible ? "visible" : "invisible"} hover:cursor-pointer`} onClick={() =>setIsCurrentPasswordVisible(false)}/>
                       </div>
                     }
                   </div>
@@ -152,10 +151,10 @@ const PasswordModal = forwardRef((props, ref) =>  {
                     }} required/>
                     {
                       password1 === "" ?
-                      <LockClosedIcon className="w-6 absolute top-1/2 right-2 -translate-y-1/2"/> :
+                      <LuKeyRound className="w-6 h-6 absolute top-1/2 right-2 -translate-y-1/2"/> :
                       <div>
-                        <EyeIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPassword1Visible ? "invisible" : "visible"} hover:cursor-pointer`} onClick={() => setIsPassword1Visible(true)}/>
-                        <EyeSlashIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPassword1Visible ? "visible" : "invisible"} hover:cursor-pointer`} onClick={() =>setIsPassword1Visible(false)}/>
+                        <LuEye className={`w-6 h-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPassword1Visible ? "invisible" : "visible"} hover:cursor-pointer`} onClick={() => setIsPassword1Visible(true)}/>
+                        <LuEyeClosed className={`w-6 h-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPassword1Visible ? "visible" : "invisible"} hover:cursor-pointer`} onClick={() =>setIsPassword1Visible(false)}/>
                       </div>
                     }
                   </div>
@@ -170,17 +169,17 @@ const PasswordModal = forwardRef((props, ref) =>  {
                     }} required/>
                     {
                       password2 === "" ?
-                      <LockClosedIcon className="w-6 absolute top-1/2 right-2 -translate-y-1/2"/> :
+                      <LuKeyRound className="w-6 h-6 absolute top-1/2 right-2 -translate-y-1/2"/> :
                       <div>
-                        <EyeIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPassword2Visible ? "invisible" : "visible"} hover:cursor-pointer`} onClick={() => setIsPassword2Visible(true)}/>
-                        <EyeSlashIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPassword2Visible ? "visible" : "invisible"} hover:cursor-pointer`} onClick={() =>setIsPassword2Visible(false)}/>
+                        <LuEye className={`w-6 h-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPassword2Visible ? "invisible" : "visible"} hover:cursor-pointer`} onClick={() => setIsPassword2Visible(true)}/>
+                        <LuEyeClosed className={`w-6 h-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPassword2Visible ? "visible" : "invisible"} hover:cursor-pointer`} onClick={() =>setIsPassword2Visible(false)}/>
                       </div>
                     }
                   </div>
               </div>
               <div className="flex flex-col items-center">
                 <p className={`text-red-500 text-center font-normal ${errorMessage !== "" ? "visible" : "invisible"}`}>{errorMessage}</p>
-                <input type="submit" value="Mentés" className="btn bg-dark-grey rounded-md text-blue drop-shadow-[0px_2px_2px_rgba(0,0,0,.5)] hover:bg-dark-grey border-0 disabled:bg-dark-grey disabled:opacity-50 disabled:text-blue" disabled={!(currentPassword && password1 && password2)}/>
+                <button type="submit" className="btn bg-dark-grey rounded-md text-blue drop-shadow-[0px_2px_2px_rgba(0,0,0,.5)] text-sm hover:bg-dark-grey border-0 disabled:bg-dark-grey disabled:opacity-50 disabled:text-blue" disabled={!(currentPassword && password1 && password2)}><span className="bg-gradient-to-t from-blue to-sky-400 bg-clip-text text-transparent">Mentés</span></button>
               </div>
           </form> : 
           <div className="flex flex-grow w-full justify-center items-center">

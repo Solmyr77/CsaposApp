@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import BackButton from "./BackButton";
-import { AtSymbolIcon } from "@heroicons/react/20/solid";
-import { UserCircleIcon, EyeIcon, EyeSlashIcon, LockClosedIcon, IdentificationIcon, CheckIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
+import { LuIdCard, LuAtSign, LuCircleUser, LuKeyRound, LuEyeClosed, LuEye, LuCheck } from "react-icons/lu";
 
 function Register() {
   const navigate = useNavigate();
@@ -120,7 +119,7 @@ function Register() {
               setLegalName(event.target.value);
               setErrorMessage("");
             }}/>
-            <IdentificationIcon className="w-5 absolute top-1/2 right-2 -translate-y-1/2"/>
+            <LuIdCard className="w-6 h-6 absolute top-1/2 right-2 -translate-y-1/2"/>
           </div>
           <label className="text-left w-full">Születési idő</label>
           <input id="date" name="birthdate" value={birthDate} type="date" className="bg-dark-grey px-5 rounded-md py-2 text-white mt-0.5 mb-4 w-full focus:outline-none shadow-[0px_2px_2px_rgba(0,0,0,.5)]" max={date.getFullYear()} required onChange={(event) => {
@@ -133,7 +132,7 @@ function Register() {
               setEmail(event.target.value);
               setErrorMessage("");
             }}/>
-            <AtSymbolIcon className="w-6 absolute top-1/2 right-2 -translate-y-1/2"/>
+            <LuAtSign className="w-6 h-6 absolute top-1/2 right-2 -translate-y-1/2"/>
           </div>
           <label className="text-left w-full">Felhasználónév</label>
           <div className="relative mt-0.5 mb-4">
@@ -141,7 +140,7 @@ function Register() {
               setUsername(event.target.value);
               setErrorMessage("");
             }}/>
-            <UserCircleIcon className="w-6 absolute top-1/2 right-2 -translate-y-1/2"/>
+            <LuCircleUser className="w-6 h-6 absolute top-1/2 right-2 -translate-y-1/2"/>
           </div>
           <label className={`text-left w-full ${password1Error ? "text-red-500" : "text-white"}`}>Jelszó</label>
           <div className="relative mt-0.5 mb-4">
@@ -153,10 +152,10 @@ function Register() {
             }}/>
             {
               password1 === "" ? 
-              <LockClosedIcon className="w-6 absolute top-1/2 right-2 -translate-y-1/2"/> :
+              <LuKeyRound className="w-6 h-6 absolute top-1/2 right-2 -translate-y-1/2"/> :
               <div>
-                <EyeIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPassword1Visible ? "invisible" : "visible"} hover:cursor-pointer`} onClick={() => setIsPassword1Visible(true)}/>
-                <EyeSlashIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPassword1Visible ? "visible" : "invisible"} hover:cursor-pointer`} onClick={() =>setIsPassword1Visible(false)}/>
+                <LuEye className={`w-6 h-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPassword1Visible ? "invisible" : "visible"} hover:cursor-pointer`} onClick={() => setIsPassword1Visible(true)}/>
+                <LuEyeClosed className={`w-6 h-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPassword1Visible ? "visible" : "invisible"} hover:cursor-pointer`} onClick={() =>setIsPassword1Visible(false)}/>
               </div>
             }
           </div>
@@ -170,21 +169,20 @@ function Register() {
             }}/>
             {
               password2 === "" ? 
-              <LockClosedIcon className="w-6 absolute top-1/2 right-2 -translate-y-1/2"/> :
+              <LuKeyRound className="w-6 h-6 absolute top-1/2 right-2 -translate-y-1/2"/> :
               <div>
-                <EyeIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPassword2Visible ? "invisible" : "visible"} hover:cursor-pointer`} onClick={() => setIsPassword2Visible(true)}/>
-                <EyeSlashIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPassword2Visible ? "visible" : "invisible"} hover:cursor-pointer`} onClick={() =>setIsPassword2Visible(false)}/>
+                <LuEye className={`w-6 h-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPassword2Visible ? "invisible" : "visible"} hover:cursor-pointer`} onClick={() => setIsPassword2Visible(true)}/>
+                <LuEyeClosed className={`w-6 h-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPassword2Visible ? "visible" : "invisible"} hover:cursor-pointer`} onClick={() =>setIsPassword2Visible(false)}/>
               </div>
             }
           </div>
           <p id="errorText" className="text-center text-red-500 invisible text-wrap max-w-44" style={{"visibility" : `${errorMessage !== "" ? "visible" : "hidden"}`}}>{errorMessage}</p>
-          <button type="submit" className="btn hover:bg-blue border-0 bg-blue text-white text-lg mt-4 shadow-[0px_2px_2px_rgba(0,0,0,.5)] h-16 w-48">Regisztráció</button>
+          <button type="submit" className="btn hover:bg-blue border-0 bg-gradient-to-t from-blue to-sky-400 text-white text-lg mt-4 shadow-[0px_2px_2px_rgba(0,0,0,.5)] h-16 w-48">Regisztráció</button>
         </form> :
-        //<p className="text-green-500 text-xl font-bold absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center">Sikeres regisztráció!</p>
         <div className="flex flex-col justify-center flex-grow items-center h-full p-4">
           <div className="flex flex-col items-center bg-dark-grey p-4 rounded-md text-green-500 shadow-[0px_2px_2px_rgba(0,0,0,.5)]">
             <p className="text-lg">Sikeres regisztráció!</p>
-            <CheckIcon className="w-12"/>
+            <LuCheck className="w-12"/>
           </div>
         </div>
         }

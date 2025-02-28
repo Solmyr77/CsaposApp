@@ -1,6 +1,6 @@
 import React, { forwardRef, useContext, useEffect, useState } from "react";
 import Context from "./Context";
-import { XMarkIcon } from "@heroicons/react/20/solid";
+import { LuX } from "react-icons/lu";
 import SearchBar from "./SearchBar";
 import TitleDivider from "./TitleDivider";
 import AddFriendItem from "./AddFriendItem";
@@ -18,7 +18,7 @@ const AddFriendToTableModal = forwardRef((props, ref) => {
     return (
     <dialog className="modal" ref={ref}>
       <div className={`w-80 h-96 bg-grey flex flex-col py-2 px-4 modal-box`}>
-        <XMarkIcon className="absolute left-0 top-0 w-9 text-red-500 font-bold bg-dark-grey p-1 rounded-tl-md rounded-tr-none rounded-bl-none rounded-br-md hover:cursor-pointer" onClick={() => ref.current.close()}/>
+        <LuX className="absolute left-0 top-0 w-9 h-9 text-red-500 font-bold bg-dark-grey p-1 rounded-tl-md rounded-tr-none rounded-bl-none rounded-br-md hover:cursor-pointer" onClick={() => ref.current.close()}/>
         <p className="text-md pt-4 text-center mb-6">Barát meghívása</p>
         <SearchBar displayTitle={false} defaultRecords={friends} setRecordsToDisplay={setRecordsToDisplay}/>
         <TitleDivider title={"Találatok"}/>

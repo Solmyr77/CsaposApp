@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
-import { EnvelopeIcon } from "@heroicons/react/24/outline";
 import Context from './Context';
 import { Link } from 'react-router-dom';
+import { LuMail } from "react-icons/lu"
 
 function Header({ notification }) {
   const { user } = useContext(Context);
@@ -13,12 +13,12 @@ function Header({ notification }) {
           <p className="ml-3 text-lg text-white">Szia {user.displayName}!</p>
       </div>
       <div className="relative">
-      <Link to={"/notifications"}>
-        <EnvelopeIcon className="text-white h-6"></EnvelopeIcon>
-      </Link>
-      {
-        notification == true && <div className="absolute bg-red-500 top-0 -right-[.125rem] w-2 h-2 rounded-full"></div>
-      }
+        <Link to={"/notifications"}>
+          <LuMail className="text-white h-6 w-6"/>
+        </Link>
+        {
+          notification == true && <div className="absolute bg-red-500 top-0 -right-[.125rem] w-2 h-2 rounded-full"></div>
+        }
       </div>
     </div>
   )

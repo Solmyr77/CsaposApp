@@ -1,11 +1,11 @@
 import React, { useContext, useState, useEffect, useRef, forwardRef } from "react";
-import { PencilSquareIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import Context from "./Context";
 import axios from "axios";
 import getAccessToken from "./refreshToken";
 import { useNavigate } from "react-router-dom";
 import heic2any from "heic2any";
 import imageCompression from "browser-image-compression";
+import { LuX, LuImagePlus } from "react-icons/lu";
 
 const ModifyModal = forwardRef((props, ref) => {
   const { user, setUser, getProfile, logout } = useContext(Context);
@@ -143,7 +143,7 @@ const ModifyModal = forwardRef((props, ref) => {
   return (
       <dialog className="modal" ref={ref}>
         <div className={`modal-box max-w-80 max-h-80 aspect-square bg-grey rounded-xl flex flex-col justify-between sticky py-2 px-4`}>
-          <XMarkIcon className="absolute left-0 top-0 w-9 text-red-500 font-bold bg-dark-grey p-1 rounded-tl-md rounded-tr-none rounded-bl-none rounded-br-md hover:cursor-pointer" onClick={() => {
+          <LuX className="absolute left-0 top-0 w-9 h-9 text-red-500 font-bold bg-dark-grey p-1 rounded-tl-md rounded-tr-none rounded-bl-none rounded-br-md hover:cursor-pointer" onClick={() => {
             document.getElementById("profilename").value = user.displayName;
             setNewProfileName(user.displayName);
             setPreviewProfilePicture(user.imageUrl);
@@ -163,7 +163,7 @@ const ModifyModal = forwardRef((props, ref) => {
                 <span className="loading loading-spinner text-blue w-20"></span> :
                 <div className="relative select-none hover:cursor-pointer" onClick={triggerFileInputClick}>
                   <img src={previewProfilePicture} className="rounded-full object-cover aspect-square w-24 opacity-50"/>
-                  <PencilSquareIcon className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-12"/>
+                  <LuImagePlus className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-12 w-12"/>
                   <input ref={imageInput} id="fileInput" type="file" style={{"display" : "none"}} onChange={(event) => showImagePreview(event)}/>
                 </div>
               }
@@ -176,7 +176,7 @@ const ModifyModal = forwardRef((props, ref) => {
                       }} required/>
                   </div>
                   <p className={`text-red-500 text-center font-normal ${errorMessage !== "" ? "visible" : "invisible"}`}>{errorMessage}</p>
-                  <input type="submit" value="Mentés" className="btn bg-dark-grey text-blue border-0 shadow-[0px_2px_2px_rgba(0,0,0,.5)] hover:bg-dark-grey disabled:opacity-50 disabled:bg-dark-grey disabled:text-blue" disabled={!(user.displayName !== newProfileName || previewProfilePicture !== user.imageUrl)}/>
+                  <button type="submit" className="btn bg-dark-grey border-0 shadow-[0px_2px_2px_rgba(0,0,0,.5)] hover:bg-dark-grey disabled:opacity-50 disabled:bg-dark-grey text-sm" disabled={!(user.displayName !== newProfileName || previewProfilePicture !== user.imageUrl)}><span className="bg-gradient-to-t from-blue to-sky-400 bg-clip-text text-transparent">Mentés</span></button>
                 </div>
               </form>
             </div> :

@@ -1,8 +1,9 @@
 import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Context from "./Context";
-import { UserCircleIcon, EyeIcon, LockClosedIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
+import { LuCircleUser, LuKeyRound, LuEyeClosed, LuEye } from "react-icons/lu";
+
 
 function Login() {
   const navigate = useNavigate();
@@ -56,7 +57,7 @@ function Login() {
               setErrorMessage("");
               setUsername(event.target.value);
             }}/>
-            <UserCircleIcon className="w-6 absolute top-1/2 right-2 -translate-y-1/2"/>
+            <LuCircleUser className="w-6 h-6 absolute top-1/2 right-2 -translate-y-1/2"/>
           </div>
           <label className="text-left w-full">Jelszó</label>
           <div className="relative mt-0.5 mb-4">
@@ -67,19 +68,19 @@ function Login() {
             }}/>
             {
               password === "" ?
-              <LockClosedIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2`}/>
+              <LuKeyRound className={`w-6 h-6 absolute top-1/2 right-2 -translate-y-1/2`}/>
               :
               <div>
-                <EyeIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPasswordVisible ? "invisible" : "visible"} hover:cursor-pointer`} onClick={() => setIsPasswordVisible(true)}/>
-                <EyeSlashIcon className={`w-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPasswordVisible ? "visible" : "invisible"} hover:cursor-pointer`} onClick={() =>setIsPasswordVisible(false)}/>
+                <LuEye className={`w-6 h-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPasswordVisible ? "invisible" : "visible"} hover:cursor-pointer`} onClick={() => setIsPasswordVisible(true)}/>
+                <LuEyeClosed className={`w-6 h-6 absolute top-1/2 right-2 -translate-y-1/2 ${isPasswordVisible ? "visible" : "invisible"} hover:cursor-pointer`} onClick={() =>setIsPasswordVisible(false)}/>
               </div>
             }
           </div>
           <p id="errorText" className={`text-center text-red-500 text-wrap max-w-40 ${errorMessage !== "" ? "visible" : "invisible"}`}>{errorMessage}</p>
-          <button type="submit" className="btn bg-blue hover:bg-blue disabled:bg-blue disabled:text-white disabled:opacity-50 border-0 text-white text-lg h-16 w-44 shadow-[0px_2px_2px_rgba(0,0,0,.5)] mt-2" disabled={errorMessage}>Bejelentkezés</button>
+          <button type="submit" className="btn bg-gradient-to-tr from-blue to-sky-400 hover:bg-blue disabled:bg-blue disabled:text-white disabled:opacity-50 border-0 text-white text-lg h-16 w-44 shadow-[0px_2px_2px_rgba(0,0,0,.5)] mt-2" disabled={errorMessage}>Bejelentkezés</button>
       </form>
       <p className="mt-8 text-gray-300">Még nincs fiókod?</p>
-      <Link to="/register"><button className="btn bg-dark-grey text-blue mt-1 border-0 shadow-[0px_2px_2px_rgba(0,0,0,.5)] hover:bg-dark-grey">Regisztráció</button></Link>
+      <Link to="/register"><button className="btn bg-dark-grey text-blue mt-1 border-0 shadow-[0px_2px_2px_rgba(0,0,0,.5)] hover:bg-dark-grey"><span className="bg-gradient-to-t from-blue to-sky-400 bg-clip-text leading-relaxed text-transparent">Regisztráció</span></button></Link>
     </div>
   );
 }

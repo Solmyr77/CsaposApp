@@ -108,7 +108,7 @@ function Reservation() {
             <div className="flex mt-8 w-full justify-center">
                 <div className="flex flex-col w-96 rounded-xl bg-gradient-to-tr from-blue to-sky-400 shadow-lg px-4 py-2 gap-1">
                     <div className="flex justify-between items-center">
-                        <p className="text-lg font-bold">{currentLocation.name}</p>
+                        <p className="text-lg font-bold max-basis-2/3">{currentLocation.name}</p>
                         {
                             !isGuest ? (
                                 isActive ?
@@ -116,14 +116,14 @@ function Reservation() {
                                 <span className="badge bg-yellow-500 border-none text-white">Nem aktív</span>
                                 
                             ) :
-                            <div className="flex items-center gap-1">
-                                <span className="badge bg-opacity-20 border-0 text-white text-xs">Foglalta:</span>
+                            <div className="flex items-center gap-1 basis-1/3">
+                                <span className="badge bg-opacity-20 border-0 font-bold text-white text-xs">Foglalta:</span>
                                 <div className="avatar border-2 rounded-full border-white">
-                                    <div className="w-4 rounded-full">
+                                    <div className="w-6 rounded-full">
                                         <img src={`https://assets.csaposapp.hu/assets/images/${bookerProfile?.imageUrl}`} alt="kép" />
                                     </div>
                                 </div>
-                                <p>{bookerProfile.displayName || "N/A"}</p>
+                                <p className="line-clamp-1 font-bold">{bookerProfile.displayName || "N/A"}</p>
                             </div>
                         }
                         
@@ -169,10 +169,10 @@ function Reservation() {
                                 <button className="btn bg-blue hover:bg-blue border-none text-white gap-0 basis-1/2 disabled:bg-blue disabled:opacity-50 disabled:text-white" disabled={!isActive}>Kezdés<ChevronRightIcon className="h-6"/></button>                
                             </div> :
                             <div className="flex justify-between mt-2 gap-2 w-full">
-                                <button className={`btn bg-red-500 hover:bg-red-500 border-none text-md text-white gap-0 basis-1/2 ${isAccepted !== null && "hidden"}`} onClick={() => setIsAccepted(false)}>Elutasítás</button>
-                                <button className={`btn bg-green-500 hover:bg-green-500 border-none text-md text-white gap-0 basis-1/2 disabled:bg-green-500 disabled:opacity-50 disabled:text-white ${isAccepted !== null && "hidden"}`} onClick={() => setIsAccepted(true)}>Elfogadás</button>                
-                                <button className={`btn bg-red-500 hover:bg-red-500 border-none text-md text-white gap-0 basis-full ${isAccepted === false ? "" : "hidden"}`}>Elutasítva</button>
-                                <button className={`btn bg-green-500 hover:bg-green-500 border-none text-md text-white gap-0 basis-full disabled:bg-green-500 disabled:opacity-50 disabled:text-white ${isAccepted === true ? "" : "hidden"}`}>Elfogadva</button>                
+                                <button className={`btn bg-black border-2 bg-opacity-20 border-red-500 text-red-500 hover:bg-black hover:bg-opacity-20 hover:border-red-500 text-md gap-0 basis-1/2 ${isAccepted !== null && "hidden"}`} onClick={() => setIsAccepted(false)}>Elutasítás</button>
+                                <button className={`btn bg-dark-grey hover:bg-dark-grey border-none text-md gap-0 basis-1/2 ${isAccepted !== null && "hidden"}`} onClick={() => setIsAccepted(true)}><span className="bg-gradient-to-t from-blue to-sky-400 bg-clip-text leading-relaxed text-transparent">Elfogadás</span></button>                
+                                <button className={`btn bg-black border-2 bg-opacity-20 border-red-500 text-red-500 hover:bg-black hover:bg-opacity-20 hover:border-red-500 text-md  gap-0 basis-full ${isAccepted === false ? "" : "hidden"}`}>Elutasítva</button>
+                                <button className={`btn bg-dark-grey hover:bg-dark-grey border-none text-md gap-0 basis-full ${isAccepted === true ? "" : "hidden"}`}><span className="bg-gradient-to-t from-blue to-sky-400 bg-clip-text leading-relaxed text-transparent">Elfogadva</span></button>                
                             </div> 
                         )
                     }

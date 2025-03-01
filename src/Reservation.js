@@ -5,7 +5,6 @@ import { MdOutlineTableRestaurant } from "react-icons/md";
 import { LuCalendar, LuClock, LuMapPin } from "react-icons/lu";
 import AvatarGroupItem from "./AvatarGroupItem";
 import Context from "./Context";
-import { ChevronRightIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import getAccessToken from "./refreshToken";
 import axios from "axios";
 
@@ -81,7 +80,7 @@ function Reservation() {
             if (foundBooking) {
                 setCurrentBooking(foundBooking);
                 const run = async () => {
-                    setBookerProfile(await getProfile(foundBooking.bookerId));
+                    setBookerProfile(await getProfile(foundBooking?.bookerId));
                     getLocationById(foundBooking.locationId);
                     setCurrentTable((await getLocationTables(foundBooking.locationId))?.find(table => table.id === foundBooking.tableId));
                 }
@@ -108,12 +107,12 @@ function Reservation() {
             <div className="flex mt-8 w-full justify-center">
                 <div className="flex flex-col w-96 rounded-xl bg-gradient-to-tr from-blue to-sky-400 shadow-lg px-4 py-2 gap-1">
                     <div className="flex justify-between items-center">
-                        <p className="text-lg font-bold max-basis-2/3">{currentLocation.name}</p>
+                        <p className="text-lg font-bold max-basis-2/3">{currentLocation?.name}</p>
                         {
                             !isGuest ? (
                                 isActive ?
-                                <span className="badge bg-green-500 border-none text-white">Aktív</span> : 
-                                <span className="badge bg-yellow-500 border-none text-white">Nem aktív</span>
+                                <span className="badge bg-green-500 border-0 text-white font-bold">Aktív</span> : 
+                                <span className="badge bg-transparent border-2 border-yellow-500 text-yellow-500 font-bold">Nem aktív</span>
                                 
                             ) :
                             <div className="flex items-center gap-1 basis-1/3">
@@ -123,20 +122,20 @@ function Reservation() {
                                         <img src={`https://assets.csaposapp.hu/assets/images/${bookerProfile?.imageUrl}`} alt="kép" />
                                     </div>
                                 </div>
-                                <p className="line-clamp-1 font-bold">{bookerProfile.displayName || "N/A"}</p>
+                                <p className="line-clamp-1 font-bold">{bookerProfile?.displayName || "N/A"}</p>
                             </div>
                         }
                         
                     </div>
                     <div className="flex items-center gap-2">
                         <LuMapPin/>
-                        <p className="text-nowrap font-bold">{currentLocation.address}</p>
+                        <p className="text-nowrap font-bold">{currentLocation?.address}</p>
                     </div>
                     <div className="flex items-center gap-2">
                         <MdOutlineTableRestaurant/>
                         {
-                            currentTable.number &&  
-                            <p className="text-nowrap font-bold">Asztal <span className="text-gray-300">#{currentTable.number}</span></p>
+                            currentTable?.number &&  
+                            <p className="text-nowrap font-bold">Asztal <span className="text-gray-300">#{currentTable?.number}</span></p>
                         }
                     </div>
                     <div className="flex items-center gap-2 font-bold">
@@ -165,13 +164,13 @@ function Reservation() {
                         (
                             !isGuest ? 
                             <div className="flex justify-between mt-2 gap-2 w-full">
-                                <button className="btn bg-red-500 hover:bg-red-500 border-none text-white gap-0 basis-1/2" onClick={async () => confirmModal.current.showModal()}><XMarkIcon className="h-6"/>Lemondás</button>
-                                <button className="btn bg-blue hover:bg-blue border-none text-white gap-0 basis-1/2 disabled:bg-blue disabled:opacity-50 disabled:text-white" disabled={!isActive}>Kezdés<ChevronRightIcon className="h-6"/></button>                
+                                <button className="btn bg-black border-2 bg-opacity-40 border-red-500 text-red-500 hover:bg-black hover:bg-opacity-40 hover:border-red-500 gap-0 basis-1/2 text-md" onClick={async () => confirmModal.current.showModal()}>Lemondás</button>
+                                <button className="btn bg-dark-grey hover:bg-dark-grey disabled:bg-dark-grey border-none gap-0 basis-1/2 disabled:opacity-10 text-md" disabled={!isActive}><span className="bg-gradient-to-t from-blue to-sky-400 bg-clip-text leading-relaxed text-transparent">Kezdés</span></button>                
                             </div> :
                             <div className="flex justify-between mt-2 gap-2 w-full">
-                                <button className={`btn bg-black border-2 bg-opacity-20 border-red-500 text-red-500 hover:bg-black hover:bg-opacity-20 hover:border-red-500 text-md gap-0 basis-1/2 ${isAccepted !== null && "hidden"}`} onClick={() => setIsAccepted(false)}>Elutasítás</button>
+                                <button className={`btn bg-black border-2 bg-opacity-40 border-red-500 text-red-500 hover:bg-black hover:bg-opacity-40 hover:border-red-500 text-md gap-0 basis-1/2 ${isAccepted !== null && "hidden"}`} onClick={() => setIsAccepted(false)}>Elutasítás</button>
                                 <button className={`btn bg-dark-grey hover:bg-dark-grey border-none text-md gap-0 basis-1/2 ${isAccepted !== null && "hidden"}`} onClick={() => setIsAccepted(true)}><span className="bg-gradient-to-t from-blue to-sky-400 bg-clip-text leading-relaxed text-transparent">Elfogadás</span></button>                
-                                <button className={`btn bg-black border-2 bg-opacity-20 border-red-500 text-red-500 hover:bg-black hover:bg-opacity-20 hover:border-red-500 text-md  gap-0 basis-full ${isAccepted === false ? "" : "hidden"}`}>Elutasítva</button>
+                                <button className={`btn bg-black border-2 bg-opacity-40 border-red-500 text-red-500 hover:bg-black hover:bg-opacity-40 hover:border-red-500 text-md  gap-0 basis-full ${isAccepted === false ? "" : "hidden"}`}>Elutasítva</button>
                                 <button className={`btn bg-dark-grey hover:bg-dark-grey border-none text-md gap-0 basis-full ${isAccepted === true ? "" : "hidden"}`}><span className="bg-gradient-to-t from-blue to-sky-400 bg-clip-text leading-relaxed text-transparent">Elfogadva</span></button>                
                             </div> 
                         )
@@ -184,10 +183,10 @@ function Reservation() {
                     <div className="modal-box bg-dark-grey flex flex-col gap-4 items-center">
                         <p className="text-md font-bold">Biztosan lemondod?</p>
                         <div className="flex w-full justify-center gap-2">
-                            <button className="btn btn-outline border-red-500 text-red-500 hover:bg-red-500 hover:border-red-500 hover:text-white" onClick={async () => {
+                            <button className="btn bg-transparent border-2 border-red-500 text-red-500 hover:bg-transparent hover:border-red-500 basis-1/2 text-sm" onClick={async () => {
                                 await removeBooking(id) && setIsSuccessful(true);
                             }}>Igen, lemondom</button>
-                            <button className="btn bg-blue hover:bg-blue border-none text-white" onClick={() => confirmModal.current.close()}>Mégsem</button>
+                            <button className="btn bg-gradient-to-tr from-blue to-sky-400 border-none text-white basis-1/2 text-sm" onClick={() => confirmModal.current.close()}>Mégsem</button>
                         </div>
                     </div> :
                     <div className="modal-box bg-dark-grey">

@@ -11,9 +11,9 @@ import ProtectedRoute from './ProtectedRoute';
 import Notifications from './Notifications';
 import Event from './Event';
 import Tables from './Tables';
-import ReserveTable from './ReserveTable';
 import PubMenu from './PubMenu';
 import Reservation from './Reservation';
+import ReserveTable from './ReserveTable';
 
 function App() {
   return (
@@ -49,14 +49,6 @@ function App() {
                 <ProtectedRoute isProtected={true}>
                   <Event />
                 </ProtectedRoute>}/>
-              <Route path="/tables/:name" element={
-                <ProtectedRoute isProtected={true}>
-                  <Tables />
-                </ProtectedRoute>}/>
-              <Route path="/reservetable/:name/table/:number" element={
-                <ProtectedRoute isProtected={true}>
-                  <ReserveTable />
-                </ProtectedRoute>}/>
               <Route path="/reservation/:id" element={
                 <ProtectedRoute isProtected={true}>
                   <Reservation />
@@ -64,6 +56,10 @@ function App() {
               <Route path="/pubmenu" element={
                 <ProtectedRoute isProtected={true}>
                   <PubMenu />
+                </ProtectedRoute>}/>
+              <Route path="/reservetable" element={
+                <ProtectedRoute isProtected={true}>
+                  <ReserveTable />
                 </ProtectedRoute>}/>
               <Route path="/register" element={
                 <ProtectedRoute>

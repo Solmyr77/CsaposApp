@@ -41,7 +41,7 @@ function ReservationItem({ booking, isGuest }) {
                                     <img src={`https://assets.csaposapp.hu/assets/images/${bookerProfile?.imageUrl}`} alt="kép" />
                                 </div>
                             </div>
-                            <p>{bookerProfile.displayName}</p>
+                            <p>{bookerProfile?.displayName}</p>
                         </div>
                         <p className="text-lg line-clamp-2">{currentLocation.name}</p>
                         <div className="flex text-gray-300 text-sm items-center font-normal gap-1">

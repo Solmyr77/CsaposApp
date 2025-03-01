@@ -2,7 +2,6 @@ import { React, useState, useEffect} from "react";
 import Context from "./Context";
 import axios from "axios";
 import getAccessToken from "./refreshToken";
-import IsEqual from "react-fast-compare";
 import { Navigate } from "react-router-dom";
 
 function Provider({ children }) {
@@ -10,7 +9,7 @@ function Provider({ children }) {
   const [menuState, setMenuState] = useState("Main");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState({});
-  const [userId, setUserId] = useState("");
+  const [userId, setUserId] = useState(null);
   const [locations, setLocations] = useState( localStorage.getItem("locations") || []);
   const [notificationFilter, setNotificationFilter] = useState("Összes");
   const [previousRoutes, setPreviousRoutes] = useState(["/"]);
@@ -64,7 +63,12 @@ function Provider({ children }) {
       if (data.friends.length > 0) {
         data.friends.map(async (_, i) => {
           const friendProfile = await getProfile(data.friends[i]);
-          if (!friends.some(friend => IsEqual(friend, friendProfile))) setFriends(state => [...state, friendProfile]);
+          setFriends(state => {
+            if(!state.some(friend => friend.id === friendProfile.id)) {
+              return [...state, friendProfile]
+            }
+            return [state];
+          })
         })
       }
     }

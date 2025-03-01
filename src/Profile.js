@@ -21,11 +21,6 @@ function Profile() {
   const [selectedFriend, setSelectedFriend] = useState({});
   const navigate = useNavigate();
 
-  const handleLogout = async() => {
-    await logout();
-    navigate("/login");
-  }
-
   useEffect(() => {
     setMenuState("Profile");
   }, []);
@@ -37,7 +32,7 @@ function Profile() {
       <TitleDivider title={"Barátok"}/>
       <div className="flex flex-row w-full overflow-x-scroll mb-8">
         { friends?.length > 0 ? 
-          friends?.sort((a, b) => a?.displayName.localeCompare(b?.displayName)).map(friend =>
+          friends?.sort((a, b) => a?.displayName?.localeCompare(b?.displayName)).map(friend =>
             {
               if(friend === friends[friends.length-1]) {
                 return (
@@ -95,7 +90,10 @@ function Profile() {
         Jelszó módosítása
         <LuKeyRound className="h-6 w-6"/>
       </div>
-      <button className="btn border-0 mt-2 hover:bg-dark-grey bg-dark-grey text-red-500 drop-shadow-[0_4px_4px_rgba(0,0,0,.5)] text-md select-none" onClick={handleLogout}>Kijelentkezés</button>
+      <button className="btn border-0 mt-2 hover:bg-dark-grey bg-dark-grey text-red-500 drop-shadow-[0_4px_4px_rgba(0,0,0,.5)] text-md select-none" onClick={async () => {
+        await logout();
+        navigate("login");
+        }}>Kijelentkezés</button>
       <div className="h-[12vh]"></div>
       <FriendModal record={Object.hasOwn(selectedFriend, "id") === true && selectedFriend} ref={friendModalRef}/>
       <ModifyModal ref={modifyModalRef}/>

@@ -141,7 +141,7 @@ function Pub() {
                             if (!state.includes(location.pathname)) return [...state, location.pathname];
                             return state;
                           });
-                        navigate(`/reservetable`);
+                        navigate(`/reservetable/${name}`);
                     }
                 }}>
                     <p className="font-bold text-xl">Foglalok</p>

@@ -1,14 +1,19 @@
-import React, { useState, forwardRef, useContext } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, forwardRef, useContext, useEffect } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import BackButton from "./BackButton";
 import DatePicker, {registerLocale} from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { addDays } from 'date-fns';
 import styled from "styled-components";
 import hu from 'date-fns/locale/hu';
-import { LuCalendar } from "react-icons/lu";
+import { LuCalendar,  LuClock, LuMapPin } from "react-icons/lu";
 import TableItem from "./TableItem";
 import Context from "./Context";
+import InviteFriendItem from "./InviteFriendItem";
+import { MdOutlineTableRestaurant } from "react-icons/md";
+import AvatarGroupItem from "./AvatarGroupItem";
+import getAccessToken from "./refreshToken";
+import axios from "axios";
 registerLocale('hu', hu);
 
 const StyledDatePickerWrapper = styled.div`
@@ -64,9 +69,13 @@ const StyledDatePickerWrapper = styled.div`
 `;
 
 function ReserveTable() {
-  const { previousRoutes } = useContext(Context);
+  const { previousRoutes, getLocationTables, selectedTable, locations, friends, tableFriends, setTableFriends, setSelectedTable, getBookingsByUser, logout } = useContext(Context);
+  const { name } = useParams();
+  const navigate = useNavigate();
+  const [currentLocation, setCurrentLocation] = useState({});
   const [startDate, setStartDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState("");
+  const [locationTables, setLocationTables] = useState([]);
   const ExampleCustomInput = forwardRef(
       ({ value, onClick, className }, ref) => (
         <button className={className} onClick={onClick} ref={ref}>
@@ -75,81 +84,75 @@ function ReserveTable() {
       )
   );
 
-  // async function handleAddToTable(bookingId) {
-  //   try {
-  //     const userIds = Array.from(tableFriends.map(friend => friend.id));
-  //     const config = {
-  //       headers: { 
-  //         Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
-  //         "Cache-Content": "no-cache"
-  //       }
-  //     }
-  //     const response = await axios.post(`https://backend.csaposapp.hu/api/bookings/add-to-table`, {
-  //       userIds: userIds,
-  //       bookingId: bookingId
-  //     }, config);
-  //     const data = response.data;
-  //     response.status === 200 && setIsBooked(true);
-  //   }
-  //   catch (error) {
-  //     if (error.response?.status === 401) {
-  //       if (await getAccessToken()) {
-  //         handleAddToTable(bookingId);
-  //       }
-  //       else {
-  //         await logout();
-  //         window.location.reload();
-  //         return false;
-  //       }
-  //     } 
-  //     else {
-  //       return false;
-  //     }
-  //   }
-  // }
+  async function handleAddToTable(bookingId) {
+    try {
+      const userIds = Array.from(tableFriends.map(friend => friend.id));
+      const config = {
+        headers: { 
+          Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+          "Cache-Content": "no-cache"
+        }
+      }
+      const response = await axios.post(`https://backend.csaposapp.hu/api/bookings/add-to-table`, {
+        userIds: userIds,
+        bookingId: bookingId
+      }, config);
+      const data = response.data;
+      //response.status === 200 && setIsBooked(true);
+      navigate("/");
+    }
+    catch (error) {
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) {
+          handleAddToTable(bookingId);
+        }
+        else {
+          await logout();
+          navigate("/login");
+        }
+      } 
+    }
+  }
 
-  // async function handleTableBooking() {
-  //   try {
-  //     const config = {
-  //       headers: { 
-  //         Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
-  //         "Cache-Content": "no-cache"
-  //       }
-  //     }
-  //     const response = await axios.post(`https://backend.csaposapp.hu/api/bookings/book-table`, {
-  //       tableId: currentTable.id,
-  //       bookedFrom: new Date(startDate.setHours(startDate.getHours() + 1)),
-  //       bookedTo: new Date()
-  //     }, config);
-  //     const data = response.data;
-  //     if (response.status === 200) {
-  //       tableFriends.length > 0 && await handleAddToTable(data.id);
-  //       setIsBooked(true);
-  //       await getBookingsByUser();
-  //       updateTime();
-  //     }
-  //   }
-  //   catch (error) {
-  //     if (error.response?.status === 401) {
-  //       if (await getAccessToken()) {
-  //         handleTableBooking();
-  //       }
-  //       else {
-  //         await logout();
-  //         window.location.reload();
-  //         return false;
-  //       }
-  //     } 
-  //     else {
-  //       return false;
-  //     }
-  //   }
-  // }
+  async function handleTableBooking() {
+    try {
+      const bookedFromTime = new Date(startDate);
+      bookedFromTime.setHours(Number(selectedTime.slice(0,2)) + 1);
+      bookedFromTime.setMinutes(Number(selectedTime.slice(3)));
+      const config = {
+        headers: { 
+          Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+          "Cache-Content": "no-cache"
+        }
+      }
+      const response = await axios.post(`https://backend.csaposapp.hu/api/bookings/book-table`, {
+        tableId: selectedTable.id,
+        bookedFrom: bookedFromTime
+      }, config);
+      const data = response.data;
+      if (response.status === 200) {
+        tableFriends.length > 0 && await handleAddToTable(data.id);
+        //setIsBooked(true);
+        await getBookingsByUser();
+        navigate("/");
+      }
+    }
+    catch (error) {
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) {
+          handleTableBooking();
+        }
+        else {
+          await logout();
+          navigate("/login");
+        }
+      }
+    }
+  }
 
   function generateTimeSlots() {
     let slots = [];
     let start = new Date();
-    
     let minutes = start.getMinutes();
     start.setMinutes(Math.ceil(minutes / 15) * 15);
     start.setSeconds(0);
@@ -159,9 +162,22 @@ function ReserveTable() {
         slots.push(new Date(start).toTimeString().slice(0, 5));
         start = new Date(start.getTime() + 15 * 60000);
     }
-
     return slots;
   }
+
+  useEffect(() => {
+    setTableFriends([]);
+    setSelectedTable({});
+    if (locations.length > 0) {
+      setCurrentLocation(locations.find(location => location.name === name));
+      if (Object.hasOwn(currentLocation, "id")) {
+        const run = async () => {
+          setLocationTables(await getLocationTables(currentLocation.id));
+        }
+        run();
+      }
+    }
+  }, [locations, currentLocation])
 
   return (
     <div className="min-h-screen w-full bg-grey text-white overflow-y-scroll flex flex-col py-8 px-4 font-bold gap-8">
@@ -169,7 +185,7 @@ function ReserveTable() {
         <Link to={previousRoutes[previousRoutes.length - 1]} className="flex w-fit">
           <BackButton/>
         </Link>
-        <p className="text-xl text-center">Félidő söröző</p>
+        <p className="text-xl text-center">{currentLocation?.name}</p>
       </div>
       <div className="flex flex-col gap-3">
           <p className="text-lg">Időpont választása</p>
@@ -193,12 +209,60 @@ function ReserveTable() {
               }
           </div>
       </div>
-      <div className="flex flex-col gap-3">
+      <div className={`flex flex-col gap-3 ${!selectedTime && "opacity-50"}`}>
         <p className="text-lg">Asztal választása</p>
         <div className="grid grid-cols-2 gap-2">
-          <TableItem/>
+          {
+            locationTables?.length > 0 &&
+            locationTables?.sort((a, b) => {
+              if (a?.capacity === b?.capacity) return a?.number - b?.number;
+              return a?.capacity - b?.capacity;
+            }).map(table => <TableItem table={table} time={selectedTime}/>)
+          }
         </div>
       </div>
+      <div className={`flex flex-col gap-3 ${!Object.hasOwn(selectedTable, "id") && "opacity-50"}`}>
+        <div>
+          <p className="text-lg">Barátok meghívása</p>
+          <p className={`text-gray-300 font-normal ${!Object.hasOwn(selectedTable, "id") && "hidden"}`}>Max: {selectedTable?.capacity - 1} fő</p>
+        </div>
+        <div className="flex flex-col max-h-80 flex-grow gap-2 overflow-y-auto">
+          {
+            friends &&
+            friends?.map(friend => <InviteFriendItem friend={friend}/>)
+          }
+        </div>
+      </div>
+      <div className={`flex flex-col gap-3 text-md ${!(selectedTime && Object.hasOwn(selectedTable, "id")) && "hidden"}`}>
+        <p className="text-lg">Összegzés</p>
+        <div className="flex flex-col bg-dark-grey rounded-lg p-2 font-normal">
+          <p className="text-lg font-bold">{currentLocation?.name}</p>
+          <div className="flex items-center gap-1 text-gray-300 mb-2">
+            <LuMapPin/>
+            <p className="text-sm font-normal">{currentLocation?.address || "2889 Súr"}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <LuCalendar/>
+            <p>{startDate.toLocaleDateString("hu").slice(5)}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <LuClock/>
+            <p>{selectedTime || "N/A"}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <MdOutlineTableRestaurant/>
+            <p>Asztal <span className="text-gray-300">#{selectedTable?.number}</span></p>
+          </div>
+          <p className={`font-bold ${tableFriends?.length === 0 && "hidden"} mb-1`}>Meghívott barátok</p>
+          <div className="avatar-group -space-x-4 rtl:space-x-reverse">
+            {
+              tableFriends?.length > 0 &&
+              tableFriends?.map(friend => <AvatarGroupItem imageUrl={friend.imageUrl}/>)
+            }
+          </div>
+        </div>
+      </div>
+      <button className="btn bg-gradient-to-tr from-blue to-sky-400 border-0 text-white w-56 h-20 self-center text-xl shadow-[0_4px_4px_rgba(0,0,0,.25)] disabled:text-white disabled:opacity-50" onClick={() => handleTableBooking()} disabled={!(selectedTime && Object.hasOwn(selectedTable, "id"))}>Foglalás</button>
     </div>
   )
 }

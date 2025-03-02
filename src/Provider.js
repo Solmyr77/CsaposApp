@@ -52,24 +52,26 @@ function Provider({ children }) {
 
   async function getFriends() {
     try {
+      setFriends([]);
       const config = {
         headers: { 
           Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
           "Cache-Content": "no-cache"
         }
       }
+      setFriends([]);
       const response = await axios.get(`https://backend.csaposapp.hu/api/friends/list`, config);
       const data = response.data;
       if (data.friends.length > 0) {
-        data.friends.map(async (_, i) => {
-          const friendProfile = await getProfile(data.friends[i]);
+        for (let friend of data.friends) {
+          const friendProfile = await getProfile(friend);
           setFriends(state => {
             if(!state.some(friend => friend.id === friendProfile.id)) {
               return [...state, friendProfile]
             }
             return [state];
           })
-        })
+        }
       }
     }
     catch (error) {
@@ -272,13 +274,13 @@ function Provider({ children }) {
       setUserId(decodeJWT(localStorage.getItem("accessToken")).sub);
       if (userId) {
        const fetch = async () => {
+          await getProfile(userId, "user");
           await getLocations();
-          getProfile(userId, "user");
-          getFriends();
-          getFriendRequests();
-          getTables();
-          getBookingsByUser();
-          getBookingsContainingUser();
+          await getFriends();
+          await getFriendRequests();
+          await getTables();
+          await getBookingsByUser();
+          await getBookingsContainingUser();
         }
         fetch()
       }

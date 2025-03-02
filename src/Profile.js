@@ -23,7 +23,8 @@ function Profile() {
 
   useEffect(() => {
     setMenuState("Profile");
-  }, []);
+    console.log(friends);
+  }, [friends]);
   
   return (
     <div className="min-h-screen h-full w-full max-w-full bg-grey flex px-4 text-white font-bold font play flex-col items-center relative">
@@ -31,8 +32,8 @@ function Profile() {
       <img src={user.imageUrl} alt="avatar" className="w-28 object-cover aspect-square rounded-full mb-8"/>
       <TitleDivider title={"Barátok"}/>
       <div className="flex flex-row w-full overflow-x-scroll mb-8">
-        { friends.every(friend => Object.hasOwn(friend, "id")) ? 
-          friends.sort((a, b) => a?.displayName?.localeCompare(b?.displayName)).map(friend =>
+        { friends.length > 0 ? 
+          friends.sort((a, b) => a.displayName?.localeCompare(b.displayName)).map(friend =>
             {
               if(friend === friends[friends.length-1]) {
                 return (

@@ -109,7 +109,7 @@ function Provider({ children }) {
         }
         else {
           await logout();
-          <Navigate to={"/login"}/>
+          window.location.reload();
           return false;
         }
       } 

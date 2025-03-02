@@ -31,8 +31,8 @@ function Profile() {
       <img src={user.imageUrl} alt="avatar" className="w-28 object-cover aspect-square rounded-full mb-8"/>
       <TitleDivider title={"Barátok"}/>
       <div className="flex flex-row w-full overflow-x-scroll mb-8">
-        { friends?.length > 0 ? 
-          friends?.sort((a, b) => a?.displayName?.localeCompare(b?.displayName)).map(friend =>
+        { friends.every(friend => Object.hasOwn(friend, "id")) ? 
+          friends.sort((a, b) => a?.displayName?.localeCompare(b?.displayName)).map(friend =>
             {
               if(friend === friends[friends.length-1]) {
                 return (

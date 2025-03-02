@@ -228,8 +228,8 @@ function ReserveTable() {
         </div>
         <div className="flex flex-col max-h-80 flex-grow gap-2 overflow-y-auto">
           {
-            friends?.every(friend => Object.hasOwn(friend, "id")) &&
-            friends?.map(friend => <InviteFriendItem friend={friend}/>)
+            friends.every(friend => Object.hasOwn(friend, "id")) &&
+            friends.map(friend => <InviteFriendItem friend={friend}/>)
           }
         </div>
       </div>

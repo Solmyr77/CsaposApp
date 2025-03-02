@@ -23,8 +23,7 @@ function Profile() {
 
   useEffect(() => {
     setMenuState("Profile");
-    console.log(friends);
-  }, [friends]);
+  }, []);
   
   return (
     <div className="min-h-screen h-full w-full max-w-full bg-grey flex px-4 text-white font-bold font play flex-col items-center relative">

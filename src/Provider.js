@@ -52,26 +52,21 @@ function Provider({ children }) {
 
   async function getFriends() {
     try {
-      setFriends([]);
       const config = {
         headers: { 
           Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
           "Cache-Content": "no-cache"
         }
       }
-      setFriends([]);
       const response = await axios.get(`https://backend.csaposapp.hu/api/friends/list`, config);
       const data = response.data;
       if (data.friends.length > 0) {
+        const updatedFriends = [];
         for (let friend of data.friends) {
           const friendProfile = await getProfile(friend);
-          setFriends(state => {
-            if(!state.some(friend => friend.id === friendProfile.id)) {
-              return [...state, friendProfile]
-            }
-            return [state];
-          })
+          data.friends.every(record => record.id !== friend) && updatedFriends.push(friendProfile);
         }
+        setFriends(updatedFriends);
       }
     }
     catch (error) {

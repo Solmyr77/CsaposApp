@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Generation Time: Feb 23, 2025 at 01:20 AM
+-- Generation Time: Mar 03, 2025 at 08:14 AM
 -- Server version: 5.7.44
 -- PHP Version: 8.2.27
 
@@ -260,6 +260,7 @@ CREATE TABLE `table_guests` (
   `id` char(36) NOT NULL,
   `user_id` char(36) DEFAULT NULL,
   `booking_id` char(36) DEFAULT NULL,
+  `status` enum('pending','accepted','rejected','') NOT NULL DEFAULT 'pending',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -503,7 +504,7 @@ ALTER TABLE `table_bookings`
 --
 ALTER TABLE `table_guests`
   ADD CONSTRAINT `table_guests_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-  ADD CONSTRAINT `table_guests_ibfk_2` FOREIGN KEY (`booking_id`) REFERENCES `table_bookings` (`id`);
+  ADD CONSTRAINT `table_guests_ibfk_2` FOREIGN KEY (`booking_id`) REFERENCES `table_bookings` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `user_achievements`

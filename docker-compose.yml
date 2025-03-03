@@ -1,0 +1,87 @@
+version: "3.8"
+
+services:
+  #################################################
+  # Caddy
+  #################################################
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./site:/usr/share/caddy:ro
+      - caddy_data:/data
+      - caddy_config:/config
+      - /var/www/assets/images:/var/www/assets/images
+    networks:
+      - caddy_network
+
+  #################################################
+  # MySQL
+  #################################################
+  mysql:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: csaposapp
+      MYSQL_USER: csaposapi
+      MYSQL_PASSWORD: ezazsql
+      TZ: Europe/Budapest
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
+    networks:
+      - caddy_network
+
+  #################################################
+  # phpMyAdmin
+  #################################################
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin
+    environment:
+      PMA_HOST: mysql
+    restart: unless-stopped
+    networks:
+      - caddy_network
+    # If you need direct host access for debugging, you can keep this:
+    # (But not strictly necessary if you only access through caddy reverse_proxy)
+    ports:
+      - "8000:80"
+
+  #################################################
+  # ASP.NET API (CsaposApi)
+  #################################################
+  # NOTE: The 'context' points to the folder where your .NET solution
+  #       and Dockerfile are located.
+  #       Adjust if your Dockerfile is in a subfolder.
+  csaposapi-container:
+    build:
+      context: ./CsaposApp
+      dockerfile: Dockerfile  # Dockerfile that you provided
+    container_name: csaposapi-container
+    restart: unless-stopped
+    networks:
+      - caddy_network
+    # If you want to debug directly on host port (optional):
+    ports:
+     - "8080:80"
+    volumes:
+     - /var/www/assets/images:/var/www/assets/images
+
+networks:
+  caddy_network:
+    driver: bridge
+
+volumes:
+  caddy_data:
+  caddy_config:
+  mysql_data:

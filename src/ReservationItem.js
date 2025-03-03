@@ -38,10 +38,10 @@ function ReservationItem({ booking, isGuest }) {
                             <span className="badge bg-opacity-20 border-0 text-white text-xs">Foglalta:</span>
                             <div className="avatar border-2 rounded-full border-white">
                                 <div className="w-4 rounded-full">
-                                    <img src={`https://assets.csaposapp.hu/assets/images/${bookerProfile?.imageUrl}`} alt="kép" />
+                                    <img src={`https://assets.csaposapp.hu/assets/images/${bookerProfile.imageUrl}`} alt="kép" />
                                 </div>
                             </div>
-                            <p>{bookerProfile?.displayName}</p>
+                            <p>{bookerProfile.displayName}</p>
                         </div>
                         <p className="text-lg line-clamp-2">{currentLocation.name}</p>
                         <div className="flex text-gray-300 text-sm items-center font-normal gap-1">

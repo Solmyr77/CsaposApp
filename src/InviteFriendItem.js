@@ -14,7 +14,7 @@ function InviteFriendItem({ friend }) {
     }, [selectedTable, tableFriends])
 
     return (
-        <div className={`w-full h-16 ${ isInvited ? "border-2" : "border-0" } bg-dark-grey rounded-lg p-2 flex items-center border-sky-400 justify-between hover:cursor-pointer`} onClick={() => {
+        <div className={`w-full h-16 ${ isInvited ? "border-sky-400" : "border-dark-grey" } bg-dark-grey rounded-lg p-2 flex items-center border-2 justify-between hover:cursor-pointer`} onClick={() => {
             if (selectedTable?.capacity - 1 > tableFriends?.length && Object.hasOwn(selectedTable, "id")) {
                 setIsInvited(state => !state);
                 setTableFriends(state => state.some(record => record.id === friend?.id) ? state.filter(record => record.id !== friend?.id) : [...state, friend]);

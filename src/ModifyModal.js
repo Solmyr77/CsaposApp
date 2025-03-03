@@ -160,7 +160,7 @@ const ModifyModal = forwardRef((props, ref) => {
               <form className="flex flex-col justify-between h-full items-center" onSubmit={(event) => handleSubmit(event)}>
               {
                 isConversionFinished === false ?
-                <span className="loading loading-spinner text-blue w-20"></span> :
+                <span className="loading loading-spinner text-sky-400 w-20"></span> :
                 <div className="relative select-none hover:cursor-pointer" onClick={triggerFileInputClick}>
                   <img src={previewProfilePicture} className="rounded-full object-cover aspect-square w-24 opacity-50"/>
                   <LuImagePlus className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-12 w-12"/>

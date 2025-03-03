@@ -1,4 +1,4 @@
-import React, { useState, forwardRef, useContext, useEffect } from "react";
+import React, { useState, forwardRef, useContext, useEffect, useRef } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import BackButton from "./BackButton";
 import DatePicker, {registerLocale} from "react-datepicker";
@@ -6,7 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { addDays } from 'date-fns';
 import styled from "styled-components";
 import hu from 'date-fns/locale/hu';
-import { LuCalendar,  LuClock, LuMapPin } from "react-icons/lu";
+import { LuCalendar,  LuCheck,  LuClock, LuMapPin } from "react-icons/lu";
 import TableItem from "./TableItem";
 import Context from "./Context";
 import InviteFriendItem from "./InviteFriendItem";
@@ -76,6 +76,10 @@ function ReserveTable() {
   const [startDate, setStartDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState("");
   const [locationTables, setLocationTables] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isBooked, setIsBooked] = useState(null);
+  const [counter, setCounter] = useState(3);
+  const modalRef = useRef();
   const ExampleCustomInput = forwardRef(
       ({ value, onClick, className }, ref) => (
         <button className={className} onClick={onClick} ref={ref}>
@@ -98,8 +102,7 @@ function ReserveTable() {
         bookingId: bookingId
       }, config);
       const data = response.data;
-      //response.status === 200 && setIsBooked(true);
-      navigate("/");
+      response.status === 200 && setIsBooked(true);
     }
     catch (error) {
       if (error.response?.status === 401) {
@@ -115,6 +118,7 @@ function ReserveTable() {
   }
 
   async function handleTableBooking() {
+    setIsLoading(true);
     try {
       const bookedFromTime = new Date(startDate);
       bookedFromTime.setHours(Number(selectedTime.slice(0,2)) + 1);
@@ -132,9 +136,8 @@ function ReserveTable() {
       const data = response.data;
       if (response.status === 200) {
         tableFriends.length > 0 && await handleAddToTable(data.id);
-        //setIsBooked(true);
+        setIsBooked(true);
         await getBookingsByUser();
-        navigate("/");
       }
     }
     catch (error) {
@@ -166,10 +169,37 @@ function ReserveTable() {
   }
 
   useEffect(() => {
+    if (isBooked) {
+      setIsLoading(false);
+      modalRef.current.inert = false;
+      modalRef.current.showModal();
+      modalRef.current.inert = true;
+      const interval = setInterval(() => {
+        setCounter(state => {
+          console.log(state);
+          if (state > 0) {
+            return state - 1;
+          }
+          else {
+            clearInterval(interval);
+            navigate("/");
+            return 0;
+          }
+        });
+      }, 1000);
+      return () => clearInterval(interval);
+    }
     setTableFriends([]);
     setSelectedTable({});
     if (locations.length > 0) {
-      setCurrentLocation(locations.find(location => location.name === name));
+      setCurrentLocation(() => {
+        const foundLocation = locations.find(location => location.name === name);
+        if (foundLocation) return foundLocation;
+        else {
+          navigate("/");
+          return 0;
+        }
+      });
       if (Object.hasOwn(currentLocation, "id")) {
         const run = async () => {
           setLocationTables(await getLocationTables(currentLocation.id));
@@ -177,7 +207,7 @@ function ReserveTable() {
         run();
       }
     }
-  }, [locations, currentLocation])
+  }, [locations, currentLocation, isBooked])
 
   return (
     <div className="min-h-screen w-full bg-grey text-white overflow-y-scroll flex flex-col py-8 px-4 font-bold gap-8">
@@ -262,7 +292,31 @@ function ReserveTable() {
           </div>
         </div>
       </div>
-      <button className="btn bg-gradient-to-tr from-blue to-sky-400 border-0 text-white w-56 h-20 self-center text-xl shadow-[0_4px_4px_rgba(0,0,0,.25)] disabled:text-white disabled:opacity-50" onClick={() => handleTableBooking()} disabled={!(selectedTime && Object.hasOwn(selectedTable, "id"))}>Foglalás</button>
+      {
+        isLoading ? 
+        <span className="loading loading-spinner text-sky-400 w-20 self-center"></span> :
+        <button className="btn bg-gradient-to-tr from-blue to-sky-400 border-0 text-white w-56 h-20 self-center text-xl shadow-[0_4px_4px_rgba(0,0,0,.25)] disabled:text-white disabled:opacity-50" onClick={() => handleTableBooking()} disabled={!(selectedTime && Object.hasOwn(selectedTable, "id"))}>Foglalás</button>
+      }
+      <dialog className="modal" ref={modalRef}>
+        <div className="modal-box flex flex-col items-center bg-grey">
+          <p className="bg-gradient-to-t from-blue to-sky-400 text-transparent bg-clip-text text-lg font-bold">Sikeres foglalás!</p>
+          <LuCheck className="fill-none stroke-[url(#gradient)] h-12 w-12"/>
+          <div className="flex items-center mt-2 font-normal gap-1 text-gray-300">
+            <p>Visszatérés a kezdőoldalra...</p>
+            <span className="countdown">
+              <span style={{"--value" : counter}} aria-live="polite" aria-label={counter}></span>
+            </span>
+          </div>
+        </div>
+      </dialog>
+      <svg width="0" height="0">
+          <defs>
+            <linearGradient id="gradient" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#3b82f6" />
+              <stop offset="100%" stopColor="#38bdf8" />
+            </linearGradient>
+          </defs>
+        </svg>
     </div>
   )
 }

@@ -271,11 +271,11 @@ function Provider({ children }) {
        const fetch = async () => {
           await getProfile(userId, "user");
           await getLocations();
-          await getFriends();
-          await getFriendRequests();
-          await getTables();
-          await getBookingsByUser();
-          await getBookingsContainingUser();
+          getFriends();
+          getFriendRequests();
+          getTables();
+          getBookingsByUser();
+          getBookingsContainingUser();
         }
         fetch()
       }

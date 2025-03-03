@@ -119,10 +119,10 @@ function Reservation() {
                                 <span className="badge bg-opacity-20 border-0 font-bold text-white text-xs">Foglalta:</span>
                                 <div className="avatar border-2 rounded-full border-white">
                                     <div className="w-6 rounded-full">
-                                        <img src={`https://assets.csaposapp.hu/assets/images/${bookerProfile?.imageUrl}`} alt="kép" />
+                                        <img src={`https://assets.csaposapp.hu/assets/images/${bookerProfile.imageUrl}`} alt="kép" />
                                     </div>
                                 </div>
-                                <p className="line-clamp-1 font-bold">{bookerProfile?.displayName || "N/A"}</p>
+                                <p className="line-clamp-1 font-bold">{bookerProfile.displayName || "N/A"}</p>
                             </div>
                         }
                         
@@ -134,7 +134,7 @@ function Reservation() {
                     <div className="flex items-center gap-2">
                         <MdOutlineTableRestaurant/>
                         {
-                            currentTable?.number &&  
+                            currentTable.number &&  
                             <p className="text-nowrap font-bold">Asztal <span className="text-gray-300">#{currentTable?.number}</span></p>
                         }
                     </div>

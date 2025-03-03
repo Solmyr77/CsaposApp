@@ -162,6 +162,40 @@ namespace CsaposApi.Controllers
             return Ok(bookings);
         }
 
+        [HttpGet("bookings-for-location")]
+        [Authorize(Policy = "MustBeGuest")]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<IEnumerable<BookingResponseWithGuestsDTO>>> GetTableBookingsForLocation(Guid locationId)
+        {
+            var bookings = await _context.TableBookings
+                .Include(tb => tb.Table)
+                .Where(tb => tb.Table.LocationId == locationId)
+                .Select(tb => new BookingResponseWithGuestsDTO
+                {
+                    Id = tb.Id,
+                    BookerId = tb.BookerId,
+                    TableId = tb.TableId,
+                    BookedFrom = tb.BookedFrom,
+                    LocationId = tb.Table.LocationId,
+                    TableGuests = tb.TableGuests.Select(tg => new GetProfileWithBookingStatusDTO
+                    {
+                        Id = tg.User.Id,
+                        DisplayName = tg.User.DisplayName,
+                        ImageUrl = tg.User.ImgUrl,
+                        Status = tg.Status
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            if (bookings == null || !bookings.Any())
+                return NotFound();
+
+            return Ok(bookings);
+        }
+
         [HttpPost("book-table")]
         [Authorize(Policy = "MustBeGuest")]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]

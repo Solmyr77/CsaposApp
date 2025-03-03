@@ -1,0 +1,21 @@
+phpmyadmin.csaposapp.hu {
+    reverse_proxy phpmyadmin:80
+}
+
+backend.csaposapp.hu {
+    reverse_proxy csaposapi-container:8080
+}
+
+assets.csaposapp.hu {
+    handle_path /assets/images* {
+        root * /var/www/assets/images
+        file_server
+    }
+}
+
+csaposapp.hu {
+    root * /usr/share/caddy
+    file_server
+    try_files {path} /index.html
+    encode gzip
+}

@@ -11,6 +11,8 @@ public partial class TableGuest
 
     public Guid? BookingId { get; set; }
 
+    public string Status { get; set; } = null!;
+
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }

@@ -7,6 +7,7 @@
             public Guid Id { get; set; }
             public Guid? UserId { get; set; }
             public Guid? BookingId { get; set; }
+            public string Status { get; set; }
         }
     }
 }

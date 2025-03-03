@@ -110,11 +110,12 @@ namespace CsaposApi.Controllers
                     TableId = tb.TableId,
                     BookedFrom = tb.BookedFrom,
                     LocationId = tb.Table.LocationId,
-                    TableGuests = tb.TableGuests.Select(tg => new GetProfileDTO
+                    TableGuests = tb.TableGuests.Select(tg => new GetProfileWithBookingStatusDTO
                     {
                         Id = tg.User.Id,
                         DisplayName = tg.User.DisplayName,
-                        ImageUrl = tg.User.ImgUrl
+                        ImageUrl = tg.User.ImgUrl,
+                        Status = tg.Status
                     }).ToList()
                 })
                 .ToListAsync();
@@ -145,11 +146,12 @@ namespace CsaposApi.Controllers
                     TableId = tb.TableId,
                     BookedFrom = tb.BookedFrom,
                     LocationId = tb.Table.LocationId,
-                    TableGuests = tb.TableGuests.Select(tg => new GetProfileDTO
+                    TableGuests = tb.TableGuests.Select(tg => new GetProfileWithBookingStatusDTO
                     {
                         Id = tg.User.Id,
                         DisplayName = tg.User.DisplayName,
-                        ImageUrl = tg.User.ImgUrl
+                        ImageUrl = tg.User.ImgUrl,
+                        Status = tg.Status
                     }).ToList()
                 })
                 .ToListAsync();
@@ -159,7 +161,6 @@ namespace CsaposApi.Controllers
 
             return Ok(bookings);
         }
-
 
         [HttpPost("book-table")]
         [Authorize(Policy = "MustBeGuest")]
@@ -293,7 +294,6 @@ namespace CsaposApi.Controllers
             }
         }
 
-
         [HttpPost("add-to-table")]
         [Authorize(Policy = "MustBeGuest")]
         [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
@@ -355,7 +355,8 @@ namespace CsaposApi.Controllers
                 {
                     Id = Guid.NewGuid(),
                     BookingId = addToTableDTO.bookingId,
-                    UserId = userId
+                    UserId = userId,
+                    Status = "pending"
                 }).ToList();
 
                 await _context.TableGuests.AddRangeAsync(guestsToAdd);
@@ -387,8 +388,6 @@ namespace CsaposApi.Controllers
                 });
             }
         }
-
-
 
         [HttpDelete("remove-from-table")]
         [Authorize(Policy = "MustBeGuest")]
@@ -450,6 +449,138 @@ namespace CsaposApi.Controllers
                 {
                     error = "server_error",
                     message = "An unexpected error occurred while removing the guest."
+                });
+            }
+        }
+        [HttpPost("accept-invite")]
+        [Authorize(Policy = "MustBeGuest")]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult> AcceptInvite(Guid bookingId)
+        {
+            try
+            {
+                Guid currentUserId = GetUserIdFromToken();
+
+                var tableGuest = await _context.TableGuests
+                    .FirstOrDefaultAsync(tg => tg.BookingId == bookingId && tg.UserId == currentUserId);
+
+                if (tableGuest == null)
+                {
+                    return NotFound(new { error = "Invite not found." });
+                }
+
+                if (tableGuest.Status != "pending")
+                {
+                    return BadRequest(new { error = "Invite is not in a pending state." });
+                }
+
+                tableGuest.Status = "accepted";
+                _context.TableGuests.Update(tableGuest);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "Invite accepted successfully." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error accepting invite.");
+                return StatusCode((int)HttpStatusCode.InternalServerError, new
+                {
+                    error = "server_error",
+                    message = "An unexpected error occurred while accepting the invite."
+                });
+            }
+        }
+
+        [HttpPost("reject-invite")]
+        [Authorize(Policy = "MustBeGuest")]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult> RejectInvite(Guid bookingId)
+        {
+            try
+            {
+                Guid currentUserId = GetUserIdFromToken();
+
+                var tableGuest = await _context.TableGuests
+                    .FirstOrDefaultAsync(tg => tg.BookingId == bookingId && tg.UserId == currentUserId);
+
+                if (tableGuest == null)
+                {
+                    return NotFound(new { error = "Invite not found." });
+                }
+
+                if (tableGuest.Status != "pending")
+                {
+                    return BadRequest(new { error = "Invite is not in a pending state." });
+                }
+
+                tableGuest.Status = "rejected";
+                _context.TableGuests.Update(tableGuest);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "Invite rejected successfully." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error rejecting invite.");
+                return StatusCode((int)HttpStatusCode.InternalServerError, new
+                {
+                    error = "server_error",
+                    message = "An unexpected error occurred while rejecting the invite."
+                });
+            }
+        }
+
+        [HttpGet("pending-invites")]
+        [Authorize(Policy = "MustBeGuest")]
+        [ProducesResponseType(typeof(IEnumerable<BookingResponseWithGuestsDTO>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<IEnumerable<BookingResponseWithGuestsDTO>>> GetPendingInvites()
+        {
+            try
+            {
+                Guid currentUserId = GetUserIdFromToken();
+
+                var pendingInvites = await _context.TableGuests
+                    .Where(tg => tg.UserId == currentUserId && tg.Status == "pending")
+                    .Select(tg => new BookingResponseWithGuestsDTO
+                    {
+                        Id = (Guid)tg.BookingId,
+                        BookerId = tg.Booking.BookerId,
+                        TableId = tg.Booking.TableId,
+                        BookedFrom = tg.Booking.BookedFrom,
+                        LocationId = tg.Booking.Table.LocationId,
+                        TableGuests = tg.Booking.TableGuests.Select(g => new GetProfileWithBookingStatusDTO
+                        {
+                            Id = g.User.Id,
+                            DisplayName = g.User.DisplayName,
+                            ImageUrl = g.User.ImgUrl,
+                            Status = g.Status
+                        }).ToList()
+                    })
+                    .ToListAsync();
+
+                if (pendingInvites == null || !pendingInvites.Any())
+                    return NotFound(new { Message = "No pending invites found." });
+
+                return Ok(pendingInvites);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving pending invites.");
+                return StatusCode((int)HttpStatusCode.InternalServerError, new
+                {
+                    error = "server_error",
+                    message = "An unexpected error occurred while retrieving pending invites."
                 });
             }
         }

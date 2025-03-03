@@ -24,6 +24,14 @@
             public string ImageUrl { get; set; }
         }
 
+        public class GetProfileWithBookingStatusDTO
+        {
+            public Guid Id { get; set; }
+            public string DisplayName { get; set; }
+            public string ImageUrl { get; set; }
+            public string Status { get; set; }
+        }
+
         public class UpdateDisplayNameDTO
         {
             public string DisplayName { get; set; }

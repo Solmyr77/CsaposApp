@@ -593,6 +593,10 @@ public partial class CsaposappContext : DbContext
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("timestamp")
                 .HasColumnName("created_at");
+            entity.Property(e => e.Status)
+                .HasDefaultValueSql("'pending'")
+                .HasColumnType("enum('pending','accepted','rejected','')")
+                .HasColumnName("status");
             entity.Property(e => e.UpdatedAt)
                 .ValueGeneratedOnAddOrUpdate()
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")

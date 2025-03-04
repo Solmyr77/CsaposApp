@@ -176,7 +176,6 @@ function ReserveTable() {
       modalRef.current.inert = true;
       const interval = setInterval(() => {
         setCounter(state => {
-          console.log(state);
           if (state > 0) {
             return state - 1;
           }

@@ -2,14 +2,14 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import BackButton from "./BackButton";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { MdOutlineTableRestaurant } from "react-icons/md";
-import { LuCalendar, LuClock, LuMapPin } from "react-icons/lu";
+import { LuCalendar, LuCheck, LuClock, LuMapPin, LuX } from "react-icons/lu";
 import AvatarGroupItem from "./AvatarGroupItem";
 import Context from "./Context";
 import getAccessToken from "./refreshToken";
 import axios from "axios";
 
 function Reservation() {
-    const { bookings, bookingsContainingUser, logout, getLocationTables, removeBooking, getProfile } = useContext(Context); 
+    const { bookings, bookingsContainingUser, setBookingsContainingUser, getBookingsContainingUser, logout, getLocationTables, removeBooking, getProfile, user } = useContext(Context); 
     const { id } = useParams();
     const navigate = useNavigate();
     const confirmModal = useRef();
@@ -23,7 +23,53 @@ function Reservation() {
     const [bookerProfile, setBookerProfile] = useState({});
     const [waiting, setWaiting] = useState(false);
     
+    async function handleAcceptInvite(id) {
+        try {
+            const config = {
+              headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` }
+            }
+            const response = await axios.post(`https://backend.csaposapp.hu/api/bookings/accept-invite?bookingId=${id}`, {}, config);
+            if (response.status === 200) {
+                setIsAccepted(true);
+                await getBookingsContainingUser();
+            }
+        }
+        catch (error) {
+            if (error.response?.status === 401) {
+                if (await getAccessToken()) {
+                    await handleAcceptInvite(id);
+                }
+                else {
+                    await logout();
+                    navigate("/login")
+                }
+            } 
+        }
+    }
 
+    async function handleRejectInvite(id) {
+        try {
+            const config = {
+              headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` }
+            }
+            const response = await axios.post(`https://backend.csaposapp.hu/api/bookings/reject-invite?bookingId=${id}`, {}, config);
+            if (response.status === 200) {
+                setIsAccepted(false);
+            }
+        }
+        catch (error) {
+            if (error.response?.status === 401) {
+                if (await getAccessToken()) {
+                    await handleRejectInvite(id);
+                }
+                else {
+                    await logout();
+                    navigate("/login")
+                }
+            } 
+        }
+    }
+    
     async function getLocationById(id) {
         try {
             const config = {
@@ -55,10 +101,15 @@ function Reservation() {
         expiryTime.setMinutes(bookedFrom.getMinutes() + 20, 0);
         if (bookedFrom.getTime() < new Date().getTime()) {
             setIsActive(true);
-            setTimeout(() => {
+            const timeout = setTimeout(() => {
                 removeBooking(id);
                 navigate("/");
             }, expiryTime.getTime() - new Date().getTime());
+            return () => clearTimeout(timeout);
+        }
+        else if (expiryTime.getTime() <= new Date().getTime()) {
+            removeBooking(id);
+            navigate("/");
         }
         else {
             const timeout = setTimeout(() => {
@@ -66,6 +117,38 @@ function Reservation() {
             }, bookedFrom.getTime() - new Date().getTime());
             return () => clearTimeout(timeout);
         }
+    }
+
+    function setGuestTimeouts(foundBooking) {
+        const bookedFrom = new Date(foundBooking.bookedFrom);
+        bookedFrom.setSeconds(0);
+        const expiryTime = new Date(bookedFrom);
+        expiryTime.setMinutes(bookedFrom.getMinutes() + 20, 0);
+        if (bookedFrom.getTime() < new Date().getTime()) {
+            const timeout = setTimeout(() => {
+                setBookingsContainingUser(state => state.filter(booking => booking.id !== id));
+                navigate("/");
+            }, expiryTime.getTime() - new Date().getTime());
+            return () => clearTimeout(timeout);
+        }
+        else if (expiryTime.getTime() <= new Date().getTime()) {
+            setBookingsContainingUser(state => state.filter(booking => booking.id !== id));
+            navigate("/");
+        }
+    }
+
+    function getUserOfTable(tableGuests) {
+        const tableUser = tableGuests.find(tableGuest => tableGuest.id === user.id);
+        switch (tableUser?.status) {
+        case "pending":
+            break;
+        case "accepted":
+            setWaiting(true);
+            break;
+        case "rejected":
+            setIsAccepted(false);
+            break;
+       }
     }
 
     useEffect(() => {
@@ -83,12 +166,16 @@ function Reservation() {
                     setBookerProfile(await getProfile(foundBooking?.bookerId));
                     getLocationById(foundBooking.locationId);
                     setCurrentTable((await getLocationTables(foundBooking.locationId))?.find(table => table.id === foundBooking.tableId));
+                    user && getUserOfTable(foundBooking.tableGuests);
                 }
                 run();
                 if (bookings.find(booking => booking.id === id)) {
                     setAdminTimeouts(foundBooking);
                 }
-                else setIsGuest(true);
+                else {
+                    setIsGuest(true);
+                    setGuestTimeouts(foundBooking);
+                }
             }
         }
         if (isAccepted === true) {
@@ -96,7 +183,7 @@ function Reservation() {
                 setWaiting(true);
             }, 2000);
         }
-    }, [id, bookings, bookingsContainingUser, isAccepted]);
+    }, [id, bookings, bookingsContainingUser, isAccepted, isActive]);
     
     return (   
         <div className="w-full min-h-screen bg-grey text-white p-4 flex flex-col select-none">
@@ -112,7 +199,7 @@ function Reservation() {
                             !isGuest ? (
                                 isActive ?
                                 <span className="badge bg-green-500 border-0 text-white font-bold">Aktív</span> : 
-                                <span className="badge bg-transparent border-2 border-yellow-500 text-yellow-500 font-bold">Nem aktív</span>
+                                <span className="badge bg-transparent border-2 border-gray-300 text-gray-300 font-bold">Nem aktív</span>
                                 
                             ) :
                             <div className="flex items-center gap-1 basis-1/3">
@@ -134,8 +221,8 @@ function Reservation() {
                     <div className="flex items-center gap-2">
                         <MdOutlineTableRestaurant/>
                         {
-                            currentTable.number &&  
-                            <p className="text-nowrap font-bold">Asztal <span className="text-gray-300">#{currentTable?.number}</span></p>
+                            currentTable?.number &&  
+                            <p className="text-nowrap font-bold">Asztal <span className="text-gray-300">#{currentTable.number}</span></p>
                         }
                     </div>
                     <div className="flex items-center gap-2 font-bold">
@@ -150,16 +237,44 @@ function Reservation() {
                         currentBooking.tableGuests?.length > 0 &&
                         <p className="font-bold">Meghívott barátok</p>
                     }
-                    <div className="avatar-group -space-x-4 rtl:space-x-reverse">
+                    <div className="avatar-group -space-x-1 rtl:space-x-reverse h-max">
                         {
-                            currentBooking.tableGuests?.map(friend => <AvatarGroupItem height="h-10" imageUrl={friend.imageUrl}/>)
+                            currentBooking.tableGuests?.map(friend => {
+                                if (friend.status === "pending") {
+                                    return (
+                                        <div className="relative">
+                                            <div className="h-4 w-4 bg-yellow-500 -right-1 top-0 absolute z-50 rounded-full flex justify-center items-center"><span className="text-xs">?</span></div>
+                                            <AvatarGroupItem height={"h-10"} imageUrl={friend.imageUrl}/>
+                                        </div>
+                                    )   
+                                } 
+                                else if (friend.status === "accepted") {
+                                    return (
+                                        <div className="relative">
+                                            <div className="h-4 w-4 bg-green-500 -right-1 top-0 absolute z-50 rounded-full flex justify-center items-center"><span className="text-xs"><LuCheck/></span></div>
+                                            <AvatarGroupItem height={"h-10"} imageUrl={friend.imageUrl}/>
+                                        </div>
+                                    )
+                                }
+                                else {
+                                    return (
+                                        <div className="relative">
+                                            <div className="h-4 w-4 bg-red-500 -right-1 top-0 absolute z-50 rounded-full flex justify-center items-center"><span className="text-xs"><LuX/></span></div>
+                                            <AvatarGroupItem height={"h-10"} imageUrl={friend.imageUrl}/>
+                                        </div>
+                                    ) 
+                                }
+                            })
                         }
                     </div>
                     {
                         waiting ?
-                        <div className="flex justify-center items-end gap-1">
-                            <p>Várakozás az adminra</p>
-                            <span className="loading loading-dots loading-xs"></span>
+                        <div className="flex flex-col items-center gap-1">
+                            <p className="font-bold text-lg">ELFOGADVA</p>
+                            <div className="flex items-end gap-1">
+                                <p>Várakozás az adminra</p>
+                                <span className="loading loading-dots loading-xs"></span>
+                            </div>
                         </div> :
                         (
                             !isGuest ? 
@@ -168,10 +283,9 @@ function Reservation() {
                                 <button className="btn bg-dark-grey hover:bg-dark-grey disabled:bg-dark-grey border-none gap-0 basis-1/2 disabled:opacity-10 text-md" disabled={!isActive}><span className="bg-gradient-to-t from-blue to-sky-400 bg-clip-text leading-relaxed text-transparent">Kezdés</span></button>                
                             </div> :
                             <div className="flex justify-between mt-2 gap-2 w-full">
-                                <button className={`btn bg-black border-2 bg-opacity-40 border-red-500 text-red-500 hover:bg-black hover:bg-opacity-40 hover:border-red-500 text-md gap-0 basis-1/2 ${isAccepted !== null && "hidden"}`} onClick={() => setIsAccepted(false)}>Elutasítás</button>
-                                <button className={`btn bg-dark-grey hover:bg-dark-grey border-none text-md gap-0 basis-1/2 ${isAccepted !== null && "hidden"}`} onClick={() => setIsAccepted(true)}><span className="bg-gradient-to-t from-blue to-sky-400 bg-clip-text leading-relaxed text-transparent">Elfogadás</span></button>                
+                                <button className={`btn bg-black border-2 bg-opacity-40 border-red-500 text-red-500 hover:bg-black hover:bg-opacity-40 hover:border-red-500 text-md gap-0 basis-1/2 ${isAccepted !== null && "hidden"}`} onClick={async () => await handleRejectInvite(currentBooking.id)}>Elutasítás</button>
+                                <button className={`btn bg-dark-grey hover:bg-dark-grey border-none text-md gap-0 basis-1/2 ${isAccepted !== null && "hidden"}`} onClick={async () => await handleAcceptInvite(currentBooking.id)}><span className="bg-gradient-to-t from-blue to-sky-400 bg-clip-text leading-relaxed text-transparent">Elfogadás</span></button>                
                                 <button className={`btn bg-black border-2 bg-opacity-40 border-red-500 text-red-500 hover:bg-black hover:bg-opacity-40 hover:border-red-500 text-md  gap-0 basis-full ${isAccepted === false ? "" : "hidden"}`}>Elutasítva</button>
-                                <button className={`btn bg-dark-grey hover:bg-dark-grey border-none text-md gap-0 basis-full ${isAccepted === true ? "" : "hidden"}`}><span className="bg-gradient-to-t from-blue to-sky-400 bg-clip-text leading-relaxed text-transparent">Elfogadva</span></button>                
                             </div> 
                         )
                     }

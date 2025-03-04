@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { LuCalendar, LuClock, LuMapPin, LuUsers } from "react-icons/lu"
 
 function ReservationItem({ booking, isGuest }) {
-    const { locations, getProfile, removeBooking } = useContext(Context);
+    const { locations, getProfile, removeBooking, setBookings } = useContext(Context);
     const [tableGuests, setTableGuests] = useState([]);
     const [currentLocation, setCurrentLocation] = useState({});
     const [bookerProfile, setBookerProfile] = useState({});
@@ -19,10 +19,10 @@ function ReservationItem({ booking, isGuest }) {
             const bookedFrom = new Date(booking.bookedFrom);
             const expiryTime = new Date(bookedFrom);
             expiryTime.setMinutes(bookedFrom.getMinutes() + 20, 0);
-            if (new Date().getTime() >= expiryTime.getTime()) removeBooking(booking.id);
+            if (new Date().getTime() >= expiryTime.getTime()) !isGuest ? removeBooking(booking.id) : setBookings(state => state.filter(record => record.id !== booking.id));
             else {
                 const timeout = setTimeout(async () => {
-                    await removeBooking(booking.id);
+                    !isGuest ? await removeBooking(booking.id) : setBookings(state => state.filter(record => record.id !== booking.id));
                 }, expiryTime.getTime() - new Date().getTime());
                 return () => clearTimeout(timeout);
             }

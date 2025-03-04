@@ -315,12 +315,15 @@ function Provider({ children }) {
       order, 
       setOrder,
       bookings,
+      setBookings,
       bookingsContainingUser,
+      setBookingsContainingUser,
       removeBooking,
       getLocationTables,
       setTableFriends, 
       getProfile,
       getBookingsByUser,
+      getBookingsContainingUser,
       setUserId,
       logout
       }}>

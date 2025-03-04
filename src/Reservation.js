@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import BackButton from "./BackButton";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { MdOutlineTableRestaurant } from "react-icons/md";
@@ -151,15 +151,17 @@ function Reservation() {
        }
     }
 
+    console.log(bookings);
+    const allBookings = useMemo(() => bookings.concat(bookingsContainingUser), [bookings, bookingsContainingUser]);
+    const foundBooking = useMemo(() => allBookings.find(booking => booking.id === id), [allBookings, id]);
+
     useEffect(() => {
         if (isSuccessful) {
             setTimeout(() => {
                 navigate("/");
             }, 1000);
         }
-        const allBookings = bookings.concat(bookingsContainingUser);
         if (id && allBookings.length > 0) {
-            const foundBooking = allBookings.find(booking => booking.id === id);
             if (foundBooking) {
                 setCurrentBooking(foundBooking);
                 const run = async () => {
@@ -183,7 +185,7 @@ function Reservation() {
                 setWaiting(true);
             }, 2000);
         }
-    }, [id, bookings, bookingsContainingUser, isAccepted, isActive]);
+    }, [id, isAccepted, isActive, foundBooking]);
     
     return (   
         <div className="w-full min-h-screen bg-grey text-white p-4 flex flex-col select-none">

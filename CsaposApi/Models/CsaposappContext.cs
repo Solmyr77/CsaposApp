@@ -214,6 +214,9 @@ public partial class CsaposappContext : DbContext
                 .HasColumnType("timestamp")
                 .HasColumnName("created_at");
             entity.Property(e => e.EventId).HasColumnName("event_id");
+            entity.Property(e => e.Status)
+                .HasColumnType("enum('accepted','rejected')")
+                .HasColumnName("status");
             entity.Property(e => e.UpdatedAt)
                 .ValueGeneratedOnAddOrUpdate()
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")

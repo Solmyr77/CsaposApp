@@ -1,18 +1,17 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import AvatarGroupItem from "./AvatarGroupItem";
 import Context from "./Context";
 import { Link } from "react-router-dom";
 import { LuCalendar, LuClock, LuMapPin, LuUsers } from "react-icons/lu"
 
 function ReservationItem({ booking, isGuest }) {
-    const { locations, getProfile, removeBooking, setBookings } = useContext(Context);
+    const { locations, removeBooking, setBookings, friends } = useContext(Context);
     const [tableGuests, setTableGuests] = useState([]);
     const [currentLocation, setCurrentLocation] = useState({});
-    const [bookerProfile, setBookerProfile] = useState({});
+
+    const bookerProfile = useMemo(() => friends.find(friend => friend.id === booking.bookerId), [friends]);
 
     useEffect(() => {
-        const run = async () => setBookerProfile(await getProfile(booking.bookerId));
-        isGuest && run();
         if (locations.length > 0) setCurrentLocation(locations.find(location => location.id === booking.locationId));
         if (booking.tableGuests) {
             setTableGuests(booking.tableGuests);
@@ -38,10 +37,10 @@ function ReservationItem({ booking, isGuest }) {
                             <span className="badge bg-opacity-20 border-0 text-white text-xs">Foglalta:</span>
                             <div className="avatar border-2 rounded-full border-white">
                                 <div className="w-4 rounded-full">
-                                    <img src={`https://assets.csaposapp.hu/assets/images/${bookerProfile.imageUrl}`} alt="kép" />
+                                    <img src={`https://assets.csaposapp.hu/assets/images/${bookerProfile?.imageUrl}`} alt="kép" />
                                 </div>
                             </div>
-                            <p>{bookerProfile.displayName}</p>
+                            <p>{bookerProfile?.displayName}</p>
                         </div>
                         <p className="text-lg line-clamp-2">{currentLocation.name}</p>
                         <div className="flex text-gray-300 text-sm items-center font-normal gap-1">

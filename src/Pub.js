@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, { useState, useEffect, useContext, useRef, useMemo } from "react";
 import TitleDivider from "./TitleDivider";
 import ListItem from "./ListItem";
 import BackButton from "./BackButton";
@@ -15,7 +15,6 @@ function Pub() {
   const { locations, previousRoutes, setPreviousRoutes, logout } = useContext(Context);
   const { name } = useParams();
   const location = useLocation();
-  const [record, setRecord] = useState({});
   const [isBusinessHoursVisible, setIsBusinessHoursVisible] = useState(false);
   const [isDescriptionWrapped, setIsDescriptionWrapped] = useState(true);
   const [isClamped, setIsClamped] = useState(false);
@@ -62,18 +61,19 @@ function Pub() {
     }
   };
 
+  const currentLocation = useMemo(() => locations.find(location => location.name === name), [locations, name]);
+
   useEffect(() => {
-    if (locations.length > 0) {
-        setRecord(locations.find((record) => record.name === name));
-        const run = async () => {
-            Object.hasOwn(record, "id") && await getBusinessHours(record.id);
-        }
-        run();
+    if (currentLocation) {
+      const run = async () => {
+        Object.hasOwn(currentLocation, "id") && await getBusinessHours(currentLocation.id);
+      }
+      run();
     }
     checkIfClamped();
     window.addEventListener('resize', checkIfClamped);
     return () => window.removeEventListener('resize', checkIfClamped);
-  }, [locations, record]);
+  }, [currentLocation]);
 
   return (
     <div className="min-h-screen bg-grey text-white flex flex-col">
@@ -83,7 +83,7 @@ function Pub() {
         <div className="w-full h-fit relative">
             <img src={img1} alt="kep" className="w-full h-48 object-cover"/>
             <div className="w-full h-full bg-gradient-to-t from-dark-grey via-15% via-dark-grey bg-opacity-65 absolute inset-0 flex flex-col justify-end text-wrap">
-                <p className="font-bold text-xl px-1 break-words text-center leading-tight w-full">{record.name}</p>
+                <p className="font-bold text-xl px-1 break-words text-center leading-tight w-full">{currentLocation?.name}</p>
             </div>
         </div>
         <div className="rounded-b-md bg-gradient-to-b from-dark-grey pt-0.5 px-4">
@@ -92,10 +92,10 @@ function Pub() {
                 <p className="text-center text-[14px]">3599 Sajószöged, Petőfi út 2.</p>
             </div>
             {
-                Number(record.rating) > 0 ?
+                Number(currentLocation?.rating) > 0 ?
                 (
                     <div className="flex flex-row justify-between w-full">
-                        <Rating readOnly precision={0.5} value={Number(record.rating)}/>
+                        <Rating readOnly precision={0.5} value={Number(currentLocation?.rating)}/>
                         <p>1 értékelés</p>
                     </div>
                 ) :
@@ -109,7 +109,7 @@ function Pub() {
             <div className="flex flex-row justify-between items-center max-w-full mb-2 pt-2">
                 <div className="flex flex-row items-center">
                   {
-                    record.isOpen ?
+                    currentLocation?.isOpen ?
                     <p className="flex items-center gap-1 leading-none"><span className="badge bg-gradient-to-tr from-blue to-sky-400 border-0 text-white font-bold">Nyitva</span> 23:00-ig</p> :
                     <p className="flex items-center gap-1 leading-none"><span className="badge bg-transparent border-2 border-red-500 text-red-500 font-bold">Zárva</span> 23:00-ig</p>
                   }
@@ -126,7 +126,7 @@ function Pub() {
                 <ListItem title={"Vasárnap"} openingHours={Object.hasOwn(businessHours, "id") ? `${Object.values(businessHours)[13].substring(0, 5)} - ${Object.values(businessHours)[14].substring(0, 5)} ` : "13:00 - 20:00"}/>
             </div>
             <TitleDivider title={"Leírás"}/>
-            <p ref={textRef} className={`max-w-full text-wrap ${isDescriptionWrapped ? "line-clamp-5" : "line-clamp-none"} mb-2`}>{record.description}</p>            
+            <p ref={textRef} className={`max-w-full text-wrap ${isDescriptionWrapped ? "line-clamp-5" : "line-clamp-none"} mb-2`}>{currentLocation?.description}</p>            
             <div className="flex w-full justify-center">
                 <LuChevronRight className={`w-10 h-10 ${isDescriptionWrapped ? "rotate-90" : "-rotate-90"} ${isClamped ? "flex" : "hidden"}`} onClick={() => setIsDescriptionWrapped((state) => !state)}/>
             </div>
@@ -135,8 +135,8 @@ function Pub() {
                 <EventSwiper/>
             </div>
             <div className="flex justify-center items-center self-center h-full py-10">
-                <button className={`btn bg-gradient-to-tr from-blue to-sky-400 text-white border-0 w-56 h-20 hover:bg-blue disabled:bg-blue disabled:text-white disabled:opacity-50 shadow-[0_4px_4px_rgba(0,0,0,.25)]`} disabled={!record.isOpen} onClick={() => {
-                    if (record.isOpen) {
+                <button className={`btn bg-gradient-to-tr from-blue to-sky-400 text-white border-0 w-56 h-20 hover:bg-blue disabled:bg-blue disabled:text-white disabled:opacity-50 shadow-[0_4px_4px_rgba(0,0,0,.25)]`} disabled={!currentLocation?.isOpen} onClick={() => {
+                    if (currentLocation?.isOpen) {
                         setPreviousRoutes((state) => {
                             if (!state.includes(location.pathname)) return [...state, location.pathname];
                             return state;

@@ -9,18 +9,15 @@ import getAccessToken from "./refreshToken";
 import axios from "axios";
 
 function Reservation() {
-    const { bookings, bookingsContainingUser, setBookingsContainingUser, getBookingsContainingUser, logout, getLocationTables, removeBooking, getProfile, user } = useContext(Context); 
+    const { bookings, bookingsContainingUser, setBookingsContainingUser, getBookingsContainingUser, logout, getLocationTables, removeBooking, user, friends, locations } = useContext(Context); 
     const { id } = useParams();
     const navigate = useNavigate();
     const confirmModal = useRef();
-    const [currentBooking, setCurrentBooking] = useState({});
-    const [currentLocation, setCurrentLocation] = useState({});
     const [currentTable, setCurrentTable] = useState({});
     const [isActive, setIsActive] = useState(false);
     const [isSuccessful, setIsSuccessful] = useState(null);
     const [isGuest, setIsGuest] = useState(false);
     const [isAccepted, setIsAccepted] = useState(null);
-    const [bookerProfile, setBookerProfile] = useState({});
     const [waiting, setWaiting] = useState(false);
     
     async function handleAcceptInvite(id) {
@@ -61,30 +58,6 @@ function Reservation() {
             if (error.response?.status === 401) {
                 if (await getAccessToken()) {
                     await handleRejectInvite(id);
-                }
-                else {
-                    await logout();
-                    navigate("/login")
-                }
-            } 
-        }
-    }
-    
-    async function getLocationById(id) {
-        try {
-            const config = {
-              headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` }
-            }
-            const response = await axios.get(`https://backend.csaposapp.hu/api/locations/${id}`, config);
-            const data = await response.data;
-            if (response.status === 200) {
-                setCurrentLocation(data);
-            }
-        }
-        catch (error) {
-            if (error.response?.status === 401) {
-                if (await getAccessToken()) {
-                    await getLocationById(id);
                 }
                 else {
                     await logout();
@@ -137,8 +110,7 @@ function Reservation() {
         }
     }
 
-    function getUserOfTable(tableGuests) {
-        const tableUser = tableGuests.find(tableGuest => tableGuest.id === user.id);
+    function getUserOfTable(tableUser) {
         switch (tableUser?.status) {
         case "pending":
             break;
@@ -151,9 +123,11 @@ function Reservation() {
        }
     }
 
-    console.log(bookings);
     const allBookings = useMemo(() => bookings.concat(bookingsContainingUser), [bookings, bookingsContainingUser]);
-    const foundBooking = useMemo(() => allBookings.find(booking => booking.id === id), [allBookings, id]);
+    const currentBooking = useMemo(() => allBookings.find(booking => booking.id === id), [allBookings, id]);
+    const tableUser = useMemo(() => currentBooking?.tableGuests.find(tableGuest => tableGuest.id === user.id), [currentBooking]);
+    const bookerProfile = useMemo(() => friends.find(friend => friend.id === currentBooking?.bookerId), [friends, currentBooking]);
+    const currentLocation = useMemo(() => locations.find(location => location.id === currentBooking?.locationId), [locations, currentBooking]);
 
     useEffect(() => {
         if (isSuccessful) {
@@ -161,23 +135,18 @@ function Reservation() {
                 navigate("/");
             }, 1000);
         }
-        if (id && allBookings.length > 0) {
-            if (foundBooking) {
-                setCurrentBooking(foundBooking);
-                const run = async () => {
-                    setBookerProfile(await getProfile(foundBooking?.bookerId));
-                    getLocationById(foundBooking.locationId);
-                    setCurrentTable((await getLocationTables(foundBooking.locationId))?.find(table => table.id === foundBooking.tableId));
-                    user && getUserOfTable(foundBooking.tableGuests);
-                }
-                run();
-                if (bookings.find(booking => booking.id === id)) {
-                    setAdminTimeouts(foundBooking);
-                }
-                else {
-                    setIsGuest(true);
-                    setGuestTimeouts(foundBooking);
-                }
+        if (currentBooking && id) {
+            const run = async () => {
+                user && getUserOfTable(tableUser);
+                setCurrentTable((await getLocationTables(currentBooking.locationId))?.find(table => table.id === currentBooking.tableId));
+            }
+            run();
+            if (bookings.find(booking => booking.id === id)) {
+                setAdminTimeouts(currentBooking);
+            }
+            else {
+                setIsGuest(true);
+                setGuestTimeouts(currentBooking);
             }
         }
         if (isAccepted === true) {
@@ -185,7 +154,7 @@ function Reservation() {
                 setWaiting(true);
             }, 2000);
         }
-    }, [id, isAccepted, isActive, foundBooking]);
+    }, [id, isAccepted, isActive, currentBooking]);
     
     return (   
         <div className="w-full min-h-screen bg-grey text-white p-4 flex flex-col select-none">
@@ -208,10 +177,10 @@ function Reservation() {
                                 <span className="badge bg-opacity-20 border-0 font-bold text-white text-xs">Foglalta:</span>
                                 <div className="avatar border-2 rounded-full border-white">
                                     <div className="w-6 rounded-full">
-                                        <img src={`https://assets.csaposapp.hu/assets/images/${bookerProfile.imageUrl}`} alt="kép" />
+                                        <img src={`https://assets.csaposapp.hu/assets/images/${bookerProfile?.imageUrl}`} alt="kép" />
                                     </div>
                                 </div>
-                                <p className="line-clamp-1 font-bold">{bookerProfile.displayName || "N/A"}</p>
+                                <p className="line-clamp-1 font-bold">{bookerProfile?.displayName || "N/A"}</p>
                             </div>
                         }
                         
@@ -229,19 +198,19 @@ function Reservation() {
                     </div>
                     <div className="flex items-center gap-2 font-bold">
                         <LuCalendar/>
-                        <p className="text-nowrap">{currentBooking.bookedFrom?.split("T")[0].substring(5)}</p>
+                        <p className="text-nowrap">{currentBooking?.bookedFrom?.split("T")[0].substring(5)}</p>
                     </div>
                     <div className="flex items-center gap-2 font-bold">
                         <LuClock/>
-                        <p className="text-nowrap">{currentBooking.bookedFrom?.split("T")[1].substring(0, 5)}</p>
+                        <p className="text-nowrap">{currentBooking?.bookedFrom?.split("T")[1].substring(0, 5)}</p>
                     </div>
                     {
-                        currentBooking.tableGuests?.length > 0 &&
+                        currentBooking?.tableGuests.length > 0 &&
                         <p className="font-bold">Meghívott barátok</p>
                     }
                     <div className="avatar-group -space-x-1 rtl:space-x-reverse h-max">
                         {
-                            currentBooking.tableGuests?.map(friend => {
+                            currentBooking?.tableGuests.map(friend => {
                                 if (friend.status === "pending") {
                                     return (
                                         <div className="relative">

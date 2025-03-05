@@ -153,6 +153,33 @@ function ReserveTable() {
     }
   }
 
+  async function getBookingsForLocation(id) {
+    try {
+      const config = {
+        headers: { 
+          Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+          "Cache-Content": "no-cache"
+        }
+      }
+      const response = await axios.get(`https://backend.csaposapp.hu/api/bookings/bookings-for-location?locationId=${id}`, config);
+      const data = await response.data;
+      if (response.status === 200) {
+        console.log(data);
+      }
+    }
+    catch (error) {
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) {
+          getBookingsForLocation(id);
+        }
+        else {
+          await logout();
+          navigate("/login");
+        }
+      }
+    }
+  }
+
   function generateTimeSlots() {
     let slots = [];
     let start = new Date();
@@ -202,6 +229,7 @@ function ReserveTable() {
       if (Object.hasOwn(currentLocation, "id")) {
         const run = async () => {
           setLocationTables(await getLocationTables(currentLocation.id));
+          await getBookingsForLocation(currentLocation.id);
         }
         run();
       }

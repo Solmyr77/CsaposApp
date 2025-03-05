@@ -13,7 +13,11 @@ function Reservation() {
     const { id } = useParams();
     const navigate = useNavigate();
     const confirmModal = useRef();
+    const [currentBooking, setCurrentBooking] = useState([]);
     const [currentTable, setCurrentTable] = useState({});
+    const [currentLocation, setCurrentLocation] = useState({});
+    const [tableUser, setTableUser] = useState({});
+    const [bookerProfile, setBookerProfile] = useState({});
     const [isActive, setIsActive] = useState(false);
     const [isSuccessful, setIsSuccessful] = useState(null);
     const [isGuest, setIsGuest] = useState(false);
@@ -84,7 +88,7 @@ function Reservation() {
             removeBooking(id);
             navigate("/");
         }
-        else {
+        else if (new Date().getTime() < bookedFrom.getTime()) {
             const timeout = setTimeout(() => {
                 setIsActive(true);
             }, bookedFrom.getTime() - new Date().getTime());
@@ -123,38 +127,42 @@ function Reservation() {
        }
     }
 
-    const allBookings = useMemo(() => bookings.concat(bookingsContainingUser), [bookings, bookingsContainingUser]);
-    const currentBooking = useMemo(() => allBookings.find(booking => booking.id === id), [allBookings, id]);
-    const tableUser = useMemo(() => currentBooking?.tableGuests.find(tableGuest => tableGuest.id === user.id), [currentBooking]);
-    const bookerProfile = useMemo(() => friends.find(friend => friend.id === currentBooking?.bookerId), [friends, currentBooking]);
-    const currentLocation = useMemo(() => locations.find(location => location.id === currentBooking?.locationId), [locations, currentBooking]);
-
     useEffect(() => {
         if (isSuccessful) {
             setTimeout(() => {
-                navigate("/");
+                navigate("/")
             }, 1000);
-        }
-        if (currentBooking && id) {
-            const run = async () => {
-                user && getUserOfTable(tableUser);
-                setCurrentTable((await getLocationTables(currentBooking.locationId))?.find(table => table.id === currentBooking.tableId));
-            }
-            run();
-            if (bookings.find(booking => booking.id === id)) {
-                setAdminTimeouts(currentBooking);
-            }
-            else {
-                setIsGuest(true);
-                setGuestTimeouts(currentBooking);
-            }
         }
         if (isAccepted === true) {
             setTimeout(() => {
                 setWaiting(true);
             }, 2000);
         }
-    }, [id, isAccepted, isActive, currentBooking]);
+        if (bookings.length > 0 || bookingsContainingUser.length > 0) {
+            const foundBooking = bookings.concat(bookingsContainingUser).find(booking => booking.id === id);
+            if (Object.hasOwn(foundBooking, "id")) {
+                setCurrentBooking(foundBooking);
+                const foundUser = foundBooking.tableGuests.find(tableGuest => tableGuest.id === user.id);
+                setTableUser(foundUser);
+                setCurrentLocation(locations.find(location => location.id === foundBooking.locationId));
+                if (friends.length > 0) setBookerProfile(friends.find(friend => friend.id === foundBooking.bookerId));
+                if (foundUser) {
+                    const run = async () => {
+                        user && getUserOfTable(foundUser);
+                        setCurrentTable((await getLocationTables(foundBooking.locationId))?.find(table => table.id === foundBooking.tableId));
+                    }
+                    run();
+                }
+                if (bookings.find(booking => booking.id === id)) {
+                    setAdminTimeouts(foundBooking);
+                }
+                else {
+                    setIsGuest(true);
+                    setGuestTimeouts(foundBooking);
+                }
+            }
+        }
+    }, [bookings, bookingsContainingUser, friends, locations, isActive, isSuccessful]);
     
     return (   
         <div className="w-full min-h-screen bg-grey text-white p-4 flex flex-col select-none">
@@ -187,30 +195,27 @@ function Reservation() {
                     </div>
                     <div className="flex items-center gap-2">
                         <LuMapPin/>
-                        <p className="text-nowrap font-bold">{currentLocation?.address}</p>
+                        <p className="text-nowrap font-bold">{currentLocation.address}</p>
                     </div>
                     <div className="flex items-center gap-2">
                         <MdOutlineTableRestaurant/>
-                        {
-                            currentTable?.number &&  
-                            <p className="text-nowrap font-bold">Asztal <span className="text-gray-300">#{currentTable.number}</span></p>
-                        }
+                        <p className="text-nowrap font-bold">Asztal <span className="text-gray-300">#{currentTable?.number}</span></p>
                     </div>
                     <div className="flex items-center gap-2 font-bold">
                         <LuCalendar/>
-                        <p className="text-nowrap">{currentBooking?.bookedFrom?.split("T")[0].substring(5)}</p>
+                        <p className="text-nowrap">{currentBooking.bookedFrom?.split("T")[0].substring(5)}</p>
                     </div>
                     <div className="flex items-center gap-2 font-bold">
                         <LuClock/>
-                        <p className="text-nowrap">{currentBooking?.bookedFrom?.split("T")[1].substring(0, 5)}</p>
+                        <p className="text-nowrap">{currentBooking.bookedFrom?.split("T")[1].substring(0, 5)}</p>
                     </div>
                     {
-                        currentBooking?.tableGuests.length > 0 &&
+                        currentBooking.tableGuests?.length > 0 &&
                         <p className="font-bold">Meghívott barátok</p>
                     }
                     <div className="avatar-group -space-x-1 rtl:space-x-reverse h-max">
                         {
-                            currentBooking?.tableGuests.map(friend => {
+                            currentBooking.tableGuests?.map(friend => {
                                 if (friend.status === "pending") {
                                     return (
                                         <div className="relative">

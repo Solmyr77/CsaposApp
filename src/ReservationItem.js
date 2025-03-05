@@ -6,13 +6,14 @@ import { LuCalendar, LuClock, LuMapPin, LuUsers } from "react-icons/lu"
 
 function ReservationItem({ booking, isGuest }) {
     const { locations, removeBooking, setBookings, friends } = useContext(Context);
+    const [bookerProfile, setBookerProfile] = useState({});
     const [tableGuests, setTableGuests] = useState([]);
     const [currentLocation, setCurrentLocation] = useState({});
 
-    const bookerProfile = useMemo(() => friends.find(friend => friend.id === booking.bookerId), [friends]);
-
+    
     useEffect(() => {
         if (locations.length > 0) setCurrentLocation(locations.find(location => location.id === booking.locationId));
+        if (friends.length > 0) setBookerProfile(friends.find(friend => friend.id === booking.bookerId), [friends]);
         if (booking.tableGuests) {
             setTableGuests(booking.tableGuests);
             const bookedFrom = new Date(booking.bookedFrom);
@@ -26,7 +27,7 @@ function ReservationItem({ booking, isGuest }) {
                 return () => clearTimeout(timeout);
             }
         }
-    }, [locations])
+    }, [locations, friends])
 
     return (
         <Link to={`/reservation/${booking.id}`}>

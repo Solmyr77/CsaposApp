@@ -94,32 +94,39 @@ namespace CsaposApi.Controllers
         // GET: api/EventAttendances
         [HttpGet]
         [Authorize(Policy = "MustBeGuest")]
-        public async Task<ActionResult<IEnumerable<EventAttendance>>> GetEventAttendances()
+        public async Task<ActionResult<IEnumerable<EventAttendanceResponseDTO>>> GetEventAttendances()
         {
-            return Ok(await _context.EventAttendances.Include(x => x.Event).Select(ea => new EventAttendanceResponseDTO
-            {
-                Id = ea.Id,
-                Event = new EventResponseDTO
+            var attendances = await _context.EventAttendances
+                .Include(x => x.Event)
+                .Select(ea => new EventAttendanceResponseDTO
                 {
-                    Id = ea.Event.Id,
-                    LocationId = (Guid)ea.Event.LocationId,
-                    Name = ea.Event.Name,
-                    Description = ea.Event.Description,
-                    ImgUrl = ea.Event.ImgUrl,
-                    Timefrom = ea.Event.Timefrom,
-                    Timeto = ea.Event.Timeto
-                },
-                UserId = (Guid)ea.UserId,
-                Status = ea.Status
-            }).ToListAsync());
+                    Id = ea.Id,
+                    Event = new EventResponseDTO
+                    {
+                        Id = ea.Event.Id,
+                        LocationId = (Guid)ea.Event.LocationId,
+                        Name = ea.Event.Name,
+                        Description = ea.Event.Description,
+                        ImgUrl = ea.Event.ImgUrl,
+                        Timefrom = ea.Event.Timefrom,
+                        Timeto = ea.Event.Timeto
+                    },
+                    UserId = (Guid)ea.UserId,
+                    Status = ea.Status
+                })
+                .ToListAsync();
+
+            return Ok(attendances);
         }
 
         // GET: api/EventAttendances/5
         [HttpGet("{id}")]
         [Authorize(Policy = "MustBeGuest")]
-        public async Task<ActionResult<EventAttendance>> GetEventAttendance(Guid id)
+        public async Task<ActionResult<EventAttendanceResponseDTO>> GetEventAttendance(Guid id)
         {
-            var currentEventAttendance = await _context.EventAttendances.Include(x => x.Event).FirstOrDefaultAsync(x => x.Id == id);
+            var currentEventAttendance = await _context.EventAttendances
+                .Include(x => x.Event)
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             if (currentEventAttendance == null)
             {
@@ -148,31 +155,34 @@ namespace CsaposApi.Controllers
 
         [HttpGet("location/{locationId}")]
         [Authorize(Policy = "MustBeGuest")]
-        public async Task<ActionResult<EventAttendance>> GetEventAttendanceByLocation(Guid locationId)
+        public async Task<ActionResult<IEnumerable<EventAttendanceResponseDTO>>> GetEventAttendanceByLocation(Guid locationId)
         {
-            var currentEventAttendances = _context.EventAttendances.Include(x => x.Event).Where(x => x.Event.LocationId == locationId).Select(ea => new EventAttendanceResponseDTO
-            {
-                Id = ea.Id,
-                Event = new EventResponseDTO
+            var attendances = _context.EventAttendances
+                .Include(x => x.Event)
+                .Where(x => x.Event.LocationId == locationId)
+                .Select(ea => new EventAttendanceResponseDTO
                 {
-                    Id = ea.Event.Id,
-                    LocationId = (Guid)ea.Event.LocationId,
-                    Name = ea.Event.Name,
-                    Description = ea.Event.Description,
-                    ImgUrl = ea.Event.ImgUrl,
-                    Timefrom = ea.Event.Timefrom,
-                    Timeto = ea.Event.Timeto
-                },
-                Status = ea.Status,
-                UserId = (Guid)ea.UserId
-            });
+                    Id = ea.Id,
+                    Event = new EventResponseDTO
+                    {
+                        Id = ea.Event.Id,
+                        LocationId = (Guid)ea.Event.LocationId,
+                        Name = ea.Event.Name,
+                        Description = ea.Event.Description,
+                        ImgUrl = ea.Event.ImgUrl,
+                        Timefrom = ea.Event.Timefrom,
+                        Timeto = ea.Event.Timeto
+                    },
+                    UserId = (Guid)ea.UserId,
+                    Status = ea.Status
+                });
 
-            if (currentEventAttendances == null)
+            if (!attendances.Any())
             {
                 return NotFound();
             }
 
-            return Ok(currentEventAttendances);
+            return Ok(await attendances.ToListAsync());
         }
 
         // PUT: api/event-attendances/accept/5
@@ -182,34 +192,57 @@ namespace CsaposApi.Controllers
         {
             var userId = GetUserIdFromToken();
 
-            var eventAttendance = await _context.EventAttendances.FirstOrDefaultAsync(x => x.EventId == eventId && x.UserId == userId);
-
-            if (eventAttendance == null)
+            // Retrieve the event from the database
+            var eventFromDb = await _context.Events.FirstOrDefaultAsync(e => e.Id == eventId);
+            if (eventFromDb == null)
             {
-                return NotFound();
+                return NotFound("Event not found.");
             }
 
-            eventAttendance.Status = "accepted";
+            // Check if an attendance record already exists for this user and event
+            var eventAttendance = await _context.EventAttendances
+                .Include(ea => ea.Event)
+                .FirstOrDefaultAsync(ea => ea.EventId == eventId && ea.UserId == userId);
 
-            _context.Entry(eventAttendance).State = EntityState.Modified;
-
-            try
+            if (eventAttendance != null)
             {
-                await _context.SaveChangesAsync();
+                // Update existing record's status
+                eventAttendance.Status = "accepted";
             }
-            catch (DbUpdateConcurrencyException)
+            else
             {
-                if (!EventAttendanceExists(eventAttendance.Id))
+                // Create new record if none exists
+                eventAttendance = new EventAttendance
                 {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                    Id = Guid.NewGuid(),
+                    EventId = eventId,
+                    UserId = userId,
+                    Status = "accepted",
+                    Event = eventFromDb
+                };
+                _context.EventAttendances.Add(eventAttendance);
             }
 
-            return Ok();
+            await _context.SaveChangesAsync();
+
+            var response = new EventAttendanceResponseDTO
+            {
+                Id = eventAttendance.Id,
+                Event = new EventResponseDTO
+                {
+                    Id = eventAttendance.Event.Id,
+                    LocationId = (Guid)eventAttendance.Event.LocationId,
+                    Name = eventAttendance.Event.Name,
+                    Description = eventAttendance.Event.Description,
+                    ImgUrl = eventAttendance.Event.ImgUrl,
+                    Timefrom = eventAttendance.Event.Timefrom,
+                    Timeto = eventAttendance.Event.Timeto
+                },
+                UserId = (Guid)eventAttendance.UserId,
+                Status = eventAttendance.Status,
+            };
+
+            return CreatedAtAction(nameof(GetEventAttendance), new { id = eventAttendance.Id }, response);
         }
 
         // PUT: api/event-attendances/reject/5
@@ -219,34 +252,57 @@ namespace CsaposApi.Controllers
         {
             var userId = GetUserIdFromToken();
 
-            var eventAttendance = await _context.EventAttendances.FirstOrDefaultAsync(x => x.EventId == eventId && x.UserId == userId);
-
-            if (eventAttendance == null)
+            // Retrieve the event from the database
+            var eventFromDb = await _context.Events.FirstOrDefaultAsync(e => e.Id == eventId);
+            if (eventFromDb == null)
             {
-                return NotFound();
+                return NotFound("Event not found.");
             }
 
-            eventAttendance.Status = "rejected";
+            // Check if an attendance record already exists for this user and event
+            var eventAttendance = await _context.EventAttendances
+                .Include(ea => ea.Event)
+                .FirstOrDefaultAsync(ea => ea.EventId == eventId && ea.UserId == userId);
 
-            _context.Entry(eventAttendance).State = EntityState.Modified;
-
-            try
+            if (eventAttendance != null)
             {
-                await _context.SaveChangesAsync();
+                // Update existing record's status
+                eventAttendance.Status = "rejected";
             }
-            catch (DbUpdateConcurrencyException)
+            else
             {
-                if (!EventAttendanceExists(eventAttendance.Id))
+                // Create new record if none exists
+                eventAttendance = new EventAttendance
                 {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                    Id = Guid.NewGuid(),
+                    EventId = eventId,
+                    UserId = userId,
+                    Status = "rejected",
+                    Event = eventFromDb
+                };
+                _context.EventAttendances.Add(eventAttendance);
             }
 
-            return Ok();
+            await _context.SaveChangesAsync();
+
+            var response = new EventAttendanceResponseDTO
+            {
+                Id = eventAttendance.Id,
+                Event = new EventResponseDTO
+                {
+                    Id = eventAttendance.Event.Id,
+                    LocationId = (Guid)eventAttendance.Event.LocationId,
+                    Name = eventAttendance.Event.Name,
+                    Description = eventAttendance.Event.Description,
+                    ImgUrl = eventAttendance.Event.ImgUrl,
+                    Timefrom = eventAttendance.Event.Timefrom,
+                    Timeto = eventAttendance.Event.Timeto
+                },
+                UserId = (Guid)eventAttendance.UserId,
+                Status = eventAttendance.Status,
+            };
+
+            return CreatedAtAction(nameof(GetEventAttendance), new { id = eventAttendance.Id }, response);
         }
 
         private bool EventAttendanceExists(Guid id)

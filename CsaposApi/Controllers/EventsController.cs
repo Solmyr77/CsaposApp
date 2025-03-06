@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Authorization;
 using static CsaposApi.Models.DTOs.LocationDTO;
 using System.Net;
 using static CsaposApi.Models.DTOs.EventDTO;
+using CsaposApi.Services.IService;
+using Microsoft.Extensions.Logging;
 
 namespace CsaposApi.Controllers
 {
@@ -18,15 +20,81 @@ namespace CsaposApi.Controllers
     public class EventsController : ControllerBase
     {
         private readonly CsaposappContext _context;
+        private readonly ILogger<EventsController> _logger;
+        private readonly IAuthService _authService;
 
-        public EventsController(CsaposappContext context)
+        public EventsController(CsaposappContext context, IAuthService authService, ILogger<EventsController> logger)
         {
             _context = context;
+            _authService = authService;
+            _logger = logger;
+        }
+
+        // Extract user ID from JWT token using AuthService
+        private Guid GetUserIdFromToken()
+        {
+            try
+            {
+                var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                if (string.IsNullOrEmpty(token))
+                {
+                    throw new UnauthorizedAccessException("Missing Authorization token.");
+                }
+
+                var userIdString = _authService.GetUserId(token);
+                return Guid.Parse(userIdString);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning(ex, "Unauthorized access attempt due to missing token.");
+                throw;
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(ex, "Invalid token format.");
+                throw new UnauthorizedAccessException("Invalid token format: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to extract user ID from token.");
+                throw new UnauthorizedAccessException("Failed to extract user ID from token.");
+            }
+        }
+
+        // Extract user role from JWT token using AuthService
+        private string GetUserRoleFromToken()
+        {
+            try
+            {
+                var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                if (string.IsNullOrEmpty(token))
+                {
+                    throw new UnauthorizedAccessException("Missing Authorization token.");
+                }
+
+                var userRole = _authService.GetUserRole(token);
+                return userRole;
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning(ex, "Unauthorized access attempt due to missing token.");
+                throw;
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(ex, "Invalid token format.");
+                throw new UnauthorizedAccessException("Invalid token format: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to extract role from token.");
+                throw new UnauthorizedAccessException("Failed to extract role from token.");
+            }
         }
 
         [HttpGet]
         [Authorize(Policy = "MustBeGuest")]
-        public async Task<ActionResult<IEnumerable<Event>>> GetEvents()
+        public async Task<ActionResult<IEnumerable<EventResponseDTO>>> GetEvents()
         {
             return Ok(await _context.Events.Select(ev => new EventResponseDTO
             {
@@ -42,7 +110,7 @@ namespace CsaposApi.Controllers
 
         [HttpGet("{id}")]
         [Authorize(Policy = "MustBeGuest")]
-        public async Task<ActionResult<Event>> GetEvent(Guid id)
+        public async Task<ActionResult<EventResponseDTO>> GetEvent(Guid id)
         {
             var currentEvent = await _context.Events.FindAsync(id);
 
@@ -65,9 +133,34 @@ namespace CsaposApi.Controllers
             return Ok(response);
         }
 
+        // GET: api/events/accepted-by-user
+        // Returns the events that the current user has accepted (via EventAttendances)
+        [HttpGet("accepted-by-user")]
+        [Authorize(Policy = "MustBeGuest")]
+        public async Task<ActionResult<IEnumerable<EventResponseDTO>>> GetEventsByUser()
+        {
+            var userId = GetUserIdFromToken();
+
+            var events = await _context.Events
+                .Include(x => x.EventAttendances)
+                .Where(x => x.EventAttendances.Any(ea => ea.UserId == userId && ea.Status == "accepted"))
+                .Select(ev => new EventResponseDTO
+                {
+                    Id = ev.Id,
+                    LocationId = (Guid)ev.LocationId,
+                    Name = ev.Name,
+                    Description = ev.Description,
+                    Timefrom = ev.Timefrom,
+                    Timeto = ev.Timeto,
+                    ImgUrl = ev.ImgUrl
+                }).ToListAsync();
+
+            return Ok(events);
+        }
+
         [HttpGet("location/{locationId}")]
         [Authorize(Policy = "MustBeGuest")]
-        public async Task<ActionResult<Event>> GetEventsByLocation(Guid locationId)
+        public async Task<ActionResult<IEnumerable<EventResponseDTO>>> GetEventsByLocation(Guid locationId)
         {
             return Ok(await _context.Events.Where(x => x.LocationId == locationId).Select(ev => new EventResponseDTO
             {
@@ -129,7 +222,7 @@ namespace CsaposApi.Controllers
                     ImgUrl = currentEvent.ImgUrl
                 };
 
-                return CreatedAtAction(nameof(CreateEvent), response);
+                return CreatedAtAction(nameof(GetEvent), new { id = currentEvent.Id }, response);
             }
             catch (Exception e)
             {

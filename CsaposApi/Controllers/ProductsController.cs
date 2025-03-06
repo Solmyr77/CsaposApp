@@ -31,6 +31,7 @@ namespace CsaposApi.Controllers
                 Id = pd.Id,
                 LocationId = pd.LocationId,
                 Name = pd.Name,
+                Description = pd.Description,
                 Category = pd.Category,
                 Price = pd.Price,
                 DiscountPercentage = pd.DiscountPercentage,
@@ -49,6 +50,7 @@ namespace CsaposApi.Controllers
                 Id = pd.Id,
                 LocationId = pd.LocationId,
                 Name = pd.Name,
+                Description = pd.Description,
                 Category = pd.Category,
                 Price = pd.Price,
                 DiscountPercentage = pd.DiscountPercentage,
@@ -74,6 +76,7 @@ namespace CsaposApi.Controllers
                 Id = product.Id,
                 LocationId = product.LocationId,
                 Name = product.Name,
+                Description = product.Description,
                 Category = product.Category,
                 Price = product.Price,
                 DiscountPercentage = product.DiscountPercentage,
@@ -96,6 +99,7 @@ namespace CsaposApi.Controllers
                 Id = productId,
                 LocationId = createProductDTO.LocationId,
                 Name = createProductDTO.Name,
+                Description = createProductDTO.Description,
                 Category = createProductDTO.Category,
                 Price = createProductDTO.Price,
                 DiscountPercentage = 0,
@@ -109,6 +113,7 @@ namespace CsaposApi.Controllers
                 Id = product.Id,
                 LocationId = product.LocationId,
                 Name = product.Name,
+                Description = product.Description,
                 Category = product.Category,
                 Price = product.Price,
                 DiscountPercentage = product.DiscountPercentage,
@@ -116,6 +121,9 @@ namespace CsaposApi.Controllers
                 IsActive = product.IsActive,
                 ImgUrl = product.ImgUrl
             };
+
+            await _context.Products.AddAsync(product);
+            await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(CreateProduct), response);
         }

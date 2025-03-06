@@ -446,6 +446,9 @@ public partial class CsaposappContext : DbContext
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("timestamp")
                 .HasColumnName("created_at");
+            entity.Property(e => e.Description)
+                .HasMaxLength(255)
+                .HasColumnName("description");
             entity.Property(e => e.DiscountPercentage)
                 .HasColumnType("int(11)")
                 .HasColumnName("discount_percentage");

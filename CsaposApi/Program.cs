@@ -10,7 +10,6 @@ using System.Text;
 using CsaposApi.Services.IService;
 using CsaposApi.Services;
 using Microsoft.OpenApi.Models;
-using CsaposApi.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
 namespace CsaposApi
@@ -80,19 +79,13 @@ namespace CsaposApi
 
                 options.AddPolicy("MustBeManager", policy =>
                 {
-                    policy.RequireRole("manager");
-                });
-
-                options.AddPolicy("ManageLocationPolicy", policyBuilder =>
-                {
-                    policyBuilder.AddRequirements(new ManageLocationRequirement());
+                    policy.RequireRole("manager", "admin");
                 });
             });
 
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IPasswordService, PasswordService>();
             builder.Services.AddScoped<IFriendshipService, FriendshipService>();
-            builder.Services.AddScoped<IAuthorizationHandler, ManageLocationHandler>();
 
             // 1. Bind JwtSettings
             var jwtSection = builder.Configuration.GetSection("JwtSettings");

@@ -97,17 +97,9 @@ namespace CsaposApi.Controllers
         }
 
         [HttpPost("upload/location")]
-        [Authorize(Policy = "MustBeManager")]
+        //[Authorize(Policy = "MustBeManager")]
         public async Task<IActionResult> UploadLocation(IFormFile file, Guid locationId)
         {
-            // 1. Resource-based authorization check
-            var authResult = await _authorizationService.AuthorizeAsync(
-                User, locationId, "ManageLocationPolicy");
-            if (!authResult.Succeeded)
-            {
-                return Forbid();
-            }
-
             if (file == null || file.Length == 0)
                 return BadRequest("No file uploaded.");
 
@@ -162,14 +154,6 @@ namespace CsaposApi.Controllers
         [Authorize(Policy = "MustBeManager")]
         public async Task<IActionResult> UploadProduct(IFormFile file, Guid locationId, Guid productId)
         {
-            // 1. Resource-based authorization check
-            var authResult = await _authorizationService.AuthorizeAsync(
-                User, locationId, "ManageLocationPolicy");
-            if (!authResult.Succeeded)
-            {
-                return Forbid();
-            }
-
             if (file == null || file.Length == 0)
                 return BadRequest("No file uploaded.");
 
@@ -224,14 +208,6 @@ namespace CsaposApi.Controllers
         [Authorize(Policy = "MustBeManager")]
         public async Task<IActionResult> UploadEvent(IFormFile file, Guid locationId, Guid eventId)
         {
-            // 1. Resource-based authorization check
-            var authResult = await _authorizationService.AuthorizeAsync(
-                User, locationId, "ManageLocationPolicy");
-            if (!authResult.Succeeded)
-            {
-                return Forbid();
-            }
-
             if (file == null || file.Length == 0)
                 return BadRequest("No file uploaded.");
 

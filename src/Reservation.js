@@ -254,7 +254,9 @@ function Reservation() {
                             !isGuest ? 
                             <div className="flex justify-between mt-2 gap-2 w-full">
                                 <button className="btn bg-black border-2 bg-opacity-40 border-red-500 text-red-500 hover:bg-black hover:bg-opacity-40 hover:border-red-500 gap-0 basis-1/2 text-md" onClick={async () => confirmModal.current.showModal()}>Lemondás</button>
-                                <button className="btn bg-dark-grey hover:bg-dark-grey disabled:bg-dark-grey border-none gap-0 basis-1/2 disabled:opacity-10 text-md" disabled={!isActive}><span className="bg-gradient-to-t from-blue to-sky-400 bg-clip-text leading-relaxed text-transparent">Kezdés</span></button>                
+                                <Link className="basis-1/2" to={`/pubmenu/${currentLocation.name}/${currentBooking.id}`}> 
+                                    <button className="btn bg-dark-grey hover:bg-dark-grey disabled:bg-dark-grey border-none gap-0 w-full disabled:opacity-10 text-md" disabled={!isActive}><span className="bg-gradient-to-t from-blue to-sky-400 bg-clip-text leading-relaxed text-transparent">Kezdés</span></button>
+                                </Link>
                             </div> :
                             <div className="flex justify-between mt-2 gap-2 w-full">
                                 <button className={`btn bg-black border-2 bg-opacity-40 border-red-500 text-red-500 hover:bg-black hover:bg-opacity-40 hover:border-red-500 text-md gap-0 basis-1/2 ${isAccepted !== null && "hidden"}`} onClick={async () => await handleRejectInvite(currentBooking.id)}>Elutasítás</button>

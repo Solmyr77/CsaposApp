@@ -5,7 +5,7 @@ import getAccessToken from "./refreshToken";
 import { Navigate } from "react-router-dom";
 
 function Provider({ children }) {
-  //basic
+  //basic states
   const [navState, setNavState] = useState("Összes");
   const [menuState, setMenuState] = useState("Main");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -26,6 +26,7 @@ function Provider({ children }) {
   //order
   const [order, setOrder] = useState([]);
   const [locationProducts, setLocationProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState({});
 
   async function getProfile(id, profile) {
     try {
@@ -324,6 +325,8 @@ function Provider({ children }) {
       setBookingsContainingUser,
       locationProducts,
       setLocationProducts,
+      selectedProduct,
+      setSelectedProduct,
       removeBooking,
       getLocationTables,
       setTableFriends, 

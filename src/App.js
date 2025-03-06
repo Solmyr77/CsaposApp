@@ -52,7 +52,7 @@ function App() {
                 <ProtectedRoute isProtected={true}>
                   <Reservation />
                 </ProtectedRoute>}/>
-              <Route path="/pubmenu" element={
+              <Route path="/pubmenu/:name/:id" element={
                 <ProtectedRoute isProtected={true}>
                   <PubMenu />
                 </ProtectedRoute>}/>

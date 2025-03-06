@@ -1,13 +1,12 @@
-import React, { useContext } from "react";
-import { useState } from "react";
+import React, { forwardRef, useContext } from "react";
 import img1 from "./img/pilsner.png";
-import { CheckIcon, MinusIcon, PlusIcon, ShoppingCartIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import Context from "./Context";
+import { LuShoppingCart, LuX } from "react-icons/lu";
 
-function MenuItem({ name, description }) {
+const  MenuItem = forwardRef(({ name, description }, ref) => {
   const { order, setOrder } = useContext(Context);
   return (
-    <div className="flex flex-row h-20 items-center bg-dark-grey rounded-md shadow-[0_4px_4px_rgba(0,0,0,.5)]">
+    <div className="flex flex-row h-20 items-center bg-dark-grey rounded-md">
         <div className="flex items-center basis-4/5 py-2 pl-4 pr-0">
             <img src={img1} alt="" className="h-14 aspect-square rounded-md"/>
             <div className="flex flex-col justify-start items-start px-2 basis-3/4">
@@ -32,14 +31,19 @@ function MenuItem({ name, description }) {
         <div className="flex h-full basis-1/5">
             {
                 !order.includes(name) ? 
-                <button className="flex justify-center items-center w-full text-sm font-normal bg-blue rounded-r-md shadow-black shadow-[-8px_0px_10px_-10px_rgba(0,0,0,0)]" 
-                onClick={() => setOrder(state => [...state, name])}><ShoppingCartIcon className="w-6"/></button> :
-                <button className="flex justify-center items-center w-full text-sm font-normal bg-red-500 rounded-r-md shadow-black shadow-[-8px_0px_10px_-10px_rgba(0,0,0,0)]" 
-                onClick={() => setOrder(state => state.filter(item => item !== name))}><XMarkIcon className="w-8"/></button>
+                <button className="flex justify-center items-center w-full text-sm font-normal bg-gradient-to-tr from-blue to-sky-400 rounded-r-md" 
+                onClick={() => {
+                    ref.current.inert = true;
+                    ref.current.showModal();
+                    ref.current.inert = false;
+                }
+                } ><LuShoppingCart className="w-6 h-6"/></button> :
+                <button className="flex justify-center items-center w-full text-sm font-normal bg-red-500 rounded-r-md" 
+                onClick={() => setOrder(state => state.filter(item => item !== name))}><LuX className="w-8 h-8"/></button>
             }
         </div>
     </div>
   )
-}
+})
 
 export default MenuItem;

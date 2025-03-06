@@ -5,6 +5,7 @@ import getAccessToken from "./refreshToken";
 import { Navigate } from "react-router-dom";
 
 function Provider({ children }) {
+  //basic
   const [navState, setNavState] = useState("Összes");
   const [menuState, setMenuState] = useState("Main");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -13,15 +14,18 @@ function Provider({ children }) {
   const [locations, setLocations] = useState( localStorage.getItem("locations") || []);
   const [notificationFilter, setNotificationFilter] = useState("Összes");
   const [previousRoutes, setPreviousRoutes] = useState(["/"]);
+  //friends
   const [friends, setFriends] = useState([]);
   const [friendRequests, setFriendRequests] = useState([]);
+  //table reservation
   const [tableFriends, setTableFriends] = useState([]);
   const [tables, setTables] = useState([]);
   const [selectedTable, setSelectedTable] = useState({});
-  const [order, setOrder] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [bookingsContainingUser, setBookingsContainingUser] = useState([]);
-  
+  //order
+  const [order, setOrder] = useState([]);
+  const [locationProducts, setLocationProducts] = useState([]);
 
   async function getProfile(id, profile) {
     try {
@@ -318,6 +322,8 @@ function Provider({ children }) {
       setBookings,
       bookingsContainingUser,
       setBookingsContainingUser,
+      locationProducts,
+      setLocationProducts,
       removeBooking,
       getLocationTables,
       setTableFriends, 

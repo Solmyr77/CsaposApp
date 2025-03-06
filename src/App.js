@@ -10,7 +10,6 @@ import Login from './Login';
 import ProtectedRoute from './ProtectedRoute';
 import Notifications from './Notifications';
 import Event from './Event';
-import Tables from './Tables';
 import PubMenu from './PubMenu';
 import Reservation from './Reservation';
 import ReserveTable from './ReserveTable';

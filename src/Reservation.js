@@ -140,19 +140,17 @@ function Reservation() {
         }
         if (bookings.length > 0 || bookingsContainingUser.length > 0) {
             const foundBooking = bookings.concat(bookingsContainingUser).find(booking => booking.id === id);
-            if (Object.hasOwn(foundBooking, "id")) {
+            if (foundBooking && Object.hasOwn(foundBooking, "id")) {
                 setCurrentBooking(foundBooking);
                 const foundUser = foundBooking.tableGuests.find(tableGuest => tableGuest.id === user.id);
                 setTableUser(foundUser);
                 setCurrentLocation(locations.find(location => location.id === foundBooking.locationId));
                 if (friends.length > 0) setBookerProfile(friends.find(friend => friend.id === foundBooking.bookerId));
-                if (foundUser) {
-                    const run = async () => {
-                        user && getUserOfTable(foundUser);
-                        setCurrentTable((await getLocationTables(foundBooking.locationId))?.find(table => table.id === foundBooking.tableId));
-                    }
-                    run();
+                const run = async () => {
+                    (user  && foundUser) && getUserOfTable(foundUser);
+                    setCurrentTable((await getLocationTables(foundBooking.locationId))?.find(table => table.id === foundBooking.tableId));
                 }
+                run();
                 if (bookings.find(booking => booking.id === id)) {
                     setAdminTimeouts(foundBooking);
                 }

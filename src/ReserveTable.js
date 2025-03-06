@@ -78,6 +78,7 @@ function ReserveTable() {
   const [locationTables, setLocationTables] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isBooked, setIsBooked] = useState(null);
+  const [bookingsForLocation, setBookingsForLocation] = useState([]);
   const [counter, setCounter] = useState(3);
   const modalRef = useRef();
   const ExampleCustomInput = forwardRef(
@@ -164,7 +165,7 @@ function ReserveTable() {
       const response = await axios.get(`https://backend.csaposapp.hu/api/bookings/bookings-for-location?locationId=${id}`, config);
       const data = await response.data;
       if (response.status === 200) {
-        console.log(data);
+        setBookingsForLocation(data);
       }
     }
     catch (error) {
@@ -234,7 +235,22 @@ function ReserveTable() {
         run();
       }
     }
-  }, [locations, currentLocation, isBooked])
+  }, [locations, currentLocation, isBooked]);
+
+  useEffect(() => {
+    if (locationTables?.length > 0 && bookingsForLocation.length > 0) {
+      for (let locationTable of locationTables) {
+        const newObject = {}
+        bookingsForLocation.map(locationBooking => {
+          if (locationBooking.tableId === locationTable.id) {
+            newObject[bookingsForLocation.indexOf(locationBooking)] = locationBooking.bookedFrom;
+            locationTable.bookings = newObject;
+          }
+        })
+      }
+    }
+  }, [locationTables, bookingsForLocation]);
+  
 
   return (
     <div className="min-h-screen w-full bg-grey text-white overflow-y-scroll flex flex-col py-8 px-4 font-bold gap-8">
@@ -272,9 +288,10 @@ function ReserveTable() {
           {
             locationTables?.length > 0 &&
             locationTables?.sort((a, b) => {
+              startDate.setHours(Number(selectedTime.slice(0,2)), Number(selectedTime.slice(3)), 0);
               if (a?.capacity === b?.capacity) return a?.number - b?.number;
               return a?.capacity - b?.capacity;
-            }).map(table => <TableItem table={table} time={selectedTime}/>)
+            }).map(table => <TableItem table={table} date={startDate} time={selectedTime}/>)
           }
         </div>
       </div>

@@ -11,6 +11,7 @@ using CsaposApi.Services.IService;
 using CsaposApi.Services;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authorization;
+using CsaposApi.Hubs;
 
 namespace CsaposApi
 {
@@ -26,6 +27,7 @@ namespace CsaposApi
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddSignalR();
 
             builder.Services.AddSwaggerGen(c =>
             {
@@ -86,6 +88,9 @@ namespace CsaposApi
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IPasswordService, PasswordService>();
             builder.Services.AddScoped<IFriendshipService, FriendshipService>();
+
+            // SignalR services
+            builder.Services.AddScoped<IBookingNotificationService, BookingNotificationService>();
 
             // 1. Bind JwtSettings
             var jwtSection = builder.Configuration.GetSection("JwtSettings");
@@ -150,6 +155,9 @@ namespace CsaposApi
             app.UseAuthorization();
 
             app.MapControllers();
+
+            // SignalR Hubs
+            app.MapHub<BookingHub>("/hubs/booking");
 
             app.Run();
         }

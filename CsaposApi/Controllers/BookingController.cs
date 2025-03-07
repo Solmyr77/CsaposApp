@@ -1,9 +1,11 @@
-﻿using CsaposApi.Models;
+﻿using CsaposApi.Hubs;
+using CsaposApi.Models;
 using CsaposApi.Models.DTOs;
 using CsaposApi.Services.IService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Net;
@@ -21,12 +23,14 @@ namespace CsaposApi.Controllers
         private readonly CsaposappContext _context;
         private readonly IAuthService _authService;
         private readonly ILogger<BookingController> _logger;
+        private readonly IBookingNotificationService _notificationService;
 
-        public BookingController(CsaposappContext context, IAuthService authService, ILogger<BookingController> logger)
+        public BookingController(CsaposappContext context, IAuthService authService, ILogger<BookingController> logger, IBookingNotificationService notificationService)
         {
             _context = context;
             _authService = authService;
             _logger = logger;
+            _notificationService = notificationService;
         }
 
         // Extract user ID from JWT token using AuthService
@@ -241,6 +245,8 @@ namespace CsaposApi.Controllers
                 await _context.TableBookings.AddAsync(currentBooking);
                 await _context.SaveChangesAsync();
 
+                await _notificationService.NotifyBookingCreated(response.Id.ToString());
+
                 return Ok(response);
             }
             catch (Exception)
@@ -315,6 +321,8 @@ namespace CsaposApi.Controllers
                 _context.TableBookings.Remove(currentBooking);
 
                 await _context.SaveChangesAsync();
+
+                await _notificationService.NotifyBookingDeleted(deleteBookingDTO.BookingId.ToString());
 
                 return NoContent(); // HTTP 204
             }
@@ -407,6 +415,12 @@ namespace CsaposApi.Controllers
                     })
                     .ToListAsync();
 
+                // Send real-time update via SignalR
+                foreach (var userId in addToTableDTO.userIds)
+                {
+                    await _notificationService.NotifyUserAddedToTable(addToTableDTO.bookingId.ToString(), userId.ToString());
+                }
+
                 return Ok(new
                 {
                     BookingId = addToTableDTO.bookingId,
@@ -474,6 +488,8 @@ namespace CsaposApi.Controllers
                 _context.TableGuests.Remove(tableGuest);
                 await _context.SaveChangesAsync();
 
+                await _notificationService.NotifyUserRemovedFromTable(removeFromTableDTO.BookingId.ToString(), removeFromTableDTO.UserId.ToString());
+
                 return Ok(new { message = "Guest removed from the table successfully." });
             }
             catch (Exception ex)
@@ -515,6 +531,8 @@ namespace CsaposApi.Controllers
                 tableGuest.Status = "accepted";
                 _context.TableGuests.Update(tableGuest);
                 await _context.SaveChangesAsync();
+
+                await _notificationService.NotifyUserAcceptedInvite(bookingId.ToString(), currentUserId.ToString());
 
                 return Ok(new { message = "Invite accepted successfully." });
             }
@@ -558,6 +576,8 @@ namespace CsaposApi.Controllers
                 tableGuest.Status = "rejected";
                 _context.TableGuests.Update(tableGuest);
                 await _context.SaveChangesAsync();
+
+                await _notificationService.NotifyUserRejectedInvite(bookingId.ToString(), currentUserId.ToString());
 
                 return Ok(new { message = "Invite rejected successfully." });
             }

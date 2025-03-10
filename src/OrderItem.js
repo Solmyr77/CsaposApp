@@ -3,17 +3,19 @@ import img1 from "./img/pilsner.png";
 import { LuX, LuPlus, LuMinus } from "react-icons/lu";
 import Context from "./Context";
 
-function OrderItem({ product }) {
+function OrderItem({ product, isOrdered }) {
   const { setOrder } = useContext(Context);
 
   return (
+    !isOrdered ?
     <div className="flex items-center justify-between select-none">
         <div className="flex gap-2">
-            <img src={img1} alt="kép" className="h-10 aspect-square bg-white p-1 rounded-md"/>
-            <div className="flex flex-col">
-              <span className="leading-none">{product.name}</span>
-              <span className="text-gray-300 font-normal">{product.description}</span>
-            </div>
+          <img src={img1} alt="kép" className="h-16 aspect-square bg-white p-1 rounded-md"/>
+          <div className="flex flex-col">
+            <span className="leading-none">{product.name}</span>
+            <span className="text-gray-300 font-normal">{product.description}</span>
+            <span>{product.price} Ft</span>
+          </div>
         </div>
         <div className="flex items-center text-gray-300 justify-end h-full flex-grow gap-2">
           <span className="text-md font-normal">x{product.quantity}</span>
@@ -39,6 +41,20 @@ function OrderItem({ product }) {
             }}/>
           </div>
         </div>
+    </div> :
+
+    <div className="flex items-center justify-between select-none">
+      <div className="flex gap-2">
+        <img src={img1} alt="kép" className="h-10 aspect-square bg-white p-1 rounded-md"/>
+        <div className="flex flex-col">
+          <span className="leading-none">Pilsner Urquell</span>
+          <span className="text-gray-300 font-normal">0.5l korsó</span>
+        </div>
+      </div>
+      <div className="flex items-center justify-evenly h-full flex-grow gap-2">
+        <span>1290 Ft</span> 
+        <span className="text-md font-normal self-end text-gray-300">x1</span>
+      </div>
     </div>
   )
 }

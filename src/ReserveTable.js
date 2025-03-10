@@ -82,11 +82,11 @@ function ReserveTable() {
   const [counter, setCounter] = useState(3);
   const modalRef = useRef();
   const ExampleCustomInput = forwardRef(
-      ({ value, onClick, className }, ref) => (
-        <button className={className} onClick={onClick} ref={ref}>
-          <span className="bg-gradient-to-t from-blue to-sky-400 bg-clip-text text-transparent">{value}</span> <hr className="w-8 rotate-90 rounded-md"/> <LuCalendar/>
-        </button>
-      )
+    ({ value, onClick, className }, ref) => (
+      <button className={className} onClick={onClick} ref={ref}>
+        <span className="bg-gradient-to-t from-blue to-sky-400 bg-clip-text text-transparent">{value}</span> <hr className="w-8 rotate-90 rounded-md"/> <LuCalendar/>
+      </button>
+    )
   );
 
   async function handleAddToTable(bookingId) {
@@ -354,13 +354,13 @@ function ReserveTable() {
         </div>
       </dialog>
       <svg width="0" height="0">
-          <defs>
-            <linearGradient id="gradient" x1="0%" y1="100%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#3b82f6" />
-              <stop offset="100%" stopColor="#38bdf8" />
-            </linearGradient>
-          </defs>
-        </svg>
+        <defs>
+          <linearGradient id="gradient" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#3b82f6" />
+            <stop offset="100%" stopColor="#38bdf8" />
+          </linearGradient>
+        </defs>
+      </svg>
     </div>
   )
 }

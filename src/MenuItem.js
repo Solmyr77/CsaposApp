@@ -14,7 +14,7 @@ const MenuItem = forwardRef(({ product }, ref) => {
                 <p className="text-gray-300 font-normal">{product?.description}</p>
             </div>
             <div className="flex self-end w-full justify-end pr-4 basis-1/4">
-                <p className="font-normal text-nowrap">{product.price} Ft</p>
+                <p className="text-nowrap">{product.price} Ft</p>
             </div>
         </div>
         <div className="flex h-full basis-1/5">

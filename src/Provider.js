@@ -27,6 +27,9 @@ function Provider({ children }) {
   const [order, setOrder] = useState([]);
   const [locationProducts, setLocationProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState({});
+  const [categories, setCategories] = useState([]);
+  const [tableOrders, setTableOrders] = useState([]);
+  
 
   async function getProfile(id, profile) {
     try {
@@ -233,25 +236,55 @@ function Provider({ children }) {
             }
         }
     }
-}
+  }
 
-  async function getTableGuests(id) {
+  async function getProductsByLocation(id) {
     try {
       const config = {
-        headers: { 
-          Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
-          "Cache-Content": "no-cache"
-        }
+        headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` }
       }
-      const response = await axios.get(`https://backend.csaposapp.hu/api/table-guests/${id}?bookingId=${id}`, config);
+      const response = await axios.get(`https://backend.csaposapp.hu/api/products/location/${id}`, config);
       const data = response.data;
       if (response.status === 200) {
-        return data;
+        const foundCategories = [];
+        data.map(record => !foundCategories.includes(record.category) && foundCategories.push(record.category));
+        setCategories(foundCategories);
+        setLocationProducts(data);
       }
     }
     catch (error) {
-      console.log(error.response?.status);
-      console.log(error.message);
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) {
+          await getProductsByLocation(id);
+        }
+        else {
+          await logout();
+          window.location.reload();
+        }
+      } 
+    }
+  }
+
+  async function getOrdersByTable(id) {
+    try {
+      const config = {
+        headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` }
+      }
+      const response = await axios.get(`https://backend.csaposapp.hu/api/orders/orders-by-table/${id}`, config);
+      if (response.status === 200) {
+        setTableOrders(response.data);
+      }
+    }
+    catch (error) {
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) {
+          await getOrdersByTable(id);
+        }
+        else {
+          await logout();
+          window.location.reload();
+        }
+      } 
     }
   }
 
@@ -324,7 +357,8 @@ function Provider({ children }) {
       bookingsContainingUser,
       setBookingsContainingUser,
       locationProducts,
-      setLocationProducts,
+      tableOrders,
+      categories,
       selectedProduct,
       setSelectedProduct,
       removeBooking,
@@ -333,6 +367,8 @@ function Provider({ children }) {
       getProfile,
       getBookingsByUser,
       getBookingsContainingUser,
+      getProductsByLocation,
+      getOrdersByTable,
       setUserId,
       logout
       }}>

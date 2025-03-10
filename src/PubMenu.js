@@ -2,51 +2,29 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import MenuItem from "./MenuItem";
 import Context from "./Context";
 import OrderItem from "./OrderItem";
-import { LuMinus, LuPlus, LuX, LuShoppingBag, LuLogOut } from "react-icons/lu";
+import { LuMinus, LuPlus, LuX, LuShoppingBag, LuLogOut, LuCheck } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import getAccessToken from "./refreshToken";
 import img1 from "./img/pilsner.png";
+import { MdOutlineTableRestaurant } from "react-icons/md";
+import AvatarGroupItem from "./AvatarGroupItem";
+
 
 function PubMenu() {
-  const { order, setOrder, locationProducts, setLocationProducts, selectedProduct, setSelectedProduct, logout, bookings, bookingsContainingUser } = useContext(Context);
+  const { order, setOrder, locationProducts, categories, tableOrders, selectedProduct, setSelectedProduct, logout, bookings, bookingsContainingUser, setPreviousRoutes, getProductsByLocation, getOrdersByTable } = useContext(Context);
   const productModal = useRef();
   const bagModal = useRef();
+  const successModal = useRef();
   const navigate = useNavigate();
   const { name, id } = useParams();
   const [currentBooking, setCurrentBooking] = useState({});
-  const [categories, setCategories] = useState([]);
   const [orderQuantity, setOrderQuantity] = useState(1);
   const [orderTotal, setOrderTotal] = useState(0);
-
-  async function getProductsByLocation(id) {
-    try {
-      const config = {
-        headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` }
-      }
-      const response = await axios.get(`https://backend.csaposapp.hu/api/products/location/${id}`, config);
-      const data = response.data;
-      if (response.status === 200) {
-        const foundCategories = [];
-        data.map(record => !foundCategories.includes(record.category) && foundCategories.push(record.category));
-        setCategories(foundCategories);
-        setLocationProducts(data);
-      }
-    }
-    catch (error) {
-      if (error.response?.status === 401) {
-        if (await getAccessToken()) {
-          await getProductsByLocation(id);
-        }
-        else {
-          await logout();
-          navigate("/login");
-        }
-      } 
-    }
-  }
+  const [isLoading, setIsLoading] = useState(false);
 
   async function handleCreateOrder() {
+    setIsLoading(true);
     const orderItems = Array.from(order.map(item => ({
       productId: item.id,
       quantity: item.quantity
@@ -59,9 +37,15 @@ function PubMenu() {
         tableId: currentBooking.tableId,
         orderItems: orderItems
       }, config);
-      const data = response.data;
-      if (response.status === 200) {
-        console.log(data);
+      if (response.status === 204 || response.status === 201) {
+        setIsLoading(false);
+        successModal.current.showModal();
+        setTimeout(() => {
+          setOrder([]);
+          bagModal.current.close();
+          successModal.current.close();
+        }, 1000);
+        await getOrdersByTable(currentBooking.tableId);
       }
     }
     catch (error) {
@@ -91,18 +75,45 @@ function PubMenu() {
   useEffect(() => {
     const allBookings = bookings.concat(bookingsContainingUser);
     const foundBooking = allBookings.find(booking => booking.id === id);
-    if (foundBooking) {
+    if (foundBooking && locationProducts) {
       setCurrentBooking(foundBooking);
-      const run = async () => await getProductsByLocation(foundBooking.locationId);
+      console.log(foundBooking)
+      const run = async () => {
+        await getOrdersByTable(foundBooking.tableId);
+        if (categories.length === 0) {
+          await getProductsByLocation(foundBooking.locationId);
+        }
+      } 
       run();
     }
-  } , [bookings, bookingsContainingUser])
+  }, [bookings, bookingsContainingUser, categories]);
 
   return (
     <div className="flex flex-col max-h-screen h-screen overflow-y-hidden bg-grey text-white font-bold">
-      <div className="shadow-lg flex flex-row justify-start items-center mb-4 h-[10vh] px-2 gap-3">
+      <div className="flex flex-col mb-3 p-2 pb-0 shadow-lg">
         <LuLogOut className="h-10 w-10 bg-dark-grey p-2 rounded-md text-red-500 rotate-180 cursor-pointer" onClick={()=> navigate("/")}/>
-        <p className="text-center text-xl">{name}</p>
+        <div className="flex flex-row justify-between items-end mb-1">
+          <p className="text-center text-xl">{name}</p>
+          <div className="relative">
+            <button className="btn bg-dark-grey border-0 hover:bg-dark-grey" onClick={() => {
+              setPreviousRoutes([window.location.pathname]);
+              navigate(`/table/${name}/${id}`);
+            }}>
+              <div className="avatar-group -space-x-3">
+                {
+                  currentBooking?.tableGuests?.map(friend => <AvatarGroupItem height={"h-7"} imageUrl={friend.imageUrl}/>)
+                }
+              </div>
+              <MdOutlineTableRestaurant className="h-8 w-8 text-sky-400"/>
+            </button>
+            {
+              tableOrders?.length > 0 &&
+              <div className="h-4 w-fit bg-yellow-500 absolute -right-1 -top-1 rounded-full flex justify-center items-center p-1">
+                <span className="font-normal">{tableOrders.length}</span>
+              </div>
+            }
+          </div>
+        </div>
       </div>
       <div className="h-full overflow-y-scroll bg-grey pb-[12vh]">
         {
@@ -147,7 +158,7 @@ function PubMenu() {
               <p className="text-md mt-1">{selectedProduct.price * selectedProduct.quantity} Ft</p>
               <div className="flex justify-start items-center w-full gap-x-4 mt-4">
                 <div className="flex justify-center gap-x-2 basis-1/3">
-                  <div className="flex justify-center items-center basis-1/3 aspect-square rounded-lg bg-grey cursor-pointer" onClick={() => {
+                  <div className={`flex justify-center items-center basis-1/3 aspect-square rounded-lg bg-grey cursor-pointer ${selectedProduct.quantity === 1 && "opacity-50 cursor-auto"}`} onClick={() => {
                     if (selectedProduct.quantity - 1 > 0) {
                       setSelectedProduct(state => (
                         {
@@ -197,7 +208,7 @@ function PubMenu() {
             order.map(product => (
                 <div className="flex flex-col">
                   <OrderItem product={product}/>
-                  <hr className="text-grey bg-grey border-grey my-2 self-end rounded-full" style={{width: "calc(100% - 3rem)"}}/>
+                  <hr className="text-grey bg-grey border-grey my-2 self-end rounded-full" style={{width: "calc(100% - 4.5rem)"}}/>
                 </div>
               )) :
               <div className="h-full flex justify-center items-center">
@@ -209,7 +220,11 @@ function PubMenu() {
             <span className="text-md">Összesen:</span>
             <span>{orderTotal} Ft</span>
           </div>
-          <button className="btn bg-gradient-to-tr from-blue to-sky-400 border-0 text-white text-md disabled:text-white disabled:opacity-50" disabled={order.length === 0} onClick={handleCreateOrder}>Rendelés leadása</button>
+          {
+            isLoading ?
+            <span className="loading loading-spinner text-sky-400 w-20 self-center"></span> : 
+            <button className="btn bg-gradient-to-tr from-blue to-sky-400 border-0 text-white text-md disabled:text-white disabled:opacity-50" disabled={order.length === 0} onClick={handleCreateOrder}>Rendelés leadása</button>
+          }
         </div>
         <form method="dialog" className="modal-backdrop">
           <button></button>
@@ -217,9 +232,21 @@ function PubMenu() {
       </dialog>
 
       {/*success modal*/}
-      <dialog className="modal">
-        
+      <dialog className="modal" ref={successModal}>
+        <div className="modal-box flex flex-col items-center bg-grey">
+          <p className="bg-gradient-to-t from-blue to-sky-400 text-transparent bg-clip-text text-lg font-bold">Sikeres rendelés!</p>
+          <LuCheck className="fill-none stroke-[url(#gradient)] h-12 w-12"/>
+          <p></p>
+        </div>
       </dialog>
+      <svg width="0" height="0">
+        <defs>
+          <linearGradient id="gradient" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#3b82f6" />
+            <stop offset="100%" stopColor="#38bdf8" />
+          </linearGradient>
+        </defs>
+      </svg>
     </div>
   )
 }

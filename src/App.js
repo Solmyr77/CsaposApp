@@ -13,65 +13,70 @@ import Event from './Event';
 import PubMenu from './PubMenu';
 import Reservation from './Reservation';
 import ReserveTable from './ReserveTable';
+import Table from './Table';
 
 function App() {
   return (
     <BrowserRouter>
-          <Provider>
-            <Routes>
-              <Route path="/" element={
-                <ProtectedRoute isProtected={true}>
-                  <Layout />
-                </ProtectedRoute>}>
-                <Route index element={
-                  <ProtectedRoute isProtected={true}>
-                    <Main />
-                  </ProtectedRoute>}/>
-                <Route path="/search" element={
-                  <ProtectedRoute isProtected={true}>
-                    <Search />
-                  </ProtectedRoute>}/>
-              </Route>
-              <Route path="/profile" element={
-                <ProtectedRoute isProtected={true}>
-                  <Profile />
-                </ProtectedRoute>}/>
-              <Route path="/pub/:name" element={
-                <ProtectedRoute isProtected={true}>
-                  <Pub />
-                </ProtectedRoute>}/>
-              <Route path="/notifications" element={
-                <ProtectedRoute isProtected={true}>
-                  <Notifications />
-                </ProtectedRoute>}/>
-              <Route path="/event" element={
-                <ProtectedRoute isProtected={true}>
-                  <Event />
-                </ProtectedRoute>}/>
-              <Route path="/reservation/:id" element={
-                <ProtectedRoute isProtected={true}>
-                  <Reservation />
-                </ProtectedRoute>}/>
-              <Route path="/pubmenu/:name/:id" element={
-                <ProtectedRoute isProtected={true}>
-                  <PubMenu />
-                </ProtectedRoute>}/>
-              <Route path="/reservetable/:name" element={
-                <ProtectedRoute isProtected={true}>
-                  <ReserveTable />
-                </ProtectedRoute>}/>
-              <Route path="/register" element={
-                <ProtectedRoute>
-                  <Register />
-                </ProtectedRoute>}/>
-              <Route path="/login" element={
-                <ProtectedRoute>
-                  <Login />
-                </ProtectedRoute>}/>
-              <Route path="*" element={<Navigate to="/login"/>}/>
-            </Routes>
-          </Provider>
-      </BrowserRouter>
+      <Provider>
+        <Routes>
+          <Route path="/" element={
+            <ProtectedRoute isProtected={true}>
+              <Layout />
+            </ProtectedRoute>}>
+            <Route index element={
+              <ProtectedRoute isProtected={true}>
+                <Main />
+              </ProtectedRoute>}/>
+            <Route path="/search" element={
+              <ProtectedRoute isProtected={true}>
+                <Search />
+              </ProtectedRoute>}/>
+          </Route>
+          <Route path="/profile" element={
+            <ProtectedRoute isProtected={true}>
+              <Profile />
+            </ProtectedRoute>}/>
+          <Route path="/pub/:name" element={
+            <ProtectedRoute isProtected={true}>
+              <Pub />
+            </ProtectedRoute>}/>
+          <Route path="/notifications" element={
+            <ProtectedRoute isProtected={true}>
+              <Notifications />
+            </ProtectedRoute>}/>
+          <Route path="/event" element={
+            <ProtectedRoute isProtected={true}>
+              <Event />
+            </ProtectedRoute>}/>
+          <Route path="/reservation/:id" element={
+            <ProtectedRoute isProtected={true}>
+              <Reservation />
+            </ProtectedRoute>}/>
+          <Route path="/pubmenu/:name/:id" element={
+            <ProtectedRoute isProtected={true}>
+              <PubMenu />
+            </ProtectedRoute>}/>
+          <Route path="/table/:name/:id" element={
+            <ProtectedRoute isProtected={true}>
+              <Table />
+            </ProtectedRoute>}/>
+          <Route path="/reservetable/:name" element={
+            <ProtectedRoute isProtected={true}>
+              <ReserveTable />
+            </ProtectedRoute>}/>
+          <Route path="/register" element={
+            <ProtectedRoute>
+              <Register />
+            </ProtectedRoute>}/>
+          <Route path="/login" element={
+            <ProtectedRoute>
+              <Login />
+            </ProtectedRoute>}/>
+          <Route path="*" element={<Navigate to="/login"/>}/>
+        </Routes>
+      </Provider>
+    </BrowserRouter>
   );
 }
 

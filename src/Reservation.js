@@ -16,7 +16,6 @@ function Reservation() {
     const [currentBooking, setCurrentBooking] = useState([]);
     const [currentTable, setCurrentTable] = useState({});
     const [currentLocation, setCurrentLocation] = useState({});
-    const [tableUser, setTableUser] = useState({});
     const [bookerProfile, setBookerProfile] = useState({});
     const [isActive, setIsActive] = useState(false);
     const [isSuccessful, setIsSuccessful] = useState(null);
@@ -143,7 +142,6 @@ function Reservation() {
             if (foundBooking && Object.hasOwn(foundBooking, "id")) {
                 setCurrentBooking(foundBooking);
                 const foundUser = foundBooking.tableGuests.find(tableGuest => tableGuest.id === user.id);
-                setTableUser(foundUser);
                 setCurrentLocation(locations.find(location => location.id === foundBooking.locationId));
                 if (friends.length > 0) setBookerProfile(friends.find(friend => friend.id === foundBooking.bookerId));
                 const run = async () => {

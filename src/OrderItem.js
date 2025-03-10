@@ -1,14 +1,22 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import img1 from "./img/pilsner.png";
 import { LuX, LuPlus, LuMinus } from "react-icons/lu";
 import Context from "./Context";
 
 function OrderItem({ product, isOrdered }) {
-  const { setOrder } = useContext(Context);
+  const { setOrder, locationProducts } = useContext(Context);
+  const [currentProduct, setCurrentProduct] = useState({}); 
+  
+  useEffect(() => {
+    if (locationProducts) {
+      setCurrentProduct(locationProducts.find(locationProduct => locationProduct.id === product.productId));
+    }
+  }, [locationProducts])
 
   return (
     !isOrdered ?
-    <div className="flex items-center justify-between select-none">
+    <div className="flex flex-col">
+      <div className="flex items-center justify-between select-none">
         <div className="flex gap-2">
           <img src={img1} alt="kép" className="h-16 aspect-square bg-white p-1 rounded-md"/>
           <div className="flex flex-col">
@@ -41,20 +49,25 @@ function OrderItem({ product, isOrdered }) {
             }}/>
           </div>
         </div>
+      </div>
+      <hr className="text-grey bg-grey border-grey my-2 self-end rounded-full" style={{width: "calc(100% - 4.5rem)"}}/>
     </div> :
 
-    <div className="flex items-center justify-between select-none">
-      <div className="flex gap-2">
-        <img src={img1} alt="kép" className="h-10 aspect-square bg-white p-1 rounded-md"/>
-        <div className="flex flex-col">
-          <span className="leading-none">Pilsner Urquell</span>
-          <span className="text-gray-300 font-normal">0.5l korsó</span>
+    <div className="flex flex-col">
+      <div className="flex items-center justify-between select-none">
+        <div className="flex gap-2">
+          <img src={img1} alt="kép" className="h-10 aspect-square bg-white p-1 rounded-md"/>
+          <div className="flex flex-col">
+            <span className="leading-none">{currentProduct?.name}</span>
+            <span className="text-gray-300 font-normal">{currentProduct?.description}</span>
+          </div>
+        </div>
+        <div className="flex items-center justify-evenly h-full flex-grow gap-2">
+          <span>{product.unitPrice} Ft</span> 
+          <span className="text-md font-normal self-end text-gray-300">x{product.quantity}</span>
         </div>
       </div>
-      <div className="flex items-center justify-evenly h-full flex-grow gap-2">
-        <span>1290 Ft</span> 
-        <span className="text-md font-normal self-end text-gray-300">x1</span>
-      </div>
+      <hr className="text-grey bg-grey border-grey my-2 self-end rounded-full" style={{width: "calc(100% - 3rem)"}}/>
     </div>
   )
 }

@@ -29,6 +29,7 @@ function Provider({ children }) {
   const [selectedProduct, setSelectedProduct] = useState({});
   const [categories, setCategories] = useState([]);
   const [tableOrders, setTableOrders] = useState([]);
+  const [currentBooking, setCurrentBooking] = useState({});
   
 
   async function getProfile(id, profile) {
@@ -361,6 +362,8 @@ function Provider({ children }) {
       categories,
       selectedProduct,
       setSelectedProduct,
+      currentBooking,
+      setCurrentBooking,
       removeBooking,
       getLocationTables,
       setTableFriends, 

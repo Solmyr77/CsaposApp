@@ -75,9 +75,8 @@ function PubMenu() {
   useEffect(() => {
     const allBookings = bookings.concat(bookingsContainingUser);
     const foundBooking = allBookings.find(booking => booking.id === id);
-    if (foundBooking && locationProducts) {
+    if (foundBooking) {
       setCurrentBooking(foundBooking);
-      console.log(foundBooking)
       const run = async () => {
         await getOrdersByTable(foundBooking.tableId);
         if (categories.length === 0) {
@@ -90,18 +89,21 @@ function PubMenu() {
 
   return (
     <div className="flex flex-col max-h-screen h-screen overflow-y-hidden bg-grey text-white font-bold">
-      <div className="flex flex-col mb-3 p-2 pb-0 shadow-lg">
-        <LuLogOut className="h-10 w-10 bg-dark-grey p-2 rounded-md text-red-500 rotate-180 cursor-pointer" onClick={()=> navigate("/")}/>
-        <div className="flex flex-row justify-between items-end mb-1">
+      <div className="flex flex-col mb-3 p-2 pb-0 shadow-sm">
+        <button className="btn min-h-0 h-8 w-fit text-red-500 bg-dark-grey border-0 hover:bg-dark-grey px-2" onClick={()=> navigate("/")}>
+          <LuLogOut className="rotate-180"/>
+          <span>Kilépés</span>
+        </button>
+        <div className="flex flex-row justify-between items-end mb-2">
           <p className="text-center text-xl">{name}</p>
           <div className="relative">
             <button className="btn bg-dark-grey border-0 hover:bg-dark-grey" onClick={() => {
               setPreviousRoutes([window.location.pathname]);
               navigate(`/table/${name}/${id}`);
             }}>
-              <div className="avatar-group -space-x-3">
+              <div className={`avatar-group -space-x-3 ${!currentBooking?.tableGuests?.some(friend => friend.status === "accepted") && "hidden"}`}>
                 {
-                  currentBooking?.tableGuests?.map(friend => <AvatarGroupItem height={"h-7"} imageUrl={friend.imageUrl}/>)
+                  currentBooking?.tableGuests?.map(friend => friend.status === "accepted" && <AvatarGroupItem height={"h-7"} imageUrl={friend.imageUrl}/>)
                 }
               </div>
               <MdOutlineTableRestaurant className="h-8 w-8 text-sky-400"/>
@@ -205,12 +207,7 @@ function PubMenu() {
           <div className="flex flex-col h-full">
           {
             order.length > 0 ?
-            order.map(product => (
-                <div className="flex flex-col">
-                  <OrderItem product={product}/>
-                  <hr className="text-grey bg-grey border-grey my-2 self-end rounded-full" style={{width: "calc(100% - 4.5rem)"}}/>
-                </div>
-              )) :
+            order.map(product => <OrderItem product={product}/>) :
               <div className="h-full flex justify-center items-center">
                 <span className="text-gray-300 font-normal">A rendelésed üres.</span>
               </div>

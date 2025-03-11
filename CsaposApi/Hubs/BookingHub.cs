@@ -15,10 +15,5 @@ namespace CsaposApi.Hubs
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, bookingId);
         }
-
-        public async Task SendBookingUpdate(string bookingId, string message)
-        {
-            await Clients.Group(bookingId).SendAsync("ReceiveBookingUpdate", message);
-        }
     }
 }

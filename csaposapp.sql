@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Generation Time: Mar 03, 2025 at 08:14 AM
+-- Generation Time: Mar 11, 2025 at 07:56 PM
 -- Server version: 5.7.44
 -- PHP Version: 8.2.27
 
@@ -97,6 +97,7 @@ CREATE TABLE `event_attendance` (
   `id` char(36) NOT NULL,
   `user_id` char(36) DEFAULT NULL,
   `event_id` char(36) DEFAULT NULL,
+  `status` enum('accepted','rejected') NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -186,6 +187,25 @@ CREATE TABLE `order_items` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `payments`
+--
+
+CREATE TABLE `payments` (
+  `id` char(36) NOT NULL,
+  `user_id` char(36) NOT NULL,
+  `order_id` char(36) DEFAULT NULL,
+  `table_booking_id` char(36) DEFAULT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `payment_status` enum('pending','completed','failed','refunded') NOT NULL DEFAULT 'pending',
+  `transaction_id` varchar(100) DEFAULT NULL,
+  `payment_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `products`
 --
 
@@ -193,6 +213,7 @@ CREATE TABLE `products` (
   `id` char(36) NOT NULL,
   `location_id` char(36) NOT NULL,
   `name` varchar(100) NOT NULL,
+  `description` varchar(255) NOT NULL,
   `category` varchar(50) NOT NULL,
   `price` int(11) NOT NULL,
   `discount_percentage` int(11) NOT NULL DEFAULT '0',
@@ -371,6 +392,15 @@ ALTER TABLE `order_items`
   ADD KEY `product_id` (`product_id`);
 
 --
+-- Indexes for table `payments`
+--
+ALTER TABLE `payments`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_payments_user` (`user_id`),
+  ADD KEY `fk_payments_order` (`order_id`),
+  ADD KEY `fk_payments_table_booking` (`table_booking_id`);
+
+--
 -- Indexes for table `products`
 --
 ALTER TABLE `products`
@@ -473,6 +503,14 @@ ALTER TABLE `orders`
 ALTER TABLE `order_items`
   ADD CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`),
   ADD CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`);
+
+--
+-- Constraints for table `payments`
+--
+ALTER TABLE `payments`
+  ADD CONSTRAINT `fk_payments_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `fk_payments_table_booking` FOREIGN KEY (`table_booking_id`) REFERENCES `table_bookings` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `fk_payments_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `products`

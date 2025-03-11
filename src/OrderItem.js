@@ -62,9 +62,9 @@ function OrderItem({ product, isOrdered }) {
             <span className="text-gray-300 font-normal">{currentProduct?.description}</span>
           </div>
         </div>
-        <div className="flex items-center justify-evenly h-full flex-grow gap-2">
+        <div className="flex items-center justify-end h-full flex-grow gap-4">
           <span>{product.unitPrice} Ft</span> 
-          <span className="text-md font-normal self-end text-gray-300">x{product.quantity}</span>
+          <span className="font-normal text-gray-300">x{product.quantity}</span>
         </div>
       </div>
       <hr className="text-grey bg-grey border-grey my-2 self-end rounded-full" style={{width: "calc(100% - 3rem)"}}/>

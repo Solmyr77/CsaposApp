@@ -1,17 +1,49 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import AvatarGroupItem from "./AvatarGroupItem";
-import { LuArrowLeft } from "react-icons/lu";
+import { LuArrowLeft, LuReceiptText, LuX } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router-dom";
 import Context from "./Context";
 import Order from "./Order";
+import OrderItem from "./OrderItem";
 
 function Table() {
-  const { bookings, previousRoutes, getOrdersByTable, tableOrders, locationProducts, getProductsByLocation, currentBooking, setCurrentBooking } = useContext(Context);
+  const { bookings, bookingsContainingUser, getOrdersByTable, tableOrders, locationProducts, getProductsByLocation, currentBooking, setCurrentBooking, user } = useContext(Context);
   const navigate = useNavigate();
   const { name, id } = useParams();
+  const receiptModal = useRef();
+  const [receipt, setReceipt] = useState([]);
+  const [total, setTotal] = useState();
+
+
+  function groupOrderItems() {
+    //group orderItems
+    let summary = [];
+    tableOrders.map(order => {
+      if (order.userId === user?.id) {
+        order.orderItems.map(item => {
+          const existingItem = summary.find(i => i.productId === item.productId);
+          if (existingItem) {
+            existingItem.quantity += item.quantity;
+          } else {
+            summary.push({ ...item });
+          }
+        })
+      }
+    });
+    setReceipt(summary);
+
+    //calculate total
+    let currentPrice = 0;
+    summary.map(item => currentPrice += item.unitPrice * item.quantity);
+    setTotal(currentPrice);
+  }
 
   useEffect(() => {
-    const foundBooking = bookings.find(booking => booking.id === id);
+    if (tableOrders && user) groupOrderItems();
+  }, [tableOrders, user])
+
+  useEffect(() => {
+    const foundBooking = bookings.concat(bookingsContainingUser).find(booking => booking.id === id);
     if (foundBooking) {
       const run = async () => {
         await getOrdersByTable(foundBooking.tableId);
@@ -21,31 +53,56 @@ function Table() {
       run();
       setCurrentBooking(foundBooking);
     }
-  }, [bookings]);
+  }, [bookings, bookingsContainingUser]);
   
   return (
     <div className="flex flex-col max-h-screen h-screen overflow-y-hidden bg-grey text-white font-bold">
-      <div className="flex flex-col px-4 shadow-lg pb-2 mb-4 bg-gradient-to-t pt-4">
-        <button className="btn min-h-0 h-8 w-fit mb-2 bg-dark-grey text-sky-400 border-0 hover:bg-dark-grey" onClick={() => navigate(previousRoutes[previousRoutes.length - 1])}><LuArrowLeft/>Rendelés</button>
+      <div className="flex flex-col px-4 shadow-lg pb-2 bg-gradient-to-t pt-4">
+        <button className="btn min-h-0 h-8 w-fit mb-2 bg-dark-grey text-sky-400 border-0 hover:bg-dark-grey" onClick={() => navigate(`/pubmenu/${name}/${id}`)}><LuArrowLeft/>Rendelés</button>
         <p className="text-xl">Asztalom</p>
         <div className="flex justify-between items-center">
             <p className="text-md">Asztal <span className="text-gray-300">#1</span></p>
-            <div className={`avatar-group -space-x-3 ${!currentBooking?.tableGuests?.some(friend => friend.status === "accepted") && "hidden"}`}>
+            <div className="avatar-group -space-x-4">
+              <AvatarGroupItem height={"h-10"} imageUrl={`${currentBooking.bookerId}.webp`}/>
               {
-                currentBooking?.tableGuests?.map(friend => friend.status === "accepted" && <AvatarGroupItem height={"h-10"} imageUrl={friend.imageUrl}/>)
+                currentBooking?.tableGuests?.map((friend, i) => friend.status === "accepted" && <AvatarGroupItem height={"h-10"} imageUrl={friend.imageUrl}/>)
               }
             </div>
         </div>
+        <button className="btn mt-2 w-fit min-h-0 h-10 bg-gradient-to-tr from-blue to-sky-400 border-0 text-white" onClick={() => receiptModal.current.showModal()}>
+          <LuReceiptText/>
+          Számlám
+        </button>
       </div>
-      <div className="flex h-full flex-col gap-3 overflow-auto px-4 pb-4">
+      <div className="flex h-full flex-col gap-3 overflow-auto px-4 py-4">
         {
           tableOrders?.length > 0 ?
-          tableOrders.map((order, i) => <Order record={order} num={i}/>) :
+          tableOrders.sort((a, b) => {
+            return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          } ).map((order, i) => <Order record={order} num={i}/>) :
           <div className="flex h-full flex-grow justify-center items-center">
             <span className="text-gray-300 font-normal">Itt jelennek meg a rendelések.</span>
           </div>
         }
       </div>
+
+      <dialog className="modal modal-bottom" ref={receiptModal}>
+        <div className="modal-box bg-dark-grey pt-9 gap-2 flex flex-col justify-between">
+          <LuX className="absolute left-0 top-0 w-9 h-9 text-white font-bold bg-red-500 p-1 rounded-tl-md rounded-tr-none rounded-bl-none rounded-br-md hover:cursor-pointer" onClick={() => receiptModal.current.close()}/>
+          <div className="flex flex-col">
+            <p className="text-lg mb-5">Számlám</p>
+            <div className="flex flex-col">
+              {
+                receipt.map(orderItem => <OrderItem product={orderItem} isOrdered/>)
+              }
+            </div>
+          </div>
+          <span className="text-md">Összesen: {total} Ft</span>
+        </div>
+        <form method="dialog" className="modal-backdrop">
+          <button></button>
+        </form>
+      </dialog>
     </div>
   )
 }

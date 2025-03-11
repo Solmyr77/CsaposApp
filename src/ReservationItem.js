@@ -1,11 +1,11 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import AvatarGroupItem from "./AvatarGroupItem";
 import Context from "./Context";
 import { Link } from "react-router-dom";
 import { LuCalendar, LuClock, LuMapPin, LuUsers } from "react-icons/lu"
 
 function ReservationItem({ booking, isGuest }) {
-    const { locations, removeBooking, setBookings, friends } = useContext(Context);
+    const { locations, friends } = useContext(Context);
     const [bookerProfile, setBookerProfile] = useState({});
     const [tableGuests, setTableGuests] = useState([]);
     const [currentLocation, setCurrentLocation] = useState({});
@@ -16,16 +16,6 @@ function ReservationItem({ booking, isGuest }) {
         if (friends.length > 0) setBookerProfile(friends.find(friend => friend.id === booking.bookerId), [friends]);
         if (booking.tableGuests) {
             setTableGuests(booking.tableGuests);
-            const bookedFrom = new Date(booking.bookedFrom);
-            const expiryTime = new Date(bookedFrom);
-            expiryTime.setMinutes(bookedFrom.getMinutes() + 20, 0);
-            if (new Date().getTime() >= expiryTime.getTime()) !isGuest ? removeBooking(booking.id) : setBookings(state => state.filter(record => record.id !== booking.id));
-            else {
-                const timeout = setTimeout(async () => {
-                    !isGuest ? await removeBooking(booking.id) : setBookings(state => state.filter(record => record.id !== booking.id));
-                }, expiryTime.getTime() - new Date().getTime());
-                return () => clearTimeout(timeout);
-            }
         }
     }, [locations, friends])
 

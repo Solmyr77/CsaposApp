@@ -64,53 +64,24 @@ function Reservation() {
                 }
                 else {
                     await logout();
-                    navigate("/login")
+                    navigate("/login");
                 }
             } 
         }
     }
 
-    function setAdminTimeouts(foundBooking) {
+    function setActiveTimeout(foundBooking) {
         const bookedFrom = new Date(foundBooking.bookedFrom);
         bookedFrom.setSeconds(0);
         const expiryTime = new Date(bookedFrom);
         expiryTime.setMinutes(bookedFrom.getMinutes() + 20, 0);
-        if (bookedFrom.getTime() < new Date().getTime()) {
-            setIsActive(true);
-            const timeout = setTimeout(() => {
-                removeBooking(id);
-                navigate("/");
-            }, expiryTime.getTime() - new Date().getTime());
-            return () => clearTimeout(timeout);
-        }
-        else if (expiryTime.getTime() <= new Date().getTime()) {
-            removeBooking(id);
-            navigate("/");
-        }
-        else if (new Date().getTime() < bookedFrom.getTime()) {
+        if (new Date().getTime() < bookedFrom.getTime()) {
             const timeout = setTimeout(() => {
                 setIsActive(true);
             }, bookedFrom.getTime() - new Date().getTime());
             return () => clearTimeout(timeout);
         }
-    }
-
-    function setGuestTimeouts(foundBooking) {
-        const bookedFrom = new Date(foundBooking.bookedFrom);
-        bookedFrom.setSeconds(0);
-        const expiryTime = new Date(bookedFrom);
-        expiryTime.setMinutes(bookedFrom.getMinutes() + 20, 0);
-        if (bookedFrom.getTime() < new Date().getTime()) {
-            const timeout = setTimeout(() => {
-                setBookingsContainingUser(state => state.filter(booking => booking.id !== id));
-                navigate("/");
-            }, expiryTime.getTime() - new Date().getTime());
-            return () => clearTimeout(timeout);
-        }
-        else if (expiryTime.getTime() <= new Date().getTime()) {
-            setBookingsContainingUser(state => state.filter(booking => booking.id !== id));
-            navigate("/");
-        }
+        else setIsActive(true);
     }
 
     function getUserOfTable(tableUser) {
@@ -149,14 +120,10 @@ function Reservation() {
                     setCurrentTable((await getLocationTables(foundBooking.locationId))?.find(table => table.id === foundBooking.tableId));
                 }
                 run();
-                if (bookings.find(booking => booking.id === id)) {
-                    setAdminTimeouts(foundBooking);
-                }
-                else {
-                    setIsGuest(true);
-                    setGuestTimeouts(foundBooking);
-                }
+                setActiveTimeout(foundBooking)
             }
+            if (bookings.find(booking => booking.id === id)) setIsGuest(false);
+            else setIsGuest(true);
         }
     }, [bookings, bookingsContainingUser, friends, locations, isActive, isSuccessful]);
     
@@ -168,26 +135,28 @@ function Reservation() {
             <p className="text-xl text-center font-bold">{!isGuest ? "Foglalásom" : "Meghívó"}</p>
             <div className="flex mt-8 w-full justify-center">
                 <div className="flex flex-col w-96 rounded-xl bg-gradient-to-tr from-blue to-sky-400 shadow-lg px-4 py-2 gap-1">
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between">
                         <p className="text-lg font-bold max-basis-2/3">{currentLocation?.name}</p>
-                        {
-                            !isGuest ? (
-                                isActive ?
-                                <span className="badge bg-green-500 border-0 text-white font-bold">Aktív</span> : 
-                                <span className="badge bg-transparent border-2 border-gray-300 text-gray-300 font-bold">Nem aktív</span>
-                                
-                            ) :
-                            <div className="flex items-center gap-1 basis-1/3">
-                                <span className="badge bg-opacity-20 border-0 font-bold text-white text-xs">Foglalta:</span>
-                                <div className="avatar border-2 rounded-full border-white">
-                                    <div className="w-6 rounded-full">
-                                        <img src={`https://assets.csaposapp.hu/assets/images/${bookerProfile?.imageUrl}`} alt="kép" />
+                        <div className="flex flex-col justify-between items-end gap-2">
+                            {
+                                isGuest &&
+                                <div className="flex items-center gap-1 basis-1/3">
+                                    <span className="badge bg-opacity-20 border-0 font-bold text-white text-xs">Foglalta:</span>
+                                    <div className="avatar border-2 rounded-full border-white">
+                                        <div className="w-6 rounded-full">
+                                            <img src={`https://assets.csaposapp.hu/assets/images/${bookerProfile?.imageUrl}`} alt="kép" />
+                                        </div>
                                     </div>
+                                    <p className="line-clamp-1 font-bold">{bookerProfile?.displayName || "N/A"}</p>
                                 </div>
-                                <p className="line-clamp-1 font-bold">{bookerProfile?.displayName || "N/A"}</p>
-                            </div>
-                        }
+                            }
+                            {
+                                isActive ?
+                                <span className="badge bg-green-500 border-0 text-white font-bold">Aktív</span> :
+                                <span className="badge bg-transparent border-2 border-gray-300 text-gray-300 font-bold">Nem aktív</span>
                         
+                            }
+                        </div>
                     </div>
                     <div className="flex items-center gap-2">
                         <LuMapPin/>
@@ -199,7 +168,7 @@ function Reservation() {
                     </div>
                     <div className="flex items-center gap-2 font-bold">
                         <LuCalendar/>
-                        <p className="text-nowrap">{currentBooking.bookedFrom?.split("T")[0].substring(5)}</p>
+                        <p className="text-nowrap">{currentBooking.bookedFrom?.split("T")[0].replaceAll("-", ".").substring(5)}.</p>
                     </div>
                     <div className="flex items-center gap-2 font-bold">
                         <LuClock/>
@@ -215,7 +184,7 @@ function Reservation() {
                                 if (friend.status === "pending") {
                                     return (
                                         <div className="relative">
-                                            <div className="h-4 w-4 bg-yellow-500 -right-1 top-0 absolute z-50 rounded-full flex justify-center items-center"><span className="text-xs">?</span></div>
+                                            <div className="h-4 w-4 bg-yellow-500 -right-1 top-0 absolute z-50 rounded-full flex justify-center items-center"><span className="text-sm font-bold">?</span></div>
                                             <AvatarGroupItem height={"h-10"} imageUrl={friend.imageUrl}/>
                                         </div>
                                     )   
@@ -223,7 +192,7 @@ function Reservation() {
                                 else if (friend.status === "accepted") {
                                     return (
                                         <div className="relative">
-                                            <div className="h-4 w-4 bg-green-500 -right-1 top-0 absolute z-50 rounded-full flex justify-center items-center"><span className="text-xs"><LuCheck/></span></div>
+                                            <div className="h-4 w-4 bg-green-500 -right-1 top-0 absolute z-50 rounded-full flex justify-center items-center"><span className="text-sm font-bold"><LuCheck/></span></div>
                                             <AvatarGroupItem height={"h-10"} imageUrl={friend.imageUrl}/>
                                         </div>
                                     )
@@ -231,7 +200,7 @@ function Reservation() {
                                 else {
                                     return (
                                         <div className="relative">
-                                            <div className="h-4 w-4 bg-red-500 -right-1 top-0 absolute z-50 rounded-full flex justify-center items-center"><span className="text-xs"><LuX/></span></div>
+                                            <div className="h-4 w-4 bg-red-500 -right-1 top-0 absolute z-50 rounded-full flex justify-center items-center"><span className="text-sm font-bold"><LuX/></span></div>
                                             <AvatarGroupItem height={"h-10"} imageUrl={friend.imageUrl}/>
                                         </div>
                                     ) 
@@ -243,18 +212,13 @@ function Reservation() {
                         waiting ?
                         <div className="flex flex-col items-center gap-1">
                             <p className="font-bold text-lg">ELFOGADVA</p>
-                            <div className="flex items-end gap-1">
-                                <p>Várakozás az adminra</p>
-                                <span className="loading loading-dots loading-xs"></span>
-                            </div>
+                            <button className="btn bg-dark-grey hover:bg-dark-grey disabled:bg-dark-grey border-none gap-0 w-full disabled:opacity-50 text-md" onClick={() => navigate(`/pubmenu/${currentLocation.name}/${currentBooking.id}`)}><span className="bg-gradient-to-t from-blue to-sky-400 bg-clip-text leading-relaxed text-transparent">Kezdés</span></button>
                         </div> :
                         (
                             !isGuest ? 
                             <div className="flex justify-between mt-2 gap-2 w-full">
                                 <button className="btn bg-black border-2 bg-opacity-40 border-red-500 text-red-500 hover:bg-black hover:bg-opacity-40 hover:border-red-500 gap-0 basis-1/2 text-md" onClick={async () => confirmModal.current.showModal()}>Lemondás</button>
-                                <Link className="basis-1/2" to={`/pubmenu/${currentLocation.name}/${currentBooking.id}`}> 
-                                    <button className="btn bg-dark-grey hover:bg-dark-grey disabled:bg-dark-grey border-none gap-0 w-full disabled:opacity-10 text-md" disabled={!isActive}><span className="bg-gradient-to-t from-blue to-sky-400 bg-clip-text leading-relaxed text-transparent">Kezdés</span></button>
-                                </Link>
+                                <button className="btn bg-dark-grey hover:bg-dark-grey disabled:bg-dark-grey border-none gap-0 basis-1/2 disabled:opacity-50 text-md" disabled={!isActive} onClick={() => navigate(`/pubmenu/${currentLocation.name}/${currentBooking.id}`)}><span className="bg-gradient-to-t from-blue to-sky-400 bg-clip-text leading-relaxed text-transparent">Kezdés</span></button>
                             </div> :
                             <div className="flex justify-between mt-2 gap-2 w-full">
                                 <button className={`btn bg-black border-2 bg-opacity-40 border-red-500 text-red-500 hover:bg-black hover:bg-opacity-40 hover:border-red-500 text-md gap-0 basis-1/2 ${isAccepted !== null && "hidden"}`} onClick={async () => await handleRejectInvite(currentBooking.id)}>Elutasítás</button>
@@ -278,7 +242,7 @@ function Reservation() {
                         </div>
                     </div> :
                     <div className="modal-box bg-dark-grey">
-                        <p className="text-center text-green-500 text-md font-bold">Sikeresen lemondtad!</p>
+                        <p className="text-center bg-gradient-to-t from-blue to-sky-400 bg-clip-text text-transparent text-md font-bold">Sikeresen lemondtad!</p>
                     </div>
                 }
                 

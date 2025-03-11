@@ -12,7 +12,7 @@ import AvatarGroupItem from "./AvatarGroupItem";
 
 
 function PubMenu() {
-  const { order, setOrder, locationProducts, categories, tableOrders, selectedProduct, setSelectedProduct, logout, bookings, bookingsContainingUser, setPreviousRoutes, getProductsByLocation, getOrdersByTable } = useContext(Context);
+  const { order, setOrder, locationProducts, categories, tableOrders, selectedProduct, setSelectedProduct, logout, bookings, bookingsContainingUser, getProductsByLocation, getOrdersByTable, user } = useContext(Context);
   const productModal = useRef();
   const bagModal = useRef();
   const successModal = useRef();
@@ -89,21 +89,26 @@ function PubMenu() {
 
   return (
     <div className="flex flex-col max-h-screen h-screen overflow-y-hidden bg-grey text-white font-bold">
-      <div className="flex flex-col mb-3 p-2 pb-0 shadow-sm">
-        <button className="btn min-h-0 h-8 w-fit text-red-500 bg-dark-grey border-0 hover:bg-dark-grey px-2" onClick={()=> navigate("/")}>
+      <div className="flex flex-col mb-3 px-4 pt-4 pb-0 shadow-lg">
+        <button className="btn min-h-0 h-8 w-fit text-red-500 bg-dark-grey border-0 hover:bg-dark-grey" onClick={()=> navigate("/")}>
           <LuLogOut className="rotate-180"/>
           <span>Kilépés</span>
         </button>
         <div className="flex flex-row justify-between items-end mb-2">
           <p className="text-center text-xl">{name}</p>
           <div className="relative">
-            <button className="btn bg-dark-grey border-0 hover:bg-dark-grey" onClick={() => {
-              setPreviousRoutes([window.location.pathname]);
-              navigate(`/table/${name}/${id}`);
-            }}>
-              <div className={`avatar-group -space-x-3 ${!currentBooking?.tableGuests?.some(friend => friend.status === "accepted") && "hidden"}`}>
+            <button className="btn bg-dark-grey border-0 hover:bg-dark-grey" onClick={() => navigate(`/table/${name}/${id}`)}>
+              <div className="avatar-group -space-x-3">
+                <AvatarGroupItem height={"h-7"} imageUrl={`${currentBooking.bookerId}.webp`}/>
                 {
-                  currentBooking?.tableGuests?.map(friend => friend.status === "accepted" && <AvatarGroupItem height={"h-7"} imageUrl={friend.imageUrl}/>)
+                  currentBooking?.tableGuests?.map((friend, i) => i < 3 ? friend.status === "accepted" && <AvatarGroupItem height={"h-7"} imageUrl={friend.imageUrl}/> : (
+                    i === currentBooking.tableGuests.length - 1 && 
+                    <div className="avatar placeholder h-7 aspect-square border-2">
+                      <div className="bg-neutral text-neutral-content w-12">
+                        <span className="">+{currentBooking?.tableGuests?.length - i}</span>
+                      </div>
+                    </div>
+                  ))
                 }
               </div>
               <MdOutlineTableRestaurant className="h-8 w-8 text-sky-400"/>
@@ -111,7 +116,7 @@ function PubMenu() {
             {
               tableOrders?.length > 0 &&
               <div className="h-4 w-fit bg-yellow-500 absolute -right-1 -top-1 rounded-full flex justify-center items-center p-1">
-                <span className="font-normal">{tableOrders.length}</span>
+                <span>{tableOrders.length}</span>
               </div>
             }
           </div>
@@ -233,7 +238,6 @@ function PubMenu() {
         <div className="modal-box flex flex-col items-center bg-grey">
           <p className="bg-gradient-to-t from-blue to-sky-400 text-transparent bg-clip-text text-lg font-bold">Sikeres rendelés!</p>
           <LuCheck className="fill-none stroke-[url(#gradient)] h-12 w-12"/>
-          <p></p>
         </div>
       </dialog>
       <svg width="0" height="0">

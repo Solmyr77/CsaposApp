@@ -11,7 +11,7 @@ function TableItem({ table, date, time }) {
     if (table.bookings) {
       Object.values(table.bookings).map(value => new Date(value).getDate() === new Date(date).getDate() && setIsBooked(true));
     }
-  }, [time, date])
+  }, [date, time])
 
   return (
     <div className={`w-full aspect-video ${selectedTable?.id === table.id ? "bg-gradient-to-tr from-blue to-sky-400" : "bg-dark-grey"} rounded-lg ${isBooked && "opacity-50 cursor-default"} flex flex-col justify-center items-center gap-1 hover:cursor-pointer`} onClick={() => {

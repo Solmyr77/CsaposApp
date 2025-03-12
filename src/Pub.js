@@ -14,9 +14,11 @@ function Pub() {
   const { name } = useParams();
   const location = useLocation();
   const [currentLocation, setCurrentLocation] = useState({});
+  const [currentDay, setCurrentDay] = useState({});
   const [isBusinessHoursVisible, setIsBusinessHoursVisible] = useState(false);
   const [isDescriptionWrapped, setIsDescriptionWrapped] = useState(true);
   const [isClamped, setIsClamped] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const textRef = useRef(null);
   const navigate = useNavigate();
 
@@ -30,10 +32,64 @@ function Pub() {
     }
   };
 
+  function getDayOfTheWeek(foundLocation) {
+    switch (new Date().getDay()) {
+      case 1:
+        return {open: foundLocation.businessHours.mondayOpen, close: foundLocation.businessHours.mondayClose};
+      
+      case 2:
+        return {open: foundLocation.businessHours.tuesdayOpen, close: foundLocation.businessHours.tuesdayClose};
+        
+      case 3:
+        return {open: foundLocation.businessHours.wednesdayOpen, close: foundLocation.businessHours.wednesdayClose};
+      
+      case 4:
+        return {open: foundLocation.businessHours.thursdayOpen, close: foundLocation.businessHours.thursdayClose};
+      
+      case 5:
+        return {open: foundLocation.businessHours.fridayOpen, close: foundLocation.businessHours.fridayClose};
+
+      case 6:
+        return {open: foundLocation.businessHours.saturdayOpen, close: foundLocation.businessHours.saturdayClose};
+
+      case 0:
+        return {open: foundLocation.businessHours.sundayOpen, close: foundLocation.businessHours.sundayClose};
+    }
+  }
+
+  function handleBusinessHours(foundLocation) {
+        const foundDay = getDayOfTheWeek(foundLocation);
+        setCurrentDay(foundDay);
+        const closeDate = new Date();
+        closeDate.setHours(Number(foundDay.close.split(":")[0]), Number(foundDay.close.split(":")[1]), 0);
+        const openaDate = new Date();
+        openaDate.setHours(Number(foundDay.open.split(":")[0]), Number(foundDay.open.split(":")[1]), 0);
+
+        if (closeDate.getTime() < new Date().getTime()) {
+            console.log("zárva");
+            setIsOpen(false);
+            const timeout = setTimeout(() => {
+                setIsOpen(true);
+            }, closeDate.getTime() - new Date().getTime());
+            return () => clearTimeout(timeout);
+        }
+        else {
+            console.log("nyitva");
+            setIsOpen(true);
+            const timeout = setTimeout(() => {
+                setIsOpen(false);
+            }, closeDate.getTime() - new Date().getTime());
+            return () => clearTimeout(timeout);
+        }
+
+    }
+
   useEffect(() => {
     if (locations.length > 0) {
       const foundLocation = locations.find(location => location.name === name);
       setCurrentLocation(foundLocation);
+      foundLocation.businessHours && handleBusinessHours(foundLocation);
+
     }
     checkIfClamped();
     window.addEventListener('resize', checkIfClamped);
@@ -74,21 +130,21 @@ function Pub() {
             <div className="flex flex-row justify-between items-center max-w-full mb-2 pt-2">
                 <div className="flex flex-row items-center">
                   {
-                    currentLocation.isOpen ?
-                    <p className="flex items-center gap-1 leading-none"><span className="badge bg-gradient-to-tr from-blue to-sky-400 border-0 text-white font-bold">Nyitva</span> 23:00-ig</p> :
-                    <p className="flex items-center gap-1 leading-none"><span className="badge bg-transparent border-2 border-red-500 text-red-500 font-bold">Zárva</span> 23:00-ig</p>
+                    isOpen ?
+                    <p className="flex items-center gap-1 leading-none"><span className="badge bg-gradient-to-tr from-blue to-sky-400 border-0 text-white font-bold">Nyitva</span> {currentDay?.close?.slice(0, 5) || "20:00"}-ig</p> :
+                    <p className="flex items-center gap-1 leading-none"><span className="badge bg-transparent border-2 border-red-500 text-red-500 font-bold">Zárva</span> {currentDay?.open?.slice(0, 5) || "13:00"}-ig</p>
                   }
                 </div>
-                <LuChevronRight className={`w-6 h-6 ${isBusinessHoursVisible ? "rotate-90" : "rotate-0"}`} onClick={() => setIsBusinessHoursVisible((state) => !state)}/>
+                <LuChevronRight className={`w-6 h-6 ${isBusinessHoursVisible ? "rotate-90" : "rotate-0"} cursor-pointer`} onClick={() => setIsBusinessHoursVisible((state) => !state)}/>
             </div>
             <div className={`flex flex-col transition-opacity max-w-full mb-2 ${isBusinessHoursVisible ? "" : "hidden"}`}>
-                <ListItem title={"Hétfő"} openingHours={currentLocation?.businessHours ? `${Object.values(currentLocation.businessHours)[1].substring(0, 5)} - ${Object.values(currentLocation.businessHours)[2].substring(0, 5)}` : "13:00 - 20:00"}/>
-                <ListItem title={"Kedd"} openingHours={currentLocation?.businessHours ? `${Object.values(currentLocation.businessHours)[3].substring(0, 5)} - ${Object.values(currentLocation.businessHours)[4].substring(0, 5)} ` : "13:00 - 20:00"}/>
-                <ListItem title={"Szerda"} openingHours={currentLocation?.businessHours ? `${Object.values(currentLocation.businessHours)[5].substring(0, 5)} - ${Object.values(currentLocation.businessHours)[6].substring(0, 5)} ` : "13:00 - 20:00"}/>
-                <ListItem title={"Csütörtök"} openingHours={currentLocation?.businessHours ? `${Object.values(currentLocation.businessHours)[7].substring(0, 5)} - ${Object.values(currentLocation.businessHours)[8].substring(0, 5)} ` : "13:00 - 20:00"}/>
-                <ListItem title={"Péntek"} openingHours={currentLocation?.businessHours ? `${Object.values(currentLocation.businessHours)[9].substring(0, 5)} - ${Object.values(currentLocation.businessHours)[10].substring(0, 5)} ` : "13:00 - 20:00"}/>
-                <ListItem title={"Szombat"} openingHours={currentLocation?.businessHours ? `${Object.values(currentLocation.businessHours)[11].substring(0, 5)} - ${Object.values(currentLocation.businessHours)[12].substring(0, 5)} ` : "13:00 - 20:00"}/>
-                <ListItem title={"Vasárnap"} openingHours={currentLocation?.businessHours ? `${Object.values(currentLocation.businessHours)[13].substring(0, 5)} - ${Object.values(currentLocation.businessHours)[14].substring(0, 5)} ` : "13:00 - 20:00"}/>
+                <ListItem title={"Hétfő"} openingHours={currentLocation?.businessHours ? `${currentLocation.businessHours.mondayOpen.slice(0, 5)} - ${currentLocation.businessHours.mondayClose.slice(0, 5)}` : "13:00 - 20:00"}/>
+                <ListItem title={"Kedd"} openingHours={currentLocation?.businessHours ? `${currentLocation.businessHours.tuesdayOpen.slice(0, 5)} - ${currentLocation.businessHours.tuesdayClose.slice(0, 5)}` : "13:00 - 20:00"}/>
+                <ListItem title={"Szerda"} openingHours={currentLocation?.businessHours ? `${currentLocation.businessHours.wednesdayOpen.slice(0, 5)} - ${currentLocation.businessHours.wednesdayClose.slice(0, 5)}` : "13:00 - 20:00"}/>
+                <ListItem title={"Csütörtök"} openingHours={currentLocation?.businessHours ? `${currentLocation.businessHours.thursdayOpen.slice(0, 5)} - ${currentLocation.businessHours.thursdayClose.slice(0, 5)}` : "13:00 - 20:00"}/>
+                <ListItem title={"Péntek"} openingHours={currentLocation?.businessHours ? `${currentLocation.businessHours.fridayOpen.slice(0, 5)} - ${currentLocation.businessHours.fridayClose.slice(0, 5)}` : "13:00 - 20:00"}/>
+                <ListItem title={"Szombat"} openingHours={currentLocation?.businessHours ? `${currentLocation.businessHours.saturdayOpen.slice(0, 5)} - ${currentLocation.businessHours.saturdayClose.slice(0, 5)}` : "13:00 - 20:00"}/>
+                <ListItem title={"Vasárnap"} openingHours={currentLocation?.businessHours ? `${currentLocation.businessHours.sundayOpen.slice(0, 5)} - ${currentLocation.businessHours.sundayClose.slice(0, 5)}` : "13:00 - 20:00"}/>
             </div>
             <TitleDivider title={"Leírás"}/>
             <p ref={textRef} className={`max-w-full text-wrap ${isDescriptionWrapped ? "line-clamp-5" : "line-clamp-none"} mb-2`}>{currentLocation.description}</p>            
@@ -101,7 +157,7 @@ function Pub() {
             </div>
             <div className="flex justify-center items-center self-center h-full py-10">
                 <button className={`btn bg-gradient-to-tr from-blue to-sky-400 text-white border-0 w-56 h-20 hover:bg-blue disabled:bg-blue disabled:text-white disabled:opacity-50 shadow-[0_4px_4px_rgba(0,0,0,.25)]`} disabled={!currentLocation.isOpen} onClick={() => {
-                    if (currentLocation.isOpen) {
+                    if (isOpen) {
                         setPreviousRoutes((state) => {
                             if (!state.includes(location.pathname)) return [...state, location.pathname];
                             return state;

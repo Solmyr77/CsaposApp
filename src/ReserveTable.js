@@ -189,7 +189,6 @@ function ReserveTable() {
   }
 
   function getDayOfTheWeek(startDate) {
-    console.log(startDate.getDay());
     switch (startDate.getDay()) {
       case 1:
         return {open: currentLocation.businessHours.mondayOpen, close: currentLocation.businessHours.mondayClose};
@@ -222,7 +221,6 @@ function ReserveTable() {
 
     const closingTime = new Date();
     closingTime.setHours(Number(currentDay.close.split(":")[0]), Number(currentDay.close.split(":")[1]))
-    console.log(closingTime.getHours() - new Date().getHours());
 
     if (startDate.getDate() === new Date().getDate()) {
       let start = new Date();
@@ -239,7 +237,6 @@ function ReserveTable() {
     else {
       let start = new Date(startDate);
       start.setHours(Number(currentDay.open.split(":")[0]), Number(currentDay.open.split(":")[1]))
-      console.log(start);
       const openingTime = new Date();
       openingTime.setHours(Number(currentDay.open.split(":")[0]), Number(currentDay.open.split(":")[1]))
       for (let i = 0; i < ((closingTime.getHours() - openingTime.getHours()) * 60) / 15; i++) {
@@ -312,7 +309,7 @@ function ReserveTable() {
   
 
   return (
-    <div className="min-h-screen w-full bg-grey text-white overflow-y-scroll flex flex-col py-8 px-4 font-bold gap-8">
+    <div className="min-h-screen w-full bg-grey text-white overflow-y-auto flex flex-col py-8 px-4 font-bold gap-8">
       <div className="">
         <Link to={previousRoutes[previousRoutes.length - 1]} className="flex w-fit">
           <BackButton/>
@@ -339,13 +336,13 @@ function ReserveTable() {
             startDate.getDate() === new Date().getDate() ?
             <div className="flex gap-2">
                 <button className={`btn w-fit bg-dark-grey hover:bg-dark-grey border-0 text-white text-sm ${selectedTime === "Most" && "bg-gradient-to-tr from-blue to-sky-400 hover:bg-gradient-to-tr"}`} onClick={() => setSelectedTime("Most")}>Most</button>
-                <div className="flex gap-2 overflow-x-scroll">
+                <div className="flex gap-2 overflow-x-auto">
                   {
                     timeSlots.map(time => <button className={`btn w-fit bg-dark-grey hover:bg-dark-grey border-0 text-white text-sm ${selectedTime === time && "bg-gradient-to-tr from-blue to-sky-400 hover:bg-gradient-to-tr"}`} onClick={() => setSelectedTime(time)}>{time}</button>)
                   }
                 </div>
             </div> :
-            <div className="flex gap-2 overflow-x-scroll">
+            <div className="flex gap-2 overflow-x-auto">
               {
                 timeSlots.map(time => <button className={`btn w-fit bg-dark-grey hover:bg-dark-grey border-0 text-white text-sm ${selectedTime === time && "bg-gradient-to-tr from-blue to-sky-400 hover:bg-gradient-to-tr"}`} onClick={() => setSelectedTime(time)}>{time}</button>)
               }

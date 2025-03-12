@@ -223,11 +223,11 @@ function Provider({ children }) {
     catch (error) {
       if (error.response?.status === 401) {
         if (await getAccessToken()) {
-          await getLocationTables(id);
+          return await getLocationTables(id);
         }
         else {
           await logout();
-          <Navigate to={"/login"}/>
+          window.location.reload();
         }
     }
     }

@@ -229,7 +229,7 @@ function ReserveTable() {
       start.setSeconds(0);
       start.setMilliseconds(0);
     
-      for (let i = 0; i < ((closingTime.getHours() - new Date().getHours()) * 60) / 15 - 1; i++) {
+      for (let i = 0; i < ((closingTime.getHours() - new Date().getHours()) * 60) / 15 - 2; i++) {
         slots.push(new Date(start).toTimeString().slice(0, 5));
         start = new Date(start.getTime() + 15 * 60000);
       }
@@ -239,7 +239,7 @@ function ReserveTable() {
       start.setHours(Number(currentDay.open.split(":")[0]), Number(currentDay.open.split(":")[1]))
       const openingTime = new Date();
       openingTime.setHours(Number(currentDay.open.split(":")[0]), Number(currentDay.open.split(":")[1]))
-      for (let i = 0; i < ((closingTime.getHours() - openingTime.getHours()) * 60) / 15; i++) {
+      for (let i = 0; i < ((closingTime.getHours() - openingTime.getHours()) * 60) / 15 - 1; i++) {
         slots.push(new Date(start).toTimeString().slice(0, 5));
         start = new Date(start.getTime() + 15 * 60000);
       }
@@ -271,23 +271,18 @@ function ReserveTable() {
     setSelectedTable({});
 
     if (locations.length > 0) {
-      setCurrentLocation(() => {
-        const foundLocation = locations.find(location => location.name === name);
-        if (foundLocation) return foundLocation;
-        else {
-          navigate("/");
-          return 0;
-        }
-      });
-      if (Object.hasOwn(currentLocation, "id")) {
+      const foundLocation = locations.find(location => location.name === name);
+      if (foundLocation && foundLocation?.isOpen) {
+        setCurrentLocation(foundLocation);
         const run = async () => {
-          setLocationTables(await getLocationTables(currentLocation.id));
-          await getBookingsForLocation(currentLocation.id);
+          setLocationTables(await getLocationTables(foundLocation.id));
+          await getBookingsForLocation(foundLocation.id);
         }
         run();
       }
+      else navigate("/");
     }
-  }, [locations, currentLocation, isBooked]);
+  }, [locations, isBooked]);
 
   useEffect(() => {
     if (locationTables?.length > 0 && bookingsForLocation.length > 0) {

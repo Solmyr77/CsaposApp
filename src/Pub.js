@@ -18,7 +18,7 @@ function Pub() {
   const [isBusinessHoursVisible, setIsBusinessHoursVisible] = useState(false);
   const [isDescriptionWrapped, setIsDescriptionWrapped] = useState(true);
   const [isClamped, setIsClamped] = useState(false);
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(null);
   const textRef = useRef(null);
   const navigate = useNavigate();
 
@@ -58,38 +58,37 @@ function Pub() {
   }
 
   function handleBusinessHours(foundLocation) {
-        const foundDay = getDayOfTheWeek(foundLocation);
-        setCurrentDay(foundDay);
-        const closeDate = new Date();
-        closeDate.setHours(Number(foundDay.close.split(":")[0]), Number(foundDay.close.split(":")[1]), 0);
-        const openaDate = new Date();
-        openaDate.setHours(Number(foundDay.open.split(":")[0]), Number(foundDay.open.split(":")[1]), 0);
+    const foundDay = getDayOfTheWeek(foundLocation);
+    setCurrentDay(foundDay);
+    const closeDate = new Date();
+    closeDate.setHours(Number(foundDay.close.split(":")[0]), Number(foundDay.close.split(":")[1]), 0);
+    const openaDate = new Date();
+    openaDate.setHours(Number(foundDay.open.split(":")[0]), Number(foundDay.open.split(":")[1]), 0);
 
-        if (closeDate.getTime() < new Date().getTime()) {
-            console.log("zárva");
-            setIsOpen(false);
-            const timeout = setTimeout(() => {
-                setIsOpen(true);
-            }, closeDate.getTime() - new Date().getTime());
-            return () => clearTimeout(timeout);
-        }
-        else {
-            console.log("nyitva");
-            setIsOpen(true);
-            const timeout = setTimeout(() => {
-                setIsOpen(false);
-            }, closeDate.getTime() - new Date().getTime());
-            return () => clearTimeout(timeout);
-        }
-
+    if (closeDate.getTime() < new Date().getTime()) {
+      setIsOpen(false);
+      const timeout = setTimeout(() => {
+          setIsOpen(true);
+      }, closeDate.getTime() - new Date().getTime());
+      return () => clearTimeout(timeout);
     }
+    else {
+      setIsOpen(true);
+      const timeout = setTimeout(() => {
+          setIsOpen(false);
+      }, closeDate.getTime() - new Date().getTime());
+      return () => clearTimeout(timeout);
+    }
+  }
 
   useEffect(() => {
     if (locations.length > 0) {
       const foundLocation = locations.find(location => location.name === name);
-      setCurrentLocation(foundLocation);
-      foundLocation.businessHours && handleBusinessHours(foundLocation);
-
+      if (foundLocation) {
+        setCurrentLocation(foundLocation);
+        foundLocation?.businessHours && handleBusinessHours(foundLocation);
+      } 
+      else navigate("/");
     }
     checkIfClamped();
     window.addEventListener('resize', checkIfClamped);
@@ -104,7 +103,7 @@ function Pub() {
         <div className="w-full h-fit relative">
             <img src={img1} alt="kep" className="w-full h-48 object-cover"/>
             <div className="w-full h-full bg-gradient-to-t from-dark-grey via-15% via-dark-grey bg-opacity-65 absolute inset-0 flex flex-col justify-end text-wrap">
-                <p className="font-bold text-xl px-1 break-words text-center leading-tight w-full">{currentLocation.name}</p>
+                <p className="font-bold text-xl px-1 break-words text-center leading-tight w-full">{currentLocation?.name}</p>
             </div>
         </div>
         <div className="rounded-b-md bg-gradient-to-b from-dark-grey pt-0.5 px-4">
@@ -113,10 +112,10 @@ function Pub() {
                 <p className="text-center text-[14px]">3599 Sajószöged, Petőfi út 2.</p>
             </div>
             {
-                Number(currentLocation.rating) > 0 ?
+                Number(currentLocation?.rating) > 0 ?
                 (
                     <div className="flex flex-row justify-between w-full">
-                        <Rating readOnly precision={0.5} value={Number(currentLocation.rating)}/>
+                        <Rating readOnly precision={0.5} value={Number(currentLocation?.rating)}/>
                         <p>1 értékelés</p>
                     </div>
                 ) :
@@ -130,7 +129,7 @@ function Pub() {
             <div className="flex flex-row justify-between items-center max-w-full mb-2 pt-2">
                 <div className="flex flex-row items-center">
                   {
-                    isOpen ?
+                    (isOpen ? isOpen : currentLocation?.isOpen) ?
                     <p className="flex items-center gap-1 leading-none"><span className="badge bg-gradient-to-tr from-blue to-sky-400 border-0 text-white font-bold">Nyitva</span> {currentDay?.close?.slice(0, 5) || "20:00"}-ig</p> :
                     <p className="flex items-center gap-1 leading-none"><span className="badge bg-transparent border-2 border-red-500 text-red-500 font-bold">Zárva</span> {currentDay?.open?.slice(0, 5) || "13:00"}-ig</p>
                   }
@@ -147,7 +146,7 @@ function Pub() {
                 <ListItem title={"Vasárnap"} openingHours={currentLocation?.businessHours ? `${currentLocation.businessHours.sundayOpen.slice(0, 5)} - ${currentLocation.businessHours.sundayClose.slice(0, 5)}` : "13:00 - 20:00"}/>
             </div>
             <TitleDivider title={"Leírás"}/>
-            <p ref={textRef} className={`max-w-full text-wrap ${isDescriptionWrapped ? "line-clamp-5" : "line-clamp-none"} mb-2`}>{currentLocation.description}</p>            
+            <p ref={textRef} className={`max-w-full text-wrap ${isDescriptionWrapped ? "line-clamp-5" : "line-clamp-none"} mb-2`}>{currentLocation?.description}</p>            
             <div className="flex w-full justify-center">
                 <LuChevronRight className={`w-10 h-10 ${isDescriptionWrapped ? "rotate-90" : "-rotate-90"} ${isClamped ? "flex" : "hidden"}`} onClick={() => setIsDescriptionWrapped((state) => !state)}/>
             </div>
@@ -156,8 +155,8 @@ function Pub() {
                 <EventSwiper/>
             </div>
             <div className="flex justify-center items-center self-center h-full py-10">
-                <button className={`btn bg-gradient-to-tr from-blue to-sky-400 text-white border-0 w-56 h-20 hover:bg-blue disabled:bg-blue disabled:text-white disabled:opacity-50 shadow-[0_4px_4px_rgba(0,0,0,.25)]`} disabled={!currentLocation.isOpen} onClick={() => {
-                    if (isOpen) {
+                <button className={`btn bg-gradient-to-tr from-blue to-sky-400 text-white border-0 w-56 h-20 hover:bg-blue disabled:bg-blue disabled:text-white disabled:opacity-50 shadow-[0_4px_4px_rgba(0,0,0,.25)]`} disabled={!currentLocation?.isOpen} onClick={() => {
+                    if (isOpen ? isOpen : currentLocation?.isOpen) {
                         setPreviousRoutes((state) => {
                             if (!state.includes(location.pathname)) return [...state, location.pathname];
                             return state;

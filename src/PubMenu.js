@@ -74,16 +74,19 @@ function PubMenu() {
   
   useEffect(() => {
     const allBookings = bookings.concat(bookingsContainingUser);
-    const foundBooking = allBookings.find(booking => booking.id === id);
-    if (foundBooking) {
-      setCurrentBooking(foundBooking);
-      const run = async () => {
-        await getOrdersByTable(foundBooking.tableId);
-        if (categories.length === 0) {
-          await getProductsByLocation(foundBooking.locationId);
-        }
-      } 
-      run();
+    if (allBookings.length > 0) {
+      const foundBooking = allBookings.find(booking => booking.id === id);
+      if (foundBooking) {
+        setCurrentBooking(foundBooking);
+        const run = async () => {
+          await getOrdersByTable(foundBooking.tableId);
+          if (categories.length === 0) {
+            await getProductsByLocation(foundBooking.locationId);
+          }
+        } 
+        run();
+      }
+      else navigate("/");
     }
   }, [bookings, bookingsContainingUser, categories]);
 

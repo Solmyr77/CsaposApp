@@ -122,6 +122,7 @@ function Reservation() {
                 run();
                 setActiveTimeout(foundBooking)
             }
+            else if (!foundBooking && !isSuccessful) navigate("/");
             if (bookings.find(booking => booking.id === id)) setIsGuest(false);
             else setIsGuest(true);
         }

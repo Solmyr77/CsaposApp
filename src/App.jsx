@@ -5,7 +5,6 @@ import ProtectedRoute from './ProtectedRoute'
 import Provider from './Provider';
 import OrdersMenu from './OrdersMenu';
 import ReceiptsMenu from './ReceiptsMenu';
-import GuestsMenu from './GuestsMenu';
 import StockMenu from './StockMenu';
 import StatisticsMenu from './StatisticsMenu'
 import ExtraMenu from './ExtraMenu';
@@ -31,12 +30,6 @@ function App() {
           <Route path="/receipts" element={
             <ProtectedRoute isProtected={true}>
               <ReceiptsMenu />
-            </ProtectedRoute>}
-          />
-
-          <Route path="/guests" element={
-            <ProtectedRoute isProtected={true}>
-              <GuestsMenu />
             </ProtectedRoute>}
           />
 

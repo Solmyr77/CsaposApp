@@ -5,12 +5,13 @@ import getAccessToken from "./refreshToken";
 import { Navigate } from "react-router-dom";
 
 function Provider({ children }) {
-  //basic
+  //basic states
   const [navState, setNavState] = useState("Összes");
   const [menuState, setMenuState] = useState("Tables");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState({});
   const [userId, setUserId] = useState(null);
+  const [userRole, setUserRole] = useState(null);
   const [locations, setLocations] = useState( localStorage.getItem("locations") || []);
   const [notificationFilter, setNotificationFilter] = useState("Összes");
   const [previousRoutes, setPreviousRoutes] = useState(["/"]);
@@ -26,6 +27,11 @@ function Provider({ children }) {
   //order
   const [order, setOrder] = useState([]);
   const [locationProducts, setLocationProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState({});
+  const [categories, setCategories] = useState([]);
+  const [tableOrders, setTableOrders] = useState([]);
+  const [currentBooking, setCurrentBooking] = useState({});
+  
 
   async function getProfile(id, profile) {
     try {
@@ -99,14 +105,20 @@ function Provider({ children }) {
         headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` }
       }
       const response = await axios.get("https://backend.csaposapp.hu/api/locations", config);
-      const data = response.data;
-      setLocations(data);
+      const data = await response.data;
+      let locations = [];
+      const openingHours = await getBusinessHours();
+      data.map(location => {
+        const foundOpeningHours = openingHours.find(item => item.locationId === location.id);
+        foundOpeningHours ? locations.push({...location, businessHours: foundOpeningHours}) : locations.push({...location});
+      })
+      setLocations(locations);
       return true;
     }
     catch (error) {
       if (error.response?.status === 401) {
         if (await getAccessToken()) {
-          getLocations();
+          await getLocations();
         }
         else {
           await logout();
@@ -119,6 +131,63 @@ function Provider({ children }) {
       }
     }
   }
+
+  // async function getBusinessHours(id) {
+  //     try {
+  //       const config = {
+  //         headers: { 
+  //           Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+  //           "Cache-Content": "no-cache"
+  //         }
+  //       }
+  //       const response = await axios.get(`https://backend.csaposapp.hu/api/business-hours/${id}`, config);
+  //       const data = await response.data;
+  //       if (response.status === 200) return data;
+  //     }
+  //     catch (error) {
+  //       if (error.response?.status === 401) {
+  //         if (await getAccessToken()) {
+  //           await getBusinessHours(id);
+  //         }
+  //         else {
+  //           await logout();
+  //           window.location.reload();
+  //           return false;
+  //         }
+  //       } 
+  //       else {
+  //         return false;
+  //       }
+  //     }
+  //   }
+  async function getBusinessHours() {
+      try {
+        const config = {
+          headers: { 
+            Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+            "Cache-Content": "no-cache"
+          }
+        }
+        const response = await axios.get(`https://backend.csaposapp.hu/api/business-hours/`, config);
+        const data = await response.data;
+        if (response.status === 200) return data;
+      }
+      catch (error) {
+        if (error.response?.status === 401) {
+          if (await getAccessToken()) {
+            await getBusinessHours();
+          }
+          else {
+            await logout();
+            window.location.reload();
+            return false;
+          }
+        } 
+        else {
+          return false;
+        }
+      }
+    }
 
   async function getTables() {
     try {
@@ -155,7 +224,7 @@ function Provider({ children }) {
     catch (error) {
       if (error.response?.status === 401) {
         if (await getAccessToken()) {
-          getLocationTables(id);
+          await getLocationTables(id);
         }
         else {
           await logout();
@@ -232,25 +301,55 @@ function Provider({ children }) {
             }
         }
     }
-}
+  }
 
-  async function getTableGuests(id) {
+  async function getProductsByLocation(id) {
     try {
       const config = {
-        headers: { 
-          Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
-          "Cache-Content": "no-cache"
-        }
+        headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` }
       }
-      const response = await axios.get(`https://backend.csaposapp.hu/api/table-guests/${id}?bookingId=${id}`, config);
+      const response = await axios.get(`https://backend.csaposapp.hu/api/products/location/${id}`, config);
       const data = response.data;
       if (response.status === 200) {
-        return data;
+        const foundCategories = [];
+        data.map(record => !foundCategories.includes(record.category) && foundCategories.push(record.category));
+        setCategories(foundCategories);
+        setLocationProducts(data);
       }
     }
     catch (error) {
-      console.log(error.response?.status);
-      console.log(error.message);
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) {
+          await getProductsByLocation(id);
+        }
+        else {
+          await logout();
+          window.location.reload();
+        }
+      } 
+    }
+  }
+
+  async function getOrdersByTable(id) {
+    try {
+      const config = {
+        headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` }
+      }
+      const response = await axios.get(`https://backend.csaposapp.hu/api/orders/orders-by-table/${id}`, config);
+      if (response.status === 200) {
+        setTableOrders(response.data);
+      }
+    }
+    catch (error) {
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) {
+          await getOrdersByTable(id);
+        }
+        else {
+          await logout();
+          window.location.reload();
+        }
+      } 
     }
   }
 
@@ -271,10 +370,11 @@ function Provider({ children }) {
   useEffect(() => {
     if (localStorage.getItem("accessToken")) {
       setUserId(decodeJWT(localStorage.getItem("accessToken")).sub);
+      setUserRole(decodeJWT(localStorage.getItem("accessToken")).role);
       if (userId) {
        const fetch = async () => {
           await getProfile(userId, "user");
-          await getLocations();
+          getLocations();
           getFriends();
           getFriendRequests();
           getTables();
@@ -323,14 +423,22 @@ function Provider({ children }) {
       bookingsContainingUser,
       setBookingsContainingUser,
       locationProducts,
-      setLocationProducts,
+      tableOrders,
+      categories,
+      selectedProduct,
+      setSelectedProduct,
+      currentBooking,
+      setCurrentBooking,
       removeBooking,
       getLocationTables,
       setTableFriends, 
       getProfile,
       getBookingsByUser,
       getBookingsContainingUser,
+      getProductsByLocation,
+      getOrdersByTable,
       setUserId,
+      getBusinessHours,
       logout
       }}>
       {children}

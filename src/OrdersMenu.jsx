@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import Header from './Header'
+import Sidebar from './Sidebar'
 import Context from "./Context";
 
 export default function OrdersMenu() {
@@ -10,8 +10,14 @@ export default function OrdersMenu() {
     }, []);
 
     return (
-        <div className='bg-grey min-h-screen w-full'>
-            <Header />
+        <div className='bg-grey min-h-screen w-full flex'>
+            <div className='basis-1/12'>
+                <Sidebar />
+            </div>
+
+            <div className='basis-11/12'>
+                
+            </div>
         </div>
     )
 }

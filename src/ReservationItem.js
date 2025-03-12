@@ -21,7 +21,7 @@ function ReservationItem({ booking, isGuest }) {
 
     return (
         <Link to={`/reservation/${booking.id}`}>
-            <div className="flex items-start w-full h-32 bg-gradient-to-tr from-blue to-sky-400 rounded-md pl-4 pr-5 pt-3 pb-2 select-none">
+            <div className="flex items-center w-full h-32 bg-gradient-to-tr from-blue to-sky-400 rounded-md pl-4 pr-5 pt-3 pb-2 select-none">
                 <div className="flex flex-col h-full basis-2/3 justify-between">
                     <div>
                         <div className={`${isGuest ? "flex" : "hidden"} items-center gap-1 text-xs`}>
@@ -58,7 +58,7 @@ function ReservationItem({ booking, isGuest }) {
                     <div className="avatar-group -space-x-4 rtl:space-x-reverse justify-end">
                         {
                             tableGuests.length > 0 && Array.from(tableGuests).map((tableGuest, i) => {
-                                if (i < 4) return <AvatarGroupItem height="h-10" imageUrl={tableGuest.imageUrl}/>
+                                if (i < 4) return <AvatarGroupItem key={i} height="h-10" imageUrl={tableGuest.imageUrl}/>
                                 else if (i === 4) return (
                                     <div className="avatar h-10 aspect-square border-2 placeholder">
                                         <div className="bg-neutral text-neutral-content w-12">

@@ -104,14 +104,20 @@ function Provider({ children }) {
         headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` }
       }
       const response = await axios.get("https://backend.csaposapp.hu/api/locations", config);
-      const data = response.data;
-      setLocations(data);
+      const data = await response.data;
+      let locations = [];
+      const openingHours = await getBusinessHours();
+      data.map(location => {
+        const foundOpeningHours = openingHours.find(item => item.locationId === location.id);
+        foundOpeningHours ? locations.push({...location, businessHours: foundOpeningHours}) : locations.push({...location});
+      })
+      setLocations(locations);
       return true;
     }
     catch (error) {
       if (error.response?.status === 401) {
         if (await getAccessToken()) {
-          getLocations();
+          await getLocations();
         }
         else {
           await logout();
@@ -124,6 +130,63 @@ function Provider({ children }) {
       }
     }
   }
+
+  // async function getBusinessHours(id) {
+  //     try {
+  //       const config = {
+  //         headers: { 
+  //           Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+  //           "Cache-Content": "no-cache"
+  //         }
+  //       }
+  //       const response = await axios.get(`https://backend.csaposapp.hu/api/business-hours/${id}`, config);
+  //       const data = await response.data;
+  //       if (response.status === 200) return data;
+  //     }
+  //     catch (error) {
+  //       if (error.response?.status === 401) {
+  //         if (await getAccessToken()) {
+  //           await getBusinessHours(id);
+  //         }
+  //         else {
+  //           await logout();
+  //           window.location.reload();
+  //           return false;
+  //         }
+  //       } 
+  //       else {
+  //         return false;
+  //       }
+  //     }
+  //   }
+  async function getBusinessHours() {
+      try {
+        const config = {
+          headers: { 
+            Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+            "Cache-Content": "no-cache"
+          }
+        }
+        const response = await axios.get(`https://backend.csaposapp.hu/api/business-hours/`, config);
+        const data = await response.data;
+        if (response.status === 200) return data;
+      }
+      catch (error) {
+        if (error.response?.status === 401) {
+          if (await getAccessToken()) {
+            await getBusinessHours();
+          }
+          else {
+            await logout();
+            window.location.reload();
+            return false;
+          }
+        } 
+        else {
+          return false;
+        }
+      }
+    }
 
   async function getTables() {
     try {
@@ -160,7 +223,7 @@ function Provider({ children }) {
     catch (error) {
       if (error.response?.status === 401) {
         if (await getAccessToken()) {
-          getLocationTables(id);
+          await getLocationTables(id);
         }
         else {
           await logout();
@@ -309,7 +372,7 @@ function Provider({ children }) {
       if (userId) {
        const fetch = async () => {
           await getProfile(userId, "user");
-          await getLocations();
+          getLocations();
           getFriends();
           getFriendRequests();
           getTables();
@@ -373,6 +436,7 @@ function Provider({ children }) {
       getProductsByLocation,
       getOrdersByTable,
       setUserId,
+      getBusinessHours,
       logout
       }}>
       {children}

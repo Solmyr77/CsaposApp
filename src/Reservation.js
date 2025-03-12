@@ -160,7 +160,7 @@ function Reservation() {
                     </div>
                     <div className="flex items-center gap-2">
                         <LuMapPin/>
-                        <p className="text-nowrap font-bold">{currentLocation.address}</p>
+                        <p className="text-nowrap font-bold">{currentLocation?.address}</p>
                     </div>
                     <div className="flex items-center gap-2">
                         <MdOutlineTableRestaurant/>

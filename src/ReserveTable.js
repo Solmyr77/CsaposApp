@@ -80,6 +80,7 @@ function ReserveTable() {
   const [isBooked, setIsBooked] = useState(null);
   const [bookingsForLocation, setBookingsForLocation] = useState([]);
   const [counter, setCounter] = useState(3);
+  const [timeSlots, setTimeSlots] = useState([]);
   const modalRef = useRef();
   const ExampleCustomInput = forwardRef(
     ({ value, onClick, className }, ref) => (
@@ -122,8 +123,14 @@ function ReserveTable() {
     setIsLoading(true);
     try {
       const bookedFromTime = new Date(startDate);
-      bookedFromTime.setHours(Number(selectedTime.slice(0,2)) + 1);
-      bookedFromTime.setMinutes(Number(selectedTime.slice(3)));
+      if (selectedTime === "Most") {
+        bookedFromTime.setHours(bookedFromTime.getHours() + 1);
+        bookedFromTime.setMinutes(bookedFromTime.getMinutes());
+      }
+      else {
+        bookedFromTime.setHours(Number(selectedTime.slice(0,2)) + 1);
+        bookedFromTime.setMinutes(Number(selectedTime.slice(3)));
+      }
       const config = {
         headers: { 
           Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
@@ -181,17 +188,64 @@ function ReserveTable() {
     }
   }
 
-  function generateTimeSlots() {
-    let slots = [];
-    let start = new Date();
-    let minutes = start.getMinutes();
-    start.setMinutes(Math.ceil(minutes / 15) * 15);
-    start.setSeconds(0);
-    start.setMilliseconds(0);
+  function getDayOfTheWeek(startDate) {
+    console.log(startDate.getDay());
+    switch (startDate.getDay()) {
+      case 1:
+        return {open: currentLocation.businessHours.mondayOpen, close: currentLocation.businessHours.mondayClose};
+      
+      case 2:
+        return {open: currentLocation.businessHours.tuesdayOpen, close: currentLocation.businessHours.tuesdayClose};
+        
+      case 3:
+        return {open: currentLocation.businessHours.wednesdayOpen, close: currentLocation.businessHours.wednesdayClose};
+      
+      case 4:
+        return {open: currentLocation.businessHours.thursdayOpen, close: currentLocation.businessHours.thursdayClose};
+      
+      case 5:
+        return {open: currentLocation.businessHours.fridayOpen, close: currentLocation.businessHours.fridayClose};
 
-    for (let i = 0; i < (24 * 60) / 15; i++) {
+      case 6:
+        return {open: currentLocation.businessHours.saturdayOpen, close: currentLocation.businessHours.saturdayClose};
+
+      case 0:
+        return {open: currentLocation.businessHours.sundayOpen, close: currentLocation.businessHours.sundayClose};
+    }
+  }
+
+  function generateTimeSlots(startDate) {
+    setSelectedTable({});
+    setSelectedTime("");
+    const currentDay = getDayOfTheWeek(startDate);
+    let slots = [];
+
+    const closingTime = new Date();
+    closingTime.setHours(Number(currentDay.close.split(":")[0]), Number(currentDay.close.split(":")[1]))
+    console.log(closingTime.getHours() - new Date().getHours());
+
+    if (startDate.getDate() === new Date().getDate()) {
+      let start = new Date();
+      let minutes = start.getMinutes();
+      start.setMinutes(Math.ceil(minutes / 15) * 15);
+      start.setSeconds(0);
+      start.setMilliseconds(0);
+    
+      for (let i = 0; i < ((closingTime.getHours() - new Date().getHours()) * 60) / 15 - 1; i++) {
         slots.push(new Date(start).toTimeString().slice(0, 5));
         start = new Date(start.getTime() + 15 * 60000);
+      }
+    }
+    else {
+      let start = new Date(startDate);
+      start.setHours(Number(currentDay.open.split(":")[0]), Number(currentDay.open.split(":")[1]))
+      console.log(start);
+      const openingTime = new Date();
+      openingTime.setHours(Number(currentDay.open.split(":")[0]), Number(currentDay.open.split(":")[1]))
+      for (let i = 0; i < ((closingTime.getHours() - openingTime.getHours()) * 60) / 15; i++) {
+        slots.push(new Date(start).toTimeString().slice(0, 5));
+        start = new Date(start.getTime() + 15 * 60000);
+      }
     }
     return slots;
   }
@@ -218,6 +272,7 @@ function ReserveTable() {
     }
     setTableFriends([]);
     setSelectedTable({});
+
     if (locations.length > 0) {
       setCurrentLocation(() => {
         const foundLocation = locations.find(location => location.name === name);
@@ -240,16 +295,20 @@ function ReserveTable() {
   useEffect(() => {
     if (locationTables?.length > 0 && bookingsForLocation.length > 0) {
       for (let locationTable of locationTables) {
-        const newObject = {}
-        bookingsForLocation.map(locationBooking => {
+        const newObject = {};
+        bookingsForLocation.map((locationBooking, i) => {
           if (locationBooking.tableId === locationTable.id) {
-            newObject[bookingsForLocation.indexOf(locationBooking)] = locationBooking.bookedFrom;
+            newObject[i] = locationBooking.bookedFrom;
             locationTable.bookings = newObject;
           }
         })
       }
     }
   }, [locationTables, bookingsForLocation]);
+
+  useEffect(() => {
+    currentLocation.businessHours && setTimeSlots(generateTimeSlots(startDate));
+  }, [startDate, currentLocation]);
   
 
   return (
@@ -276,11 +335,22 @@ function ReserveTable() {
               className="font-play"
               customInput={<ExampleCustomInput className="bg-dark-grey px-4 py-2 rounded-lg text-lg flex flex-row items-center"/>}/>
           </StyledDatePickerWrapper>
-          <div className="flex gap-2 overflow-x-scroll">
+          {
+            startDate.getDate() === new Date().getDate() ?
+            <div className="flex gap-2">
+                <button className={`btn w-fit bg-dark-grey hover:bg-dark-grey border-0 text-white text-sm ${selectedTime === "Most" && "bg-gradient-to-tr from-blue to-sky-400 hover:bg-gradient-to-tr"}`} onClick={() => setSelectedTime("Most")}>Most</button>
+                <div className="flex gap-2 overflow-x-scroll">
+                  {
+                    timeSlots.map(time => <button className={`btn w-fit bg-dark-grey hover:bg-dark-grey border-0 text-white text-sm ${selectedTime === time && "bg-gradient-to-tr from-blue to-sky-400 hover:bg-gradient-to-tr"}`} onClick={() => setSelectedTime(time)}>{time}</button>)
+                  }
+                </div>
+            </div> :
+            <div className="flex gap-2 overflow-x-scroll">
               {
-                generateTimeSlots().map(time => <button className={`btn w-fit bg-dark-grey hover:bg-dark-grey border-0 text-white text-sm ${selectedTime === time && "bg-gradient-to-tr from-blue to-sky-400 hover:bg-gradient-to-tr"}`} onClick={() => setSelectedTime(time)}>{time}</button>)
+                timeSlots.map(time => <button className={`btn w-fit bg-dark-grey hover:bg-dark-grey border-0 text-white text-sm ${selectedTime === time && "bg-gradient-to-tr from-blue to-sky-400 hover:bg-gradient-to-tr"}`} onClick={() => setSelectedTime(time)}>{time}</button>)
               }
-          </div>
+            </div>  
+          }
       </div>
       <div className={`flex flex-col gap-3 ${!selectedTime && "opacity-50"}`}>
         <p className="text-lg">Asztal választása</p>
@@ -288,7 +358,11 @@ function ReserveTable() {
           {
             locationTables?.length > 0 &&
             locationTables?.sort((a, b) => {
-              startDate.setHours(Number(selectedTime.slice(0,2)), Number(selectedTime.slice(3)), 0);
+              if (selectedTime === "Most") {
+                const newDate = new Date();
+                startDate.setHours(newDate.getHours(), newDate.getMinutes());
+              } 
+              else startDate.setHours(Number(selectedTime.slice(0,2)), Number(selectedTime.slice(3)), 0)
               if (a?.capacity === b?.capacity) return a?.number - b?.number;
               return a?.capacity - b?.capacity;
             }).map(table => <TableItem table={table} date={startDate} time={selectedTime}/>)

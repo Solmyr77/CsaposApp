@@ -7,50 +7,18 @@ import img1 from "./img/pub.webp"
 import { Rating } from "@mui/material";
 import Context from "./Context";
 import EventSwiper from "./EventSwiper";
-import axios from "axios";
-import getAccessToken from "./refreshToken";
 import { LuMapPin, LuChevronRight } from "react-icons/lu";
 
 function Pub() {
-  const { locations, previousRoutes, setPreviousRoutes, logout } = useContext(Context);
+  const { locations, previousRoutes, setPreviousRoutes } = useContext(Context);
   const { name } = useParams();
   const location = useLocation();
   const [currentLocation, setCurrentLocation] = useState({});
   const [isBusinessHoursVisible, setIsBusinessHoursVisible] = useState(false);
   const [isDescriptionWrapped, setIsDescriptionWrapped] = useState(true);
   const [isClamped, setIsClamped] = useState(false);
-  const [businessHours, setBusinessHours] = useState({});
   const textRef = useRef(null);
   const navigate = useNavigate();
-
-  async function getBusinessHours(id) {
-    try {
-      const config = {
-        headers: { 
-          Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
-          "Cache-Content": "no-cache"
-        }
-      }
-      const response = await axios.get(`https://backend.csaposapp.hu/api/business-hours/${id}`, config);
-      const data = await response.data;
-      if (response.status === 200) setBusinessHours(data);
-    }
-    catch (error) {
-      if (error.response?.status === 401) {
-        if (await getAccessToken()) {
-          await getBusinessHours(id);
-        }
-        else {
-          await logout();
-          window.location.reload();
-          return false;
-        }
-      } 
-      else {
-        return false;
-      }
-    }
-  }
 
   const checkIfClamped = () => {
     const element = textRef.current;
@@ -66,12 +34,6 @@ function Pub() {
     if (locations.length > 0) {
       const foundLocation = locations.find(location => location.name === name);
       setCurrentLocation(foundLocation);
-      if (Object.hasOwn(foundLocation, "id")) {
-        const run = async () => {
-          await getBusinessHours(foundLocation.id);
-        }
-        run();
-      }
     }
     checkIfClamped();
     window.addEventListener('resize', checkIfClamped);
@@ -120,13 +82,13 @@ function Pub() {
                 <LuChevronRight className={`w-6 h-6 ${isBusinessHoursVisible ? "rotate-90" : "rotate-0"}`} onClick={() => setIsBusinessHoursVisible((state) => !state)}/>
             </div>
             <div className={`flex flex-col transition-opacity max-w-full mb-2 ${isBusinessHoursVisible ? "" : "hidden"}`}>
-                <ListItem title={"Hétfő"} openingHours={Object.hasOwn(businessHours, "id") ? `${Object.values(businessHours)[1].substring(0, 5)} - ${Object.values(businessHours)[2].substring(0, 5)}` : "13:00 - 20:00"}/>
-                <ListItem title={"Kedd"} openingHours={Object.hasOwn(businessHours, "id") ?`${Object.values(businessHours)[3].substring(0, 5)} - ${Object.values(businessHours)[4].substring(0, 5)} ` : "13:00 - 20:00"}/>
-                <ListItem title={"Szerda"} openingHours={Object.hasOwn(businessHours, "id") ?`${Object.values(businessHours)[5].substring(0, 5)} - ${Object.values(businessHours)[6].substring(0, 5)} ` : "13:00 - 20:00"}/>
-                <ListItem title={"Csütörtök"} openingHours={Object.hasOwn(businessHours, "id") ? `${Object.values(businessHours)[7].substring(0, 5)} - ${Object.values(businessHours)[8].substring(0, 5)} ` : "13:00 - 20:00"}/>
-                <ListItem title={"Péntek"} openingHours={Object.hasOwn(businessHours, "id") ? `${Object.values(businessHours)[9].substring(0, 5)} - ${Object.values(businessHours)[10].substring(0, 5)} ` : "13:00 - 20:00"}/>
-                <ListItem title={"Szombat"} openingHours={Object.hasOwn(businessHours, "id") ? `${Object.values(businessHours)[11].substring(0, 5)} - ${Object.values(businessHours)[12].substring(0, 5)} ` : "13:00 - 20:00"}/>
-                <ListItem title={"Vasárnap"} openingHours={Object.hasOwn(businessHours, "id") ? `${Object.values(businessHours)[13].substring(0, 5)} - ${Object.values(businessHours)[14].substring(0, 5)} ` : "13:00 - 20:00"}/>
+                <ListItem title={"Hétfő"} openingHours={currentLocation?.businessHours ? `${Object.values(currentLocation.businessHours)[1].substring(0, 5)} - ${Object.values(currentLocation.businessHours)[2].substring(0, 5)}` : "13:00 - 20:00"}/>
+                <ListItem title={"Kedd"} openingHours={currentLocation?.businessHours ? `${Object.values(currentLocation.businessHours)[3].substring(0, 5)} - ${Object.values(currentLocation.businessHours)[4].substring(0, 5)} ` : "13:00 - 20:00"}/>
+                <ListItem title={"Szerda"} openingHours={currentLocation?.businessHours ? `${Object.values(currentLocation.businessHours)[5].substring(0, 5)} - ${Object.values(currentLocation.businessHours)[6].substring(0, 5)} ` : "13:00 - 20:00"}/>
+                <ListItem title={"Csütörtök"} openingHours={currentLocation?.businessHours ? `${Object.values(currentLocation.businessHours)[7].substring(0, 5)} - ${Object.values(currentLocation.businessHours)[8].substring(0, 5)} ` : "13:00 - 20:00"}/>
+                <ListItem title={"Péntek"} openingHours={currentLocation?.businessHours ? `${Object.values(currentLocation.businessHours)[9].substring(0, 5)} - ${Object.values(currentLocation.businessHours)[10].substring(0, 5)} ` : "13:00 - 20:00"}/>
+                <ListItem title={"Szombat"} openingHours={currentLocation?.businessHours ? `${Object.values(currentLocation.businessHours)[11].substring(0, 5)} - ${Object.values(currentLocation.businessHours)[12].substring(0, 5)} ` : "13:00 - 20:00"}/>
+                <ListItem title={"Vasárnap"} openingHours={currentLocation?.businessHours ? `${Object.values(currentLocation.businessHours)[13].substring(0, 5)} - ${Object.values(currentLocation.businessHours)[14].substring(0, 5)} ` : "13:00 - 20:00"}/>
             </div>
             <TitleDivider title={"Leírás"}/>
             <p ref={textRef} className={`max-w-full text-wrap ${isDescriptionWrapped ? "line-clamp-5" : "line-clamp-none"} mb-2`}>{currentLocation.description}</p>            

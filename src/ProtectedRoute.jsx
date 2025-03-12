@@ -6,7 +6,7 @@ function ProtectedRoute({ children, isProtected }) {
     if (isProtected) {
         return isAuthenticated ? children : <Navigate to="/login"/>;
     }
-    return isAuthenticated ? <Navigate to="/"/> : children;
+    return isAuthenticated ? <Navigate to="/tables"/> : children;
 }
 
 export default ProtectedRoute;

@@ -7,7 +7,7 @@ import { Navigate } from "react-router-dom";
 function Provider({ children }) {
   //basic
   const [navState, setNavState] = useState("Összes");
-  const [menuState, setMenuState] = useState("Main");
+  const [menuState, setMenuState] = useState("Tables");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState({});
   const [userId, setUserId] = useState(null);

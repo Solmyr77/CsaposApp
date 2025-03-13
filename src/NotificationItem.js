@@ -117,7 +117,7 @@ function NotificationItem({ record, isFriendRequest }) {
         </div>
         <div className="flex flex-col w-full pl-4">
           <p className="text-sm font-bold text-left">Azahriah koncert a Félidőben!</p>
-          <p className="w w line-clamp-1">A magyarországon világhírű énekes meghódítja a sajószögedi Félidő sörözőt.</p>
+          <p className="line-clamp-1">A magyarországon világhírű énekes meghódítja a sajószögedi Félidő sörözőt.</p>
         </div>
     </div>
   );

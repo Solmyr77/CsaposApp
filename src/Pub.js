@@ -62,14 +62,14 @@ function Pub() {
     setCurrentDay(foundDay);
     const closeDate = new Date();
     closeDate.setHours(Number(foundDay.close.split(":")[0]), Number(foundDay.close.split(":")[1]), 0);
-    const openaDate = new Date();
-    openaDate.setHours(Number(foundDay.open.split(":")[0]), Number(foundDay.open.split(":")[1]), 0);
+    const openDate = new Date();
+    openDate.setHours(Number(foundDay.open.split(":")[0]), Number(foundDay.open.split(":")[1]), 0);
 
     if (closeDate.getTime() < new Date().getTime()) {
       setIsOpen(false);
       const timeout = setTimeout(() => {
           setIsOpen(true);
-      }, closeDate.getTime() - new Date().getTime());
+      }, openDate.getTime() - new Date().getTime());
       return () => clearTimeout(timeout);
     }
     else {
@@ -129,7 +129,7 @@ function Pub() {
             <div className="flex flex-row justify-between items-center max-w-full mb-2 pt-2">
                 <div className="flex flex-row items-center">
                   {
-                    (isOpen ? isOpen : currentLocation?.isOpen) ?
+                    (isOpen !== null ? isOpen : currentLocation?.isOpen) ?
                     <p className="flex items-center gap-1 leading-none"><span className="badge bg-gradient-to-tr from-blue to-sky-400 border-0 text-white font-bold">Nyitva</span> {currentDay?.close?.slice(0, 5) || "20:00"}-ig</p> :
                     <p className="flex items-center gap-1 leading-none"><span className="badge bg-transparent border-2 border-red-500 text-red-500 font-bold">Zárva</span> {currentDay?.open?.slice(0, 5) || "13:00"}-ig</p>
                   }
@@ -155,8 +155,8 @@ function Pub() {
                 <EventSwiper/>
             </div>
             <div className="flex justify-center items-center self-center h-full py-10">
-                <button className={`btn bg-gradient-to-tr from-blue to-sky-400 text-white border-0 w-56 h-20 hover:bg-blue disabled:bg-blue disabled:text-white disabled:opacity-50 shadow-[0_4px_4px_rgba(0,0,0,.25)]`} disabled={!currentLocation?.isOpen} onClick={() => {
-                    if (isOpen ? isOpen : currentLocation?.isOpen) {
+                <button className={`btn bg-gradient-to-tr from-blue to-sky-400 text-white border-0 w-56 h-20 hover:bg-blue disabled:bg-blue disabled:text-white disabled:opacity-50 shadow-[0_4px_4px_rgba(0,0,0,.25)]`} disabled={isOpen !== null ? !isOpen : !currentLocation?.isOpen} onClick={() => {
+                    if (isOpen !== null ? isOpen : currentLocation?.isOpen) {
                         setPreviousRoutes((state) => {
                             if (!state.includes(location.pathname)) return [...state, location.pathname];
                             return state;

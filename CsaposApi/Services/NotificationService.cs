@@ -18,7 +18,7 @@ namespace CsaposApi.Services
         [HttpPost("invoke")]
         public async Task NotifyUserAddedToTable(string userId, BookingResponseDTO currentBooking)
         {
-            await _hubContext.Clients.User(userId).SendAsync("NotifyAddedToTable", currentBooking);
+            await _hubContext.Clients.Group("notifications").SendAsync("NotifyAddedToTable", currentBooking);
         }
     }
 }

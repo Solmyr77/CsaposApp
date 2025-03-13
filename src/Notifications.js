@@ -6,7 +6,7 @@ import NavItem from "./NavItem";
 import Context from "./Context";
 
 function Notifications() {
-    const { friendRequests, notificationFilter, previousRoutes } = useContext(Context);
+    const { friendRequests, notificationFilter, previousRoutes, addedToTableNotifications } = useContext(Context);
     const [recordsToDisplay, setRecordsToDisplay] = useState([]);
     const eventRecords = [""];
 
@@ -31,27 +31,31 @@ function Notifications() {
         </Link>
         <p className="text-xl font-bold text-center mb-4">Értesítések</p>
         <div className="flex flex-row justify-between font-bold">
-            <NavItem title={"Összes"} isNotificationPage={true}/>
-            <NavItem title={"Események"} isNotificationPage={true}/>
-            <NavItem title={"Barátkérelmek"} isNotificationPage={true}/>
+            <NavItem key="Összes" title={"Összes"} isNotificationPage/>
+            <NavItem key="Események" title={"Események"} isNotificationPage/>
+            <NavItem key="Barátkérelmek" title={"Barátkérelmek"} isNotificationPage/>
         </div>
         <div className="flex flex-grow flex-col mt-4 gap-y-2 pr-1 overflow-y-auto">
-            <div className="flex w-full items-center justify-between bg-dark-grey px-4 py-2 rounded-md drop-shadow-[0px_4px_4px_rgba(0,0,0,.5)]">
-                <div className="flex flex-col">
-                    <span className="font-bold text-md bg-gradient-to-t from-blue to-sky-400 bg-clip-text text-transparent">Új asztalmeghívás!</span>
-                    <span className="text-sm text-gray-300">Részletekért koppints!</span>
-                </div>
-                <div className="flex gap-2 items-center">
-                    <div className="avatar">
-                        <div className="h-10 rounded-full border-2">
-                            <img src="https://thispersondoesnotexist.com" alt="kép" />
-                        </div>
-                    </div>
-                    <span>adminferi</span>
-                </div>
-            </div>
             {
-                recordsToDisplay.map(record => <NotificationItem key={record.id} record={record} isFriendRequest={Object.hasOwn(record, "id")}/>)
+                addedToTableNotifications && (
+                <div className="flex w-full items-center justify-between bg-dark-grey px-4 py-2 rounded-md drop-shadow-[0px_4px_4px_rgba(0,0,0,.5)]">
+                    <div className="flex flex-col">
+                        <span className="font-bold text-md bg-gradient-to-t from-blue to-sky-400 bg-clip-text text-transparent">Új asztalmeghívás!</span>
+                        <span className="text-sm text-gray-300">Részletekért koppints!</span>
+                    </div>
+                    <div className="flex gap-2 items-center">
+                        <div className="avatar">
+                            <div className="h-10 rounded-full border-2">
+                                <img src="https://thispersondoesnotexist.com" alt="kép" />
+                            </div>
+                        </div>
+                        <span>adminferi</span>
+                    </div>
+                </div>
+                )
+            }
+            {
+                recordsToDisplay.map((record, i) => <NotificationItem key={i} record={record} isFriendRequest={Object.hasOwn(record, "id")}/>)
             }
         </div>
     </div>

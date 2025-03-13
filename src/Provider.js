@@ -30,6 +30,9 @@ function Provider({ children }) {
   const [categories, setCategories] = useState([]);
   const [tableOrders, setTableOrders] = useState([]);
   const [currentBooking, setCurrentBooking] = useState({});
+  //notifications
+  const [addedToTableNotifications, setAddedToTableNotifications] = useState([]);
+
   
 
   async function getProfile(id, profile) {
@@ -393,28 +396,29 @@ function Provider({ children }) {
   useEffect(() => {
     bookingConnection.start()
         .then(() => {
-            bookingConnection.on("notifyaddedtotable", (message) => {
-                console.log("📨 Received from hub:", message);
-                setBookingsContainingUser(state => {
-                  if (!state.some(booking => booking.id === message.id)) {
-                    return [...state, message];
-                  } 
-                });
-            });
-            localStorage.getItem("accessToken") !== null && bookingConnection.invoke("RegisterUser", localStorage.getItem("accessToken").replaceAll(`"`, "")).then((message) => console.log(message));
+          bookingConnection.on("notifyaddedtotable", (message) => {
+              console.log("📨 Received from hub:", message);
+              setAddedToTableNotifications(state => [...state, message]);
+              setBookingsContainingUser(state => {
+                if (!state.some(booking => booking.id === message.id)) {
+                  return [...state, message];
+                } 
+              });
+          });
+          localStorage.getItem("accessToken") !== null && bookingConnection.invoke("RegisterUser", localStorage.getItem("accessToken").replaceAll(`"`, "")).then((message) => console.log(message));
 
-            bookingConnection.invoke("JoinBookingGroup")
-                .then(() => console.log(`✅ Joined group: notifications`))
-                .catch(err => console.error("❌ Failed to join group:", err));
+          bookingConnection.invoke("JoinBookingGroup")
+              .then(() => console.log(`✅ Joined group: notifications`))
+              .catch(err => console.error("❌ Failed to join group:", err));
 
-            console.log("✅ BookingHub connected successfully.");
+          console.log("✅ BookingHub connected successfully.");
         })
         .catch((err) => {
             console.error("❌ Connection failed:", err);
         });
 
     return () => {
-        bookingConnection.off("NotifyAddedToTable");
+      bookingConnection.off("notifyaddedtotable");
     };
   }, [localStorage.getItem("accessToken")]);
 
@@ -456,6 +460,8 @@ function Provider({ children }) {
       currentBooking,
       setCurrentBooking,
       removeBooking,
+      addedToTableNotifications,
+      setAddedToTableNotifications,
       getLocationTables,
       setTableFriends, 
       getProfile,

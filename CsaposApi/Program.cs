@@ -157,7 +157,7 @@ namespace CsaposApi
             app.MapControllers();
 
             // SignalR Hubs
-            app.MapHub<BookingHub>("/hubs/booking");
+            app.MapHub<BookingHub>("/hubs/booking").RequireCors("AllowOrigin");
 
             app.Run();
         }

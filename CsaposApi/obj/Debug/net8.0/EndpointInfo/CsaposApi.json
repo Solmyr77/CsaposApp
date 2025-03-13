@@ -2219,6 +2219,18 @@
         }
       }
     },
+    "/api/Manager/manager-location": {
+      "get": {
+        "tags": [
+          "Manager"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/order-items": {
       "get": {
         "tags": [
@@ -3599,6 +3611,10 @@
             "type": "string",
             "nullable": true
           },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
           "category": {
             "type": "string",
             "nullable": true
@@ -4278,6 +4294,10 @@
             "type": "string",
             "nullable": true
           },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
           "category": {
             "type": "string",
             "nullable": true
@@ -4336,6 +4356,10 @@
             "format": "uuid"
           },
           "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
             "type": "string",
             "nullable": true
           },

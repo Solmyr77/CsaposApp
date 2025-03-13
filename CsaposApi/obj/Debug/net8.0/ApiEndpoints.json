@@ -1365,6 +1365,16 @@
     ]
   },
   {
+    "ContainingType": "CsaposApi.Controllers.ManagerController",
+    "Method": "GetManagerLocation",
+    "RelativePath": "api/Manager/manager-location",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "CsaposApi.Controllers.OrderItemsController",
     "Method": "GetOrderItems",
     "RelativePath": "api/order-items",

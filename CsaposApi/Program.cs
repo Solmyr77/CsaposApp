@@ -91,6 +91,7 @@ namespace CsaposApi
 
             // SignalR services
             builder.Services.AddScoped<IBookingNotificationService, BookingNotificationService>();
+            builder.Services.AddScoped<INotificationService, NotificationService>();
 
             // 1. Bind JwtSettings
             var jwtSection = builder.Configuration.GetSection("JwtSettings");

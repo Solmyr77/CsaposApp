@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CsaposApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+aacfc022e14a013a4513b3b2a0e750b4ca29c3e1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+743d5cb7bc979d0f90240a93306fae9d3bfc20f8")]
 [assembly: System.Reflection.AssemblyProductAttribute("CsaposApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CsaposApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

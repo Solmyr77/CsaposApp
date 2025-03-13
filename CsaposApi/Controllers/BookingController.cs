@@ -23,13 +23,15 @@ namespace CsaposApi.Controllers
         private readonly CsaposappContext _context;
         private readonly IAuthService _authService;
         private readonly ILogger<BookingController> _logger;
-        private readonly IBookingNotificationService _notificationService;
+        private readonly INotificationService _notificationService;
+        private readonly IBookingNotificationService _bookingNotificationService;
 
-        public BookingController(CsaposappContext context, IAuthService authService, ILogger<BookingController> logger, IBookingNotificationService notificationService)
+        public BookingController(CsaposappContext context, IAuthService authService, ILogger<BookingController> logger, IBookingNotificationService bookingNotificationService, INotificationService notificationService)
         {
             _context = context;
             _authService = authService;
             _logger = logger;
+            _bookingNotificationService = bookingNotificationService;
             _notificationService = notificationService;
         }
 
@@ -245,7 +247,7 @@ namespace CsaposApi.Controllers
                 await _context.TableBookings.AddAsync(currentBooking);
                 await _context.SaveChangesAsync();
 
-                await _notificationService.NotifyBookingCreated(bookerId.ToString(), response);
+                await _bookingNotificationService.NotifyBookingCreated(bookerId.ToString(), response);
 
                 return Ok(response);
             }
@@ -322,7 +324,7 @@ namespace CsaposApi.Controllers
 
                 await _context.SaveChangesAsync();
 
-                await _notificationService.NotifyBookingDeleted(deleteBookingDTO.BookingId.ToString());
+                await _bookingNotificationService.NotifyBookingDeleted(deleteBookingDTO.BookingId.ToString());
 
                 return NoContent(); // HTTP 204
             }
@@ -494,7 +496,7 @@ namespace CsaposApi.Controllers
                 _context.TableGuests.Remove(tableGuest);
                 await _context.SaveChangesAsync();
 
-                await _notificationService.NotifyUserRemovedFromTable(removeFromTableDTO.BookingId.ToString(), removeFromTableDTO.UserId.ToString());
+                await _bookingNotificationService.NotifyUserRemovedFromTable(removeFromTableDTO.BookingId.ToString(), removeFromTableDTO.UserId.ToString());
 
                 return Ok(new { message = "Guest removed from the table successfully." });
             }
@@ -538,7 +540,7 @@ namespace CsaposApi.Controllers
                 _context.TableGuests.Update(tableGuest);
                 await _context.SaveChangesAsync();
 
-                await _notificationService.NotifyUserAcceptedInvite(bookingId.ToString(), currentUserId.ToString());
+                await _bookingNotificationService.NotifyUserAcceptedInvite(bookingId.ToString(), currentUserId.ToString());
 
                 return Ok(new { message = "Invite accepted successfully." });
             }
@@ -583,7 +585,7 @@ namespace CsaposApi.Controllers
                 _context.TableGuests.Update(tableGuest);
                 await _context.SaveChangesAsync();
 
-                await _notificationService.NotifyUserRejectedInvite(bookingId.ToString(), currentUserId.ToString());
+                await _bookingNotificationService.NotifyUserRejectedInvite(bookingId.ToString(), currentUserId.ToString());
 
                 return Ok(new { message = "Invite rejected successfully." });
             }

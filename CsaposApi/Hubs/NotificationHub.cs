@@ -22,8 +22,6 @@ namespace CsaposApi.Hubs
             var userId = Guid.Parse(_authService.GetUserId(token));
 
             _connectionManager.AddConnection(userId, Context.ConnectionId);
-
-            await Clients.Caller.SendAsync("Registration", true);
         }
 
         public async Task JoinBookingGroup()

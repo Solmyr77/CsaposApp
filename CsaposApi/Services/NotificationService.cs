@@ -18,7 +18,7 @@ namespace CsaposApi.Services
         }
 
         [HttpPost("invoke")]
-        public async Task NotifyUserAddedToTable(string userId, BookingResponseDTO currentBooking)
+        public async Task NotifyUserAddedToTable(string userId, BookingResponseWithGuestsDTO currentBooking)
         {
             var connectionId = _connectionManager.GetConnection(Guid.Parse(userId));
 

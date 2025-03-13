@@ -4,6 +4,6 @@ namespace CsaposApi.Services.IService
 {
     public interface INotificationService
     {
-        Task NotifyUserAddedToTable(string userId, BookingResponseDTO currentBooking);
+        Task NotifyUserAddedToTable(string userId, BookingResponseWithGuestsDTO currentBooking);
     }
 }

@@ -83,7 +83,7 @@ function Table() {
           tableOrders?.length > 0 ?
           tableOrders.sort((a, b) => {
             return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-          } ).map((order, i) => <Order record={order} num={i}/>) :
+          } ).map((order, i) => <Order key={order.id} record={order} num={i}/>) :
           <div className="flex h-full flex-grow justify-center items-center">
             <span className="text-gray-300 font-normal">Itt jelennek meg a rendelések.</span>
           </div>

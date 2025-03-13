@@ -184,7 +184,7 @@ function Reservation() {
                             currentBooking.tableGuests?.map(friend => {
                                 if (friend.status === "pending") {
                                     return (
-                                        <div className="relative">
+                                        <div className="relative" key={friend.id}>
                                             <div className="h-4 w-4 bg-yellow-500 -right-1 top-0 absolute z-50 rounded-full flex justify-center items-center"><span className="text-sm font-bold">?</span></div>
                                             <AvatarGroupItem height={"h-10"} imageUrl={friend.imageUrl}/>
                                         </div>
@@ -192,7 +192,7 @@ function Reservation() {
                                 } 
                                 else if (friend.status === "accepted") {
                                     return (
-                                        <div className="relative">
+                                        <div className="relative" key={friend.id}>
                                             <div className="h-4 w-4 bg-green-500 -right-1 top-0 absolute z-50 rounded-full flex justify-center items-center"><span className="text-sm font-bold"><LuCheck/></span></div>
                                             <AvatarGroupItem height={"h-10"} imageUrl={friend.imageUrl}/>
                                         </div>
@@ -200,7 +200,7 @@ function Reservation() {
                                 }
                                 else {
                                     return (
-                                        <div className="relative">
+                                        <div className="relative" key={friend.id}>
                                             <div className="h-4 w-4 bg-red-500 -right-1 top-0 absolute z-50 rounded-full flex justify-center items-center"><span className="text-sm font-bold"><LuX/></span></div>
                                             <AvatarGroupItem height={"h-10"} imageUrl={friend.imageUrl}/>
                                         </div>

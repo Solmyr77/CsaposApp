@@ -3,6 +3,7 @@ import Context from "./Context";
 import axios from "axios";
 import getAccessToken from "./refreshToken";
 import { Navigate } from "react-router-dom";
+import bookingConnection from "./signalRBookingConnection";
 
 function Provider({ children }) {
   //basic states
@@ -387,6 +388,35 @@ function Provider({ children }) {
     const decodedPayload = atob(payload);
     return JSON.parse(decodedPayload);
   }
+
+  //hub connections
+  useEffect(() => {
+    bookingConnection.start()
+        .then(() => {
+            bookingConnection.on("notifyaddedtotable", (message) => {
+                console.log("📨 Received from hub:", message);
+                setBookingsContainingUser(state => {
+                  if (!state.some(booking => booking.id === message.id)) {
+                    return [...state, message];
+                  } 
+                });
+            });
+            localStorage.getItem("accessToken") !== null && bookingConnection.invoke("RegisterUser", localStorage.getItem("accessToken").replaceAll(`"`, "")).then((message) => console.log(message));
+
+            bookingConnection.invoke("JoinBookingGroup")
+                .then(() => console.log(`✅ Joined group: notifications`))
+                .catch(err => console.error("❌ Failed to join group:", err));
+
+            console.log("✅ BookingHub connected successfully.");
+        })
+        .catch((err) => {
+            console.error("❌ Connection failed:", err);
+        });
+
+    return () => {
+        bookingConnection.off("NotifyAddedToTable");
+    };
+  }, [localStorage.getItem("accessToken")]);
 
   return (
     <Context.Provider value={{ 

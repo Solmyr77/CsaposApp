@@ -9,7 +9,9 @@ function Header({ notification }) {
   return (
     <div className="w-full flex flex-row justify-between items-center pt-8 font-play font-bold px-4">
       <div className="flex flex-row items-center">
-          <Link to={"/profile"}><img src={user.imageUrl} alt="avatar" className="w-12 object-cover aspect-square rounded-full"/></Link>
+          <Link to={"/profile"}>
+            <img src={user?.imageUrl} alt="avatar" className="w-12 object-cover aspect-square rounded-full"/>
+          </Link>
           <p className="ml-3 text-lg text-white">Szia {user.displayName}!</p>
       </div>
       <div className="p-2 bg-dark-grey rounded-md">

@@ -104,9 +104,9 @@ function PubMenu() {
               <div className="avatar-group -space-x-3">
                 <AvatarGroupItem height={"h-7"} imageUrl={`${currentBooking.bookerId}.webp`}/>
                 {
-                  currentBooking?.tableGuests?.map((friend, i) => i < 3 ? friend.status === "accepted" && <AvatarGroupItem height={"h-7"} imageUrl={friend.imageUrl}/> : (
+                  currentBooking?.tableGuests?.map((friend, i) => i < 3 ? friend.status === "accepted" && <AvatarGroupItem key={friend.id} height={"h-7"} imageUrl={friend.imageUrl}/> : (
                     i === currentBooking.tableGuests.length - 1 && 
-                    <div className="avatar placeholder h-7 aspect-square border-2">
+                    <div className="avatar placeholder h-7 aspect-square border-2" key={friend.id}>
                       <div className="bg-neutral text-neutral-content w-12">
                         <span className="">+{currentBooking?.tableGuests?.length - i}</span>
                       </div>
@@ -129,12 +129,12 @@ function PubMenu() {
         {
           categories.length > 0 ? 
           categories.map(category => (
-            <div className="flex flex-col">
+            <div className="flex flex-col" key={category}>
               <p className="text-lg w-full py-2 sticky top-0 px-4 bg-grey">{category}</p>
               <div className="flex flex-col px-4 gap-y-2">
                 {
                   locationProducts.length > 0 && 
-                  locationProducts.map(product => product.category === category && <MenuItem product={product} ref={productModal}/>) 
+                  locationProducts.map(product => product.category === category && <MenuItem key={product.id} product={product} ref={productModal}/>) 
                 }
               </div>
             </div> 

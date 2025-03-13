@@ -333,13 +333,13 @@ function ReserveTable() {
                 <button className={`btn w-fit bg-dark-grey hover:bg-dark-grey border-0 text-white text-sm ${selectedTime === "Most" && "bg-gradient-to-tr from-blue to-sky-400 hover:bg-gradient-to-tr"}`} onClick={() => setSelectedTime("Most")}>Most</button>
                 <div className="flex gap-2 overflow-x-auto">
                   {
-                    timeSlots.map(time => <button className={`btn w-fit bg-dark-grey hover:bg-dark-grey border-0 text-white text-sm ${selectedTime === time && "bg-gradient-to-tr from-blue to-sky-400 hover:bg-gradient-to-tr"}`} onClick={() => setSelectedTime(time)}>{time}</button>)
+                    timeSlots.map(time => <button key={time} className={`btn w-fit bg-dark-grey hover:bg-dark-grey border-0 text-white text-sm ${selectedTime === time && "bg-gradient-to-tr from-blue to-sky-400 hover:bg-gradient-to-tr"}`} onClick={() => setSelectedTime(time)}>{time}</button>)
                   }
                 </div>
             </div> :
             <div className="flex gap-2 overflow-x-auto">
               {
-                timeSlots.map(time => <button className={`btn w-fit bg-dark-grey hover:bg-dark-grey border-0 text-white text-sm ${selectedTime === time && "bg-gradient-to-tr from-blue to-sky-400 hover:bg-gradient-to-tr"}`} onClick={() => setSelectedTime(time)}>{time}</button>)
+                timeSlots.map(time => <button key={time} className={`btn w-fit bg-dark-grey hover:bg-dark-grey border-0 text-white text-sm ${selectedTime === time && "bg-gradient-to-tr from-blue to-sky-400 hover:bg-gradient-to-tr"}`} onClick={() => setSelectedTime(time)}>{time}</button>)
               }
             </div>  
           }
@@ -357,7 +357,7 @@ function ReserveTable() {
               else startDate.setHours(Number(selectedTime.slice(0,2)), Number(selectedTime.slice(3)), 0)
               if (a?.capacity === b?.capacity) return a?.number - b?.number;
               return a?.capacity - b?.capacity;
-            }).map(table => <TableItem table={table} date={startDate} time={selectedTime}/>)
+            }).map(table => <TableItem key={table.id} table={table} date={startDate} time={selectedTime}/>)
           }
         </div>
       </div>
@@ -369,7 +369,7 @@ function ReserveTable() {
         <div className="flex flex-col max-h-80 flex-grow gap-2 overflow-y-auto">
           {
             friends.every(friend => Object.hasOwn(friend, "id")) &&
-            friends.map(friend => <InviteFriendItem friend={friend}/>)
+            friends.map(friend => <InviteFriendItem key={friend.id} friend={friend}/>)
           }
         </div>
       </div>
@@ -397,7 +397,7 @@ function ReserveTable() {
           <div className="avatar-group -space-x-4 rtl:space-x-reverse">
             {
               tableFriends?.length > 0 &&
-              tableFriends?.map(friend => <AvatarGroupItem imageUrl={friend.imageUrl}/>)
+              tableFriends?.map(friend => <AvatarGroupItem key={friend.id} imageUrl={friend.imageUrl}/>)
             }
           </div>
         </div>

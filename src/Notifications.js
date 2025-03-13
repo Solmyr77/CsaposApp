@@ -4,20 +4,11 @@ import BackButton from "./BackButton";
 import NotificationItem from "./NotificationItem";
 import NavItem from "./NavItem";
 import Context from "./Context";
-import bookingConnection from "./signalRBookingConnection";
 
 function Notifications() {
     const { friendRequests, notificationFilter, previousRoutes } = useContext(Context);
     const [recordsToDisplay, setRecordsToDisplay] = useState([]);
     const eventRecords = [""];
-
-    useEffect(() => {
-        bookingConnection.start()
-        .then(() => console.log("Connected to notification hub"))
-        .catch(() => console.log("nemjo"));
-        
-            bookingConnection.on("NotifyAddedToTable", (message) => console.log(message));
-    }, [])
 
     useEffect(() => {
         switch (notificationFilter) {
@@ -60,16 +51,7 @@ function Notifications() {
                 </div>
             </div>
             {
-                recordsToDisplay.map(record => Object.hasOwn(record, "id") ? (
-                    <div>
-                        <NotificationItem record={record} isFriendRequest/>
-                    </div>
-                ) :
-                (
-                    <div>
-                        <NotificationItem/>
-                    </div> 
-                ))
+                recordsToDisplay.map(record => <NotificationItem key={record.id} record={record} isFriendRequest={Object.hasOwn(record, "id")}/>)
             }
         </div>
     </div>

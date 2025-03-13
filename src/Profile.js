@@ -44,7 +44,7 @@ function Profile() {
             {
               if(friend === friends[friends.length-1]) {
                 return (
-                  <div className="flex hover:cursor-pointer" onClick={() => {
+                  <div key={friend.id} className="flex hover:cursor-pointer" onClick={() => {
                     friendModalRef.current.inert = true;
                     friendModalRef.current.showModal();
                     friendModalRef.current.inert = false;
@@ -55,7 +55,7 @@ function Profile() {
                 )
               }
               return (
-                <div className="flex items-center hover:cursor-pointer" onClick={()=> {
+                <div key={friend.id} className="flex items-center hover:cursor-pointer" onClick={()=> {
                   friendModalRef.current.inert = true;
                   friendModalRef.current.showModal();
                   friendModalRef.current.inert = false;

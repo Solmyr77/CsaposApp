@@ -2,6 +2,7 @@
 using CsaposApi.Services.IService;
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
+using static CsaposApi.Models.DTOs.BookingDTO;
 
 namespace CsaposApi.Services
 {
@@ -14,9 +15,9 @@ namespace CsaposApi.Services
             _hubContext = hubContext;
         }
 
-        public async Task NotifyBookingCreated(string bookingId)
+        public async Task NotifyBookingCreated(string userId, BookingResponseDTO currentBooking)
         {
-            await _hubContext.Clients.Group(bookingId).SendAsync("ReceiveBookingUpdate", "New booking created.");
+            await _hubContext.Clients.User(userId).SendAsync("NotifyNewBookingCreated", currentBooking);
         }
 
         public async Task NotifyBookingDeleted(string bookingId)
@@ -24,9 +25,9 @@ namespace CsaposApi.Services
             await _hubContext.Clients.Group(bookingId).SendAsync("ReceiveBookingUpdate", "Booking deleted.");
         }
 
-        public async Task NotifyUserAddedToTable(string bookingId, string userId)
+        public async Task NotifyUserAddedToTable(string userId, BookingResponseDTO currentBooking)
         {
-            await _hubContext.Clients.User(userId).SendAsync("ReceiveBookingUpdate", "You were added to a booking.");
+            await _hubContext.Clients.User(userId).SendAsync("NotifyAddedToTable", currentBooking);
         }
 
         public async Task NotifyUserRemovedFromTable(string bookingId, string userId)

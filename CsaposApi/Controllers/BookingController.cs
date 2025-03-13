@@ -245,7 +245,7 @@ namespace CsaposApi.Controllers
                 await _context.TableBookings.AddAsync(currentBooking);
                 await _context.SaveChangesAsync();
 
-                await _notificationService.NotifyBookingCreated(response.Id.ToString());
+                await _notificationService.NotifyBookingCreated(bookerId.ToString(), response);
 
                 return Ok(response);
             }
@@ -418,7 +418,13 @@ namespace CsaposApi.Controllers
                 // Send real-time update via SignalR
                 foreach (var userId in addToTableDTO.userIds)
                 {
-                    await _notificationService.NotifyUserAddedToTable(addToTableDTO.bookingId.ToString(), userId.ToString());
+                    await _notificationService.NotifyUserAddedToTable(userId.ToString(), await _context.TableBookings.Select(x => new BookingResponseDTO
+                    {
+                        Id = x.Id,
+                        BookerId = x.BookerId,
+                        TableId = x.TableId,
+                        BookedFrom = x.BookedFrom,
+                    }).FirstOrDefaultAsync(x => x.Id == addToTableDTO.bookingId));
                 }
 
                 return Ok(new

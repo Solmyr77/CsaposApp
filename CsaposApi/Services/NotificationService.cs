@@ -1,5 +1,6 @@
 ﻿using CsaposApi.Hubs;
 using CsaposApi.Services.IService;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using static CsaposApi.Models.DTOs.BookingDTO;
 
@@ -14,6 +15,7 @@ namespace CsaposApi.Services
             _hubContext = hubContext;
         }
 
+        [HttpPost("invoke")]
         public async Task NotifyUserAddedToTable(string userId, BookingResponseDTO currentBooking)
         {
             await _hubContext.Clients.User(userId).SendAsync("NotifyAddedToTable", currentBooking);

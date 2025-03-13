@@ -7,7 +7,7 @@ import Context from "./Context";
 import bookingConnection from "./signalRBookingConnection";
 
 function Notifications() {
-    const { friendRequests, notificationFilter, previousRoutes, user } = useContext(Context);
+    const { friendRequests, notificationFilter, previousRoutes } = useContext(Context);
     const [recordsToDisplay, setRecordsToDisplay] = useState([]);
     const eventRecords = [""];
 
@@ -40,7 +40,7 @@ function Notifications() {
         <div className="flex flex-row justify-between font-bold">
             <NavItem title={"Összes"} isNotificationPage={true}/>
             <NavItem title={"Események"} isNotificationPage={true}/>
-            <NavItem title={"Barát kérelmek"} isNotificationPage={true}/>
+            <NavItem title={"Barátkérelmek"} isNotificationPage={true}/>
         </div>
         <div className="flex flex-grow flex-col mt-4 gap-y-2 pr-1 overflow-y-auto">
             <div className="flex w-full items-center justify-between bg-dark-grey px-4 py-2 rounded-md drop-shadow-[0px_4px_4px_rgba(0,0,0,.5)]">

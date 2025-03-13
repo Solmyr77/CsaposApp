@@ -10,7 +10,6 @@ function Provider({ children }) {
   const [menuState, setMenuState] = useState("Main");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState({});
-  const [userId, setUserId] = useState(null);
   const [locations, setLocations] = useState( localStorage.getItem("locations") || []);
   const [notificationFilter, setNotificationFilter] = useState("Összes");
   const [previousRoutes, setPreviousRoutes] = useState(["/"]);
@@ -359,7 +358,6 @@ function Provider({ children }) {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("user");
-      setUserId("");
       setFriends([]);
       setBookings([]);
       setBookingsContainingUser([]);
@@ -368,7 +366,7 @@ function Provider({ children }) {
 
   useEffect(() => {
     if (localStorage.getItem("accessToken")) {
-      setUserId(decodeJWT(localStorage.getItem("accessToken")).sub);
+      const userId = decodeJWT(localStorage.getItem("accessToken")).sub;
       if (userId) {
        const fetch = async () => {
           await getProfile(userId, "user");
@@ -382,7 +380,7 @@ function Provider({ children }) {
         fetch()
       }
     }
-  }, [localStorage.getItem("accessToken"), userId]);
+  }, [localStorage.getItem("accessToken")]);
 
   function decodeJWT(token) {
     const payload = token.split('.')[1]; 
@@ -435,7 +433,6 @@ function Provider({ children }) {
       getBookingsContainingUser,
       getProductsByLocation,
       getOrdersByTable,
-      setUserId,
       getBusinessHours,
       logout
       }}>

@@ -101,7 +101,10 @@ function Table() {
               }
             </div>
           </div>
-          <span className="text-md">Összesen: {total} Ft</span>
+          <div className="flex items-center justify-between">
+            <span className="text-md">Összesen: {total} Ft</span>
+            <button className="btn w-fit min-h-0 bg-gradient-to-tr from-blue to-sky-400 border-0 text-white">Számla kifizetése</button>
+          </div>
         </div>
         <form method="dialog" className="modal-backdrop">
           <button></button>

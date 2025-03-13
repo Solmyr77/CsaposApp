@@ -12,13 +12,15 @@ function Header({ notification }) {
           <Link to={"/profile"}><img src={user.imageUrl} alt="avatar" className="w-12 object-cover aspect-square rounded-full"/></Link>
           <p className="ml-3 text-lg text-white">Szia {user.displayName}!</p>
       </div>
-      <div className="relative">
-        <Link to={"/notifications"}>
-          <LuMail className="text-white h-6 w-6"/>
-        </Link>
-        {
-          notification == true && <div className="absolute bg-red-500 top-0 -right-[.125rem] w-2 h-2 rounded-full"></div>
-        }
+      <div className="p-2 bg-dark-grey rounded-md">
+        <div className="relative">
+          <Link to={"/notifications"}>
+            <LuMail className="text-white h-6 w-6 bg-dark-grey"/>
+          </Link>
+          {
+            notification == true && <div className="absolute bg-red-500 top-0 -right-[.125rem] w-2 h-2 rounded-full"></div>
+          }
+        </div>
       </div>
     </div>
   )

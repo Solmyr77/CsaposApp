@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import AvatarGroupItem from "./AvatarGroupItem";
 import { LuArrowLeft, LuReceiptText, LuX } from "react-icons/lu";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import Context from "./Context";
 import Order from "./Order";
 import OrderItem from "./OrderItem";
@@ -40,7 +40,7 @@ function Table() {
 
   useEffect(() => {
     if (tableOrders && user) groupOrderItems();
-  }, [tableOrders, user])
+  }, [tableOrders, user]);
 
   useEffect(() => {
     const allBookings = bookings.concat(bookingsContainingUser);
@@ -103,7 +103,9 @@ function Table() {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-md">Összesen: {total} Ft</span>
-            <button className="btn w-fit min-h-0 bg-gradient-to-tr from-blue to-sky-400 border-0 text-white">Számla kifizetése</button>
+            <Link to={"https://buy.stripe.com/test_4gw4jb7qM3ogco0eUU"}>
+              <button className="btn w-fit min-h-0 bg-gradient-to-tr from-blue to-sky-400 border-0 text-white">Számla kifizetése</button>
+            </Link>
           </div>
         </div>
         <form method="dialog" className="modal-backdrop">

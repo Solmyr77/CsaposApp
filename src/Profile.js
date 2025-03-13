@@ -30,7 +30,15 @@ function Profile() {
       <h1 className="text-center w-full pt-8 text-2xl mb-2">{user.displayName}</h1>
       <img src={user.imageUrl} alt="avatar" className="w-28 object-cover aspect-square rounded-full mb-8"/>
       <TitleDivider title={"Barátok"}/>
-      <div className="flex flex-row w-full overflow-x-scroll mb-8">
+      <div className="flex w-full mb-8 gap-2">
+        <div className="flex justify-center cursor-pointer items-center h-20 min-w-16 bg-gradient-to-tr from-blue to-sky-400 text-white border-0 rounded-md" onClick={() => {
+          addfriendModalRef.current.inert = true;
+          addfriendModalRef.current.showModal();
+          addfriendModalRef.current.inert = false;
+        }}>
+          <LuUserPlus className="w-8 h-8"/>
+        </div>
+        <div className="flex flex-row w-full h-full overflow-x-scroll">
         { friends.length > 0 ? 
           friends.sort((a, b) => a.displayName?.localeCompare(b.displayName)).map(friend =>
             {
@@ -60,6 +68,7 @@ function Profile() {
             }):
           <p className="font-normal text-center w-full">Nincsenek barátaid</p>
         }
+        </div>
       </div>
       <TitleDivider title={"Eredmények"}/>
       <div className="flex flex-row w-full overflow-x-scroll gap-4 mb-8">
@@ -73,14 +82,6 @@ function Profile() {
         }}>
         Profil szerkesztése
         <LuSquarePen className="h-6 w-6"/>
-      </div>
-      <div className="w-full h-10 font-normal bg-dark-grey rounded-md flex flex-row justify-between items-center px-2 drop-shadow-[0_2px_2px_rgba(0,0,0,.5)] mb-2 select-none hover:cursor-pointer" onClick={() => {
-        addfriendModalRef.current.inert = true;
-        addfriendModalRef.current.showModal();
-        addfriendModalRef.current.inert = false;
-      }}>
-        Barát hozzáadása
-        <LuUserPlus className="h-6 w-6"/>
       </div>
       <div className="w-full h-10 font-normal bg-dark-grey rounded-md flex flex-row justify-between items-center px-2 drop-shadow-[0_2px_2px_rgba(0,0,0,.5)] mb-2 select-none hover:cursor-pointer" onClick={() => {
         passwordModalRef.current.inert = true;

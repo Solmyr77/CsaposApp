@@ -13,8 +13,10 @@ function Notifications() {
 
     useEffect(() => {
         bookingConnection.start()
-            .then(() => console.log("Signalr connected"))
-            .catch(() => console.log("nemjo"));
+        .then(() => console.log("Connected to notification hub"))
+        .catch(() => console.log("nemjo"));
+        
+            bookingConnection.on("NotifyAddedToTable", (message) => console.log(message));
     }, [])
 
     useEffect(() => {

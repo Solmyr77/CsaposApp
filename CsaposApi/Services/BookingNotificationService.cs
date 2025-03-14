@@ -1,4 +1,5 @@
 ﻿using CsaposApi.Hubs;
+using CsaposApi.Models;
 using CsaposApi.Services.IService;
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
@@ -15,34 +16,24 @@ namespace CsaposApi.Services
             _hubContext = hubContext;
         }
 
-        public async Task NotifyBookingCreated(string userId, BookingResponseDTO currentBooking)
-        {
-            await _hubContext.Clients.User(userId).SendAsync("NotifyNewBookingCreated", currentBooking);
-        }
-
         public async Task NotifyBookingDeleted(string bookingId)
         {
-            await _hubContext.Clients.Group(bookingId).SendAsync("ReceiveBookingUpdate", "Booking deleted.");
-        }
-
-        public async Task NotifyUserAddedToTable(string userId, BookingResponseDTO currentBooking)
-        {
-            await _hubContext.Clients.User(userId).SendAsync("NotifyAddedToTable", currentBooking);
+            await _hubContext.Clients.Group(bookingId).SendAsync("NotifyBookingDeleted", "Booking deleted.");
         }
 
         public async Task NotifyUserRemovedFromTable(string bookingId, string userId)
         {
-            await _hubContext.Clients.User(userId).SendAsync("ReceiveBookingUpdate", "You were removed from a booking.");
+            await _hubContext.Clients.User(userId).SendAsync("NotifyUserRemovedFromBooking", "You were removed from a booking.");
         }
 
         public async Task NotifyUserAcceptedInvite(string bookingId, string userId)
         {
-            await _hubContext.Clients.Group(bookingId).SendAsync("ReceiveBookingUpdate", $"{userId} accepted the invite.");
+            await _hubContext.Clients.Group(bookingId).SendAsync("NotifyUserAcceptedInvite", $"{userId} accepted the invite.");
         }
 
         public async Task NotifyUserRejectedInvite(string bookingId, string userId)
         {
-            await _hubContext.Clients.Group(bookingId).SendAsync("ReceiveBookingUpdate", $"{userId} rejected the invite.");
+            await _hubContext.Clients.Group(bookingId).SendAsync("NotifyUserRejectedInvite", $"{userId} rejected the invite.");
         }
     }
 }

@@ -247,8 +247,6 @@ namespace CsaposApi.Controllers
                 await _context.TableBookings.AddAsync(currentBooking);
                 await _context.SaveChangesAsync();
 
-                await _bookingNotificationService.NotifyBookingCreated(bookerId.ToString(), response);
-
                 return Ok(response);
             }
             catch (Exception)

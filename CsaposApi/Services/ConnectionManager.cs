@@ -1,8 +1,9 @@
-﻿using System.Collections.Concurrent;
+﻿using CsaposApi.Services.IService;
+using System.Collections.Concurrent;
 
 namespace CsaposApi.Services
 {
-    public class ConnectionManager
+    public class ConnectionManager : IConnectionManager
     {
         private readonly ConcurrentDictionary<Guid, string> _connections = new();
 

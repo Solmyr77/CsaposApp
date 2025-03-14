@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CsaposApi.Services.IService;
+using static CsaposApi.Models.DTOs.FriendshipDTO;
 
 namespace CsaposApi.Controllers
 {
@@ -18,12 +19,14 @@ namespace CsaposApi.Controllers
         private readonly IFriendshipService _friendshipService;
         private readonly IAuthService _authService;
         private readonly ILogger<FriendshipController> _logger;
+        private readonly INotificationService _notificationService;
 
-        public FriendshipController(IFriendshipService friendshipService, IAuthService authService, ILogger<FriendshipController> logger)
+        public FriendshipController(IFriendshipService friendshipService, IAuthService authService, ILogger<FriendshipController> logger, INotificationService notificationService)
         {
             _friendshipService = friendshipService;
             _authService = authService;
             _logger = logger;
+            _notificationService = notificationService;
         }
 
         // Extract user ID from JWT token using AuthService
@@ -89,6 +92,7 @@ namespace CsaposApi.Controllers
             {
                 Guid receiverId = GetUserIdFromToken();
                 var success = await _friendshipService.AcceptFriendRequest(friendshipId, receiverId);
+
                 return success ? Ok(new { message = "Friend request accepted" })
                                : NotFound(new { error = "Friend request not found or already processed" });
             }
@@ -203,7 +207,18 @@ namespace CsaposApi.Controllers
             {
                 Guid userId = GetUserIdFromToken();
                 var requests = await _friendshipService.GetPendingRequests(userId);
-                return Ok(new { pendingRequests = requests });
+
+                var response = requests.Select(x => new FriendshipResponseDTO
+                {
+                    Id = x.Id,
+                    UserId1 = x.UserId1,
+                    UserId2 = x.UserId2,
+                    Status = x.Status,
+                    CreatedAt = x.CreatedAt,
+                    UpdatedAt = x.UpdatedAt
+                });
+
+                return Ok(new { pendingRequests = response });
             }
             catch (UnauthorizedAccessException ex)
             {

@@ -1,9 +1,12 @@
 ﻿using CsaposApi.Models;
+using CsaposApi.Models.DTOs;
+using CsaposApi.Services.IService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using static CsaposApi.Models.DTOs.FriendshipDTO;
 
 namespace CsaposApi.Services
 {
@@ -11,11 +14,13 @@ namespace CsaposApi.Services
     {
         private readonly CsaposappContext _context;
         private readonly ILogger<FriendshipService> _logger;
+        private readonly INotificationService _notificationService;
 
-        public FriendshipService(CsaposappContext context, ILogger<FriendshipService> logger)
+        public FriendshipService(CsaposappContext context, ILogger<FriendshipService> logger, INotificationService notificationService)
         {
             _context = context;
             _logger = logger;
+            _notificationService = notificationService;
         }
 
         public async Task<bool> SendFriendRequest(Guid senderId, Guid receiverId)
@@ -42,6 +47,17 @@ namespace CsaposApi.Services
                         friendship.Status = "pending";
                         friendship.UpdatedAt = DateTime.UtcNow;
                         await _context.SaveChangesAsync();
+
+                        await _notificationService.NotifyFriendRequestReceived(receiverId.ToString(), new FriendshipResponseDTO
+                        {
+                            Id = friendship.Id,
+                            UserId1 = friendship.UserId1,
+                            UserId2 = friendship.UserId2,
+                            Status = friendship.Status,
+                            CreatedAt = friendship.CreatedAt,
+                            UpdatedAt = friendship.UpdatedAt
+                        });
+
                         return true;
                     }
                 }
@@ -90,6 +106,17 @@ namespace CsaposApi.Services
                 friendship.Status = "accepted";
                 friendship.UpdatedAt = DateTime.UtcNow;
                 await _context.SaveChangesAsync();
+
+                await _notificationService.NotifyFriendRequestAccepted(friendship.UserId1.ToString(), new FriendshipResponseDTO
+                {
+                    Id = friendshipId,
+                    UserId1 = friendship.UserId1,
+                    UserId2 = friendship.UserId2,
+                    Status = friendship.Status,
+                    CreatedAt = friendship.CreatedAt,
+                    UpdatedAt = friendship.UpdatedAt
+                });
+
                 return true;
             }
             catch (Exception ex)

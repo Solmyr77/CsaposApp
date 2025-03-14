@@ -15,62 +15,54 @@ namespace CsaposApi.Services
 
         public void AddConnection(Guid userId, string connectionId)
         {
-            _logger.LogInformation($"Attempting to add connection {connectionId} for user {userId}");
-
-            if (!_connections.TryGetValue(userId, out var existingConnections))
-            {
-                _logger.LogInformation($"User {userId} not found, creating new connection list.");
-            }
-            else
-            {
-                _logger.LogInformation($"Before adding: User {userId} has {existingConnections.Count} connections: {string.Join(", ", existingConnections)}");
-            }
+            _logger.LogInformation($"🔄 Attempting to add connection {connectionId} for user {userId}");
 
             _connections.AddOrUpdate(
                 userId,
-                _ => new HashSet<string> { connectionId }, // If user doesn't exist, create a new HashSet
+                _ => new HashSet<string> { connectionId }, // If new user, create a new HashSet
                 (_, existingConnections) =>
                 {
                     lock (existingConnections) // Ensure thread safety
                     {
-                        existingConnections.Add(connectionId);
+                        if (!existingConnections.Contains(connectionId))
+                        {
+                            existingConnections.Add(connectionId);
+                            _logger.LogInformation($"✅ Connection {connectionId} added for user {userId}. Total connections: {existingConnections.Count}");
+                        }
+                        else
+                        {
+                            _logger.LogWarning($"⚠️ Connection {connectionId} already exists for user {userId}. Skipping duplicate.");
+                        }
                     }
                     return existingConnections;
                 });
 
-            _logger.LogInformation($"Added connection {connectionId} for user {userId}");
-
-            if (_connections.TryGetValue(userId, out var updatedConnections))
-            {
-                _logger.LogInformation($"After adding: User {userId} now has {updatedConnections.Count} connections: {string.Join(", ", updatedConnections)}");
-            }
-            else
-            {
-                _logger.LogWarning($"After adding, user {userId} still not found in dictionary!");
-            }
+            _logger.LogInformation($"📌 After adding: User {userId} now has {GetConnections(userId)?.Count ?? 0} connections: {string.Join(", ", GetConnections(userId) ?? new HashSet<string>())}");
         }
-
 
         public void RemoveConnection(string connectionId)
         {
+            _logger.LogInformation($"🗑 Attempting to remove connection {connectionId}");
+
             foreach (var (userId, connections) in _connections)
             {
-                lock (connections) // Ensure thread safety on modifications
+                lock (connections)
                 {
                     if (connections.Remove(connectionId))
                     {
-                        _logger.LogInformation($"Removed connection {connectionId} for user {userId}");
+                        _logger.LogInformation($"❌ Removed connection {connectionId} for user {userId}. Remaining connections: {connections.Count}");
 
-                        // Clean up if no connections remain
                         if (connections.Count == 0)
                         {
                             _connections.TryRemove(userId, out _);
-                            _logger.LogInformation($"Removed user {userId} from connection manager (no active connections)");
+                            _logger.LogInformation($"🗑 User {userId} removed from connection manager (no active connections left)");
                         }
                         return;
                     }
                 }
             }
+
+            _logger.LogWarning($"⚠️ Connection {connectionId} was not found in any user records!");
         }
 
         public HashSet<string>? GetConnections(Guid userId)
@@ -79,18 +71,17 @@ namespace CsaposApi.Services
             {
                 if (connections.Count == 0)
                 {
-                    _logger.LogWarning($"User {userId} found, but has no active connections.");
+                    _logger.LogWarning($"⚠️ User {userId} found, but has NO active connections.");
                     return null;
                 }
 
-                _logger.LogInformation($"Found {connections.Count} connections for user {userId}.");
-                return new HashSet<string>(connections); // Return a clone to avoid concurrency issues
+                _logger.LogInformation($"📢 Found {connections.Count} connections for user {userId}: {string.Join(", ", connections)}");
+                return new HashSet<string>(connections);
             }
 
-            _logger.LogWarning($"No active connections found for user {userId}.");
+            _logger.LogWarning($"❌ No active connections found for user {userId}.");
             return null;
         }
-
 
         public IEnumerable<Guid> GetConnectedUsers()
         {

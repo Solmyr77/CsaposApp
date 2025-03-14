@@ -74,6 +74,8 @@ namespace CsaposApi.Services
 
         public HashSet<string>? GetConnections(Guid userId)
         {
+            _logger.LogDebug("Current dictionary keys: {keys}", string.Join(", ", _connections.Keys));
+
             if (_connections.TryGetValue(userId, out var connections))
             {
                 if (connections.Count == 0)

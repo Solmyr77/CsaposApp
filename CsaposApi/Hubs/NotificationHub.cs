@@ -9,9 +9,9 @@ namespace CsaposApi.Hubs
     public class NotificationHub : Hub
     {
         private readonly IAuthService _authService;
-        private readonly ConnectionManager _connectionManager;
+        private readonly IConnectionManager _connectionManager;
 
-        public NotificationHub(IAuthService authService, ConnectionManager connectionManager)
+        public NotificationHub(IAuthService authService, IConnectionManager connectionManager)
         {
             _authService = authService;
             _connectionManager = connectionManager;

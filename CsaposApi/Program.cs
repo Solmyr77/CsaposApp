@@ -93,7 +93,7 @@ namespace CsaposApi
             builder.Services.AddScoped<IBookingNotificationService, BookingNotificationService>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
 
-            builder.Services.AddScoped<IConnectionManager, ConnectionManager>();
+            builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
 
             // 1. Bind JwtSettings
             var jwtSection = builder.Configuration.GetSection("JwtSettings");

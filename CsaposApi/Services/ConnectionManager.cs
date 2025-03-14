@@ -6,6 +6,12 @@ namespace CsaposApi.Services
     public class ConnectionManager : IConnectionManager
     {
         private readonly ConcurrentDictionary<Guid, HashSet<string>> _connections = new();
+        private readonly ILogger<ConnectionManager> _logger;
+
+        public ConnectionManager(ILogger<ConnectionManager> logger)
+        {
+            _logger = logger;
+        }
 
         public void AddConnection(Guid userId, string connectionId)
         {
@@ -21,7 +27,7 @@ namespace CsaposApi.Services
                     return existingConnections;
                 });
 
-            Console.WriteLine($"Added connection {connectionId} for user {userId}");
+            _logger.LogInformation($"Added connection {connectionId} for user {userId}");
         }
 
         public void RemoveConnection(string connectionId)
@@ -32,13 +38,13 @@ namespace CsaposApi.Services
                 {
                     if (connections.Remove(connectionId))
                     {
-                        Console.WriteLine($"Removed connection {connectionId} for user {userId}");
+                        _logger.LogInformation($"Removed connection {connectionId} for user {userId}");
 
                         // Clean up if no connections remain
                         if (connections.Count == 0)
                         {
                             _connections.TryRemove(userId, out _);
-                            Console.WriteLine($"Removed user {userId} from connection manager (no active connections)");
+                            _logger.LogInformation($"Removed user {userId} from connection manager (no active connections)");
                         }
                         return;
                     }
@@ -48,8 +54,22 @@ namespace CsaposApi.Services
 
         public HashSet<string>? GetConnections(Guid userId)
         {
-            return _connections.TryGetValue(userId, out var connections) ? connections : null;
+            if (_connections.TryGetValue(userId, out var connections))
+            {
+                if (connections.Count == 0)
+                {
+                    _logger.LogWarning($"User {userId} found, but has no active connections.");
+                    return null;
+                }
+
+                _logger.LogInformation($"Found {connections.Count} connections for user {userId}.");
+                return new HashSet<string>(connections); // Return a clone to avoid concurrency issues
+            }
+
+            _logger.LogWarning($"No active connections found for user {userId}.");
+            return null;
         }
+
 
         public IEnumerable<Guid> GetConnectedUsers()
         {

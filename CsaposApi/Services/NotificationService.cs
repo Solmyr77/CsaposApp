@@ -1,8 +1,11 @@
 ﻿using CsaposApi.Hubs;
 using CsaposApi.Models.DTOs;
 using CsaposApi.Services.IService;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using static CsaposApi.Models.DTOs.BookingDTO;
 using static CsaposApi.Models.DTOs.FriendshipDTO;
 
@@ -21,31 +24,42 @@ namespace CsaposApi.Services
             _logger = logger;
         }
 
+        private async Task NotifyUserAsync(string userId, string method, object payload)
+        {
+            if (!Guid.TryParse(userId, out Guid userGuid))
+            {
+                _logger.LogWarning($"Invalid user ID: {userId}");
+                return;
+            }
+
+            var connections = _connectionManager.GetConnections(userGuid);
+            if (connections == null || connections.Count == 0)
+            {
+                _logger.LogWarning($"No active connections for user {userId}");
+                return;
+            }
+
+            foreach (var connectionId in connections)
+            {
+                _logger.LogInformation($"Notifying user {userId} (connectionId: {connectionId}) via {method}");
+
+                await _hubContext.Clients.Client(connectionId).SendAsync(method, payload);
+            }
+        }
+
         public async Task NotifyFriendRequestReceived(string userId, FriendshipResponseDTO friendshipResponse)
         {
-            var connectionId = _connectionManager.GetConnection(Guid.Parse(userId));
-
-            _logger.LogInformation($"Notifying user with connectionId: {connectionId} about incoming friend request");
-
-            await _hubContext.Clients.Client(connectionId).SendAsync("NotifyIncomingFriendRequest", friendshipResponse);
+            await NotifyUserAsync(userId, "NotifyIncomingFriendRequest", friendshipResponse);
         }
 
         public async Task NotifyFriendRequestAccepted(string userId, FriendshipResponseDTO friendshipResponse)
         {
-            var connectionId = _connectionManager.GetConnection(Guid.Parse(userId));
-
-            _logger.LogInformation($"Notifying user with connectionId: {connectionId} about friend request accepted");
-
-            await _hubContext.Clients.Client(connectionId).SendAsync("NotifyFriendRequestAccepted", friendshipResponse);
+            await NotifyUserAsync(userId, "NotifyFriendRequestAccepted", friendshipResponse);
         }
 
         public async Task NotifyUserAddedToTable(string userId, BookingResponseWithGuestsDTO currentBooking)
         {
-            var connectionId = _connectionManager.GetConnection(Guid.Parse(userId));
-
-            _logger.LogInformation($"Notifying user with connectionId: {connectionId} about being added to table");
-
-            await _hubContext.Clients.Client(connectionId).SendAsync("NotifyAddedToTable", currentBooking);
+            await NotifyUserAsync(userId, "NotifyAddedToTable", currentBooking);
         }
     }
 }

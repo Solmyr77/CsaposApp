@@ -19,27 +19,44 @@ namespace CsaposApi.Hubs
             _logger = logger;
         }
 
-        public async Task RegisterUser(string token)
+        public async Task<bool> RegisterUser(string token)
         {
-            var userId = Guid.Parse(_authService.GetUserId(token));
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                _logger.LogWarning("Registration failed: Token is empty or null.");
+                return false;
+            }
 
-            _logger.LogInformation($"Registering user with userId: {userId} and connectionId: {Context.ConnectionId}");
+            string? userIdString = _authService.GetUserId(token);
+            if (!Guid.TryParse(userIdString, out Guid userId))
+            {
+                _logger.LogWarning($"Registration failed: Invalid token received. Token: {token}");
+                return false;
+            }
+
+            _logger.LogInformation($"Registering user {userId} with connection {Context.ConnectionId}");
 
             _connectionManager.AddConnection(userId, Context.ConnectionId);
+            return true;
         }
 
         public async Task JoinBookingGroup()
         {
-            _logger.LogInformation($"User with connectionId: {Context.ConnectionId} joined the notifications group");
-
+            _logger.LogInformation($"User {Context.ConnectionId} joined the notifications group");
             await Groups.AddToGroupAsync(Context.ConnectionId, "notifications");
         }
 
         public async Task LeaveBookingGroup()
         {
-            _logger.LogInformation($"User with connectionId: {Context.ConnectionId} left the notifications group");
-
+            _logger.LogInformation($"User {Context.ConnectionId} left the notifications group");
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, "notifications");
+        }
+
+        public override async Task OnDisconnectedAsync(Exception? exception)
+        {
+            _connectionManager.RemoveConnection(Context.ConnectionId);
+            _logger.LogInformation($"User disconnected. Connection ID: {Context.ConnectionId}");
+            await base.OnDisconnectedAsync(exception);
         }
     }
 }

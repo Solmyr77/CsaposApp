@@ -44,12 +44,15 @@ namespace CsaposApi.Services
         {
             _logger.LogInformation($"🗑 Attempting to remove connection {connectionId}");
 
+            bool found = false;
+
             foreach (var (userId, connections) in _connections)
             {
                 lock (connections)
                 {
                     if (connections.Remove(connectionId))
                     {
+                        found = true;
                         _logger.LogInformation($"❌ Removed connection {connectionId} for user {userId}. Remaining connections: {connections.Count}");
 
                         if (connections.Count == 0)
@@ -62,8 +65,12 @@ namespace CsaposApi.Services
                 }
             }
 
-            _logger.LogWarning($"⚠️ Connection {connectionId} was not found in any user records!");
+            if (!found)
+            {
+                _logger.LogWarning($"⚠️ Connection {connectionId} was NOT found in any user records! Possible premature disconnection.");
+            }
         }
+
 
         public HashSet<string>? GetConnections(Guid userId)
         {

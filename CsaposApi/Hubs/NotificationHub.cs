@@ -37,6 +37,9 @@ namespace CsaposApi.Hubs
             _logger.LogInformation($"Registering user {userId} with connection {Context.ConnectionId}");
 
             _connectionManager.AddConnection(userId, Context.ConnectionId);
+
+            await Task.Delay(500);
+
             return true;
         }
 
@@ -54,9 +57,12 @@ namespace CsaposApi.Hubs
 
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
+            _logger.LogWarning($"User disconnected. Connection ID: {Context.ConnectionId}, Exception: {exception?.Message}");
+
             _connectionManager.RemoveConnection(Context.ConnectionId);
-            _logger.LogInformation($"User disconnected. Connection ID: {Context.ConnectionId}");
+
             await base.OnDisconnectedAsync(exception);
         }
+
     }
 }

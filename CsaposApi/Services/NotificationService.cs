@@ -12,16 +12,20 @@ namespace CsaposApi.Services
     {
         private readonly IHubContext<NotificationHub> _hubContext;
         private readonly IConnectionManager _connectionManager;
+        private readonly ILogger<NotificationService> _logger;
 
-        public NotificationService(IHubContext<NotificationHub> hubContext, IConnectionManager connectionManager)
+        public NotificationService(IHubContext<NotificationHub> hubContext, IConnectionManager connectionManager, ILogger<NotificationService> logger)
         {
             _hubContext = hubContext;
             _connectionManager = connectionManager;
+            _logger = logger;
         }
 
         public async Task NotifyFriendRequestReceived(string userId, FriendshipResponseDTO friendshipResponse)
         {
             var connectionId = _connectionManager.GetConnection(Guid.Parse(userId));
+
+            _logger.LogInformation($"Notifying user with connectionId: {connectionId} about incoming friend request");
 
             await _hubContext.Clients.Client(connectionId).SendAsync("NotifyIncomingFriendRequest", friendshipResponse);
         }
@@ -30,12 +34,16 @@ namespace CsaposApi.Services
         {
             var connectionId = _connectionManager.GetConnection(Guid.Parse(userId));
 
+            _logger.LogInformation($"Notifying user with connectionId: {connectionId} about friend request accepted");
+
             await _hubContext.Clients.Client(connectionId).SendAsync("NotifyFriendRequestAccepted", friendshipResponse);
         }
 
         public async Task NotifyUserAddedToTable(string userId, BookingResponseWithGuestsDTO currentBooking)
         {
             var connectionId = _connectionManager.GetConnection(Guid.Parse(userId));
+
+            _logger.LogInformation($"Notifying user with connectionId: {connectionId} about being added to table");
 
             await _hubContext.Clients.Client(connectionId).SendAsync("NotifyAddedToTable", currentBooking);
         }

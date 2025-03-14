@@ -15,12 +15,23 @@ namespace CsaposApi.Services
 
         public void AddConnection(Guid userId, string connectionId)
         {
+            _logger.LogInformation($"Attempting to add connection {connectionId} for user {userId}");
+
+            if (!_connections.TryGetValue(userId, out var existingConnections))
+            {
+                _logger.LogInformation($"User {userId} not found, creating new connection list.");
+            }
+            else
+            {
+                _logger.LogInformation($"Before adding: User {userId} has {existingConnections.Count} connections: {string.Join(", ", existingConnections)}");
+            }
+
             _connections.AddOrUpdate(
                 userId,
-                _ => new HashSet<string> { connectionId }, // If new user, create a new HashSet
+                _ => new HashSet<string> { connectionId }, // If user doesn't exist, create a new HashSet
                 (_, existingConnections) =>
                 {
-                    lock (existingConnections) // Ensure thread safety on modifications
+                    lock (existingConnections) // Ensure thread safety
                     {
                         existingConnections.Add(connectionId);
                     }
@@ -28,7 +39,17 @@ namespace CsaposApi.Services
                 });
 
             _logger.LogInformation($"Added connection {connectionId} for user {userId}");
+
+            if (_connections.TryGetValue(userId, out var updatedConnections))
+            {
+                _logger.LogInformation($"After adding: User {userId} now has {updatedConnections.Count} connections: {string.Join(", ", updatedConnections)}");
+            }
+            else
+            {
+                _logger.LogWarning($"After adding, user {userId} still not found in dictionary!");
+            }
         }
+
 
         public void RemoveConnection(string connectionId)
         {

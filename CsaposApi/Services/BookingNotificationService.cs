@@ -23,7 +23,7 @@ namespace CsaposApi.Services
 
         public async Task NotifyUserRemovedFromTable(string bookingId, string userId)
         {
-            await _hubContext.Clients.User(userId).SendAsync("NotifyUserRemovedFromBooking", "You were removed from a booking.");
+            await _hubContext.Clients.User(userId).SendAsync("NotifyUserRemovedFromBooking", $"You were removed from a booking with ID: {bookingId}.");
         }
 
         public async Task NotifyUserAcceptedInvite(string bookingId, string userId)

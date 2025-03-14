@@ -12,10 +12,11 @@ namespace CsaposApi.Hubs
         private readonly IConnectionManager _connectionManager;
         private readonly ILogger<NotificationHub> _logger;
 
-        public NotificationHub(IAuthService authService, IConnectionManager connectionManager)
+        public NotificationHub(IAuthService authService, IConnectionManager connectionManager, ILogger<NotificationHub> logger)
         {
             _authService = authService;
             _connectionManager = connectionManager;
+            _logger = logger;
         }
 
         public async Task RegisterUser(string token)

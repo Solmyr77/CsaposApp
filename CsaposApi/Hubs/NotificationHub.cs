@@ -43,13 +43,13 @@ namespace CsaposApi.Hubs
             return true;
         }
 
-        public async Task JoinBookingGroup()
+        public async Task JoinNotificationGroup()
         {
             _logger.LogInformation($"User {Context.ConnectionId} joined the notifications group");
             await Groups.AddToGroupAsync(Context.ConnectionId, "notifications");
         }
 
-        public async Task LeaveBookingGroup()
+        public async Task LeaveNotificationGroup()
         {
             _logger.LogInformation($"User {Context.ConnectionId} left the notifications group");
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, "notifications");

@@ -127,7 +127,7 @@ namespace CsaposApi.Controllers
                 .ToListAsync();
 
             if (bookings == null || !bookings.Any())
-                return NotFound();
+                return NoContent();
 
             return Ok(bookings);
         }
@@ -163,7 +163,7 @@ namespace CsaposApi.Controllers
                 .ToListAsync();
 
             if (bookings.Count == 0)
-                return NotFound(new { Message = "No bookings where the user is a guest." });
+                return NoContent();
 
             return Ok(bookings);
         }

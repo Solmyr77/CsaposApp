@@ -100,14 +100,25 @@ function Reservation() {
     useEffect(() => {
         if (isSuccessful) {
             setTimeout(() => {
-                navigate("/")
+                navigate("/");
             }, 1000);
         }
         if (isAccepted === true) {
             setTimeout(() => {
                 setWaiting(true);
+                const foundBooking = bookingsContainingUser.find(booking => booking.id === id);
+                Object.defineProperty(foundBooking, "userAccepted", {value: true});
+                console.log(foundBooking);
             }, 2000);
         }
+        else if (isAccepted === false) {
+            const foundBooking = bookingsContainingUser.find(booking => booking.id === id);
+            Object.defineProperty(foundBooking, "userAccepted", {value: false});        
+            console.log(foundBooking);
+        }
+    }, [isSuccessful, isAccepted, bookingsContainingUser]);
+
+    useEffect(() => {
         if (bookings.length > 0 || bookingsContainingUser.length > 0) {
             const foundBooking = bookings.concat(bookingsContainingUser).find(booking => booking.id === id);
             if (foundBooking && Object.hasOwn(foundBooking, "id")) {
@@ -126,7 +137,7 @@ function Reservation() {
             if (bookings.find(booking => booking.id === id)) setIsGuest(false);
             else setIsGuest(true);
         }
-    }, [bookings, bookingsContainingUser, friends, locations, isActive, isSuccessful]);
+    }, [bookings, bookingsContainingUser, friends, locations]);
     
     return (   
         <div className="w-full min-h-screen bg-grey text-white p-4 flex flex-col select-none">

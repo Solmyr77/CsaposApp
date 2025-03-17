@@ -3,7 +3,7 @@ import Context from "./Context";
 import axios from "axios";
 import getAccessToken from "./refreshToken";
 import { Navigate } from "react-router-dom";
-import bookingConnection from "./signalRBookingConnection";
+import notificationConnection from "./signalRBookingConnection";
 
 function Provider({ children }) {
   //basic states
@@ -134,34 +134,6 @@ function Provider({ children }) {
     }
   }
 
-  // async function getBusinessHours(id) {
-  //     try {
-  //       const config = {
-  //         headers: { 
-  //           Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
-  //           "Cache-Content": "no-cache"
-  //         }
-  //       }
-  //       const response = await axios.get(`https://backend.csaposapp.hu/api/business-hours/${id}`, config);
-  //       const data = await response.data;
-  //       if (response.status === 200) return data;
-  //     }
-  //     catch (error) {
-  //       if (error.response?.status === 401) {
-  //         if (await getAccessToken()) {
-  //           await getBusinessHours(id);
-  //         }
-  //         else {
-  //           await logout();
-  //           window.location.reload();
-  //           return false;
-  //         }
-  //       } 
-  //       else {
-  //         return false;
-  //       }
-  //     }
-  //   }
   async function getBusinessHours() {
       try {
         const config = {
@@ -368,6 +340,7 @@ function Provider({ children }) {
     }
   }
 
+  //main useffect to fetch data
   useEffect(() => {
     if (localStorage.getItem("accessToken")) {
       const userId = decodeJWT(localStorage.getItem("accessToken")).sub;
@@ -386,40 +359,50 @@ function Provider({ children }) {
     }
   }, [localStorage.getItem("accessToken")]);
 
+  //function to get userId from JWT token
   function decodeJWT(token) {
     const payload = token.split('.')[1]; 
     const decodedPayload = atob(payload);
     return JSON.parse(decodedPayload);
   }
 
+  //user
+  // useEffect(() => {
+  //   if (bookingsContainingUser.length > 0 && Object.hasOwn(user, "id")) {
+  //     bookingsContainingUser.map(bookingInvite => bookingInvite.tableGuests.map(guest => (guest.id === user.id && guest.status == "accepted") ? Object.defineProperty(bookingInvite, "userAccepted", {value: true}) : Object.defineProperty(bookingInvite, "userAccepted", {value: false})));
+  //   }
+  // }, [bookingsContainingUser, user])
+
   //hub connections
   useEffect(() => {
-    bookingConnection.start()
-        .then(() => {
-          bookingConnection.on("notifyaddedtotable", (message) => {
-              console.log("📨 Received from hub:", message);
-              setAddedToTableNotifications(state => [...state, message]);
-              setBookingsContainingUser(state => {
-                if (!state.some(booking => booking.id === message.id)) {
-                  return [...state, message];
-                } 
-              });
-          });
-          localStorage.getItem("accessToken") !== null && bookingConnection.invoke("RegisterUser", localStorage.getItem("accessToken").replaceAll(`"`, "")).then((message) => console.log(message));
-
-          bookingConnection.invoke("JoinBookingGroup")
-              .then(() => console.log(`✅ Joined group: notifications`))
-              .catch(err => console.error("❌ Failed to join group:", err));
-
-          console.log("✅ BookingHub connected successfully.");
-        })
-        .catch((err) => {
-            console.error("❌ Connection failed:", err);
+    if (localStorage.getItem("accessToken") !== null) {
+      notificationConnection.start()
+      .then(() => {
+        notificationConnection.invoke("RegisterUser", localStorage.getItem("accessToken").replaceAll(`"`, "")).then((message) => console.log(message));
+        notificationConnection.invoke("JoinNotificationGroup")
+        .then(() => console.log(`✅ Joined group: notifications`))
+        .catch(err => console.error("❌ Failed to join group:", err));
+        
+        notificationConnection.on("notifyaddedtotable", (message) => {
+            console.log("📨 Received from hub:", message);
+            setAddedToTableNotifications(state => [...state, message]);
+            setBookingsContainingUser(state => {
+              if (!state.some(booking => booking.id === message.id)) {
+                return [...state, message];
+              } 
+            });
         });
 
-    return () => {
-      bookingConnection.off("notifyaddedtotable");
-    };
+        console.log("✅ BookingHub connected successfully.");
+      })
+      .catch((err) => {
+          console.error("❌ Connection failed:", err);
+      });
+
+      return () => {
+        notificationConnection.off("notifyaddedtotable");
+      };
+    }
   }, [localStorage.getItem("accessToken")]);
 
   return (

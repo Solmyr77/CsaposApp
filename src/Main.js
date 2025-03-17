@@ -8,20 +8,21 @@ import { useLocation } from "react-router-dom";
 import ReservationsSwiper from "./ReservationsSwiper";
 
 function Main() {
-  const { navState, setMenuState, locations, setPreviousRoutes, bookings, bookingsContainingUser } = useContext(Context);
+  const { navState, setMenuState, locations, setPreviousRoutes, bookings, bookingsContainingUser, user } = useContext(Context);
   const location = useLocation();
 
   useEffect(() => {
     setMenuState("Main");
     setPreviousRoutes(Array(location.pathname));
-  }, [])
+    console.log(bookingsContainingUser.filter(booking => (booking.userAccepted === true || booking.tableGuests.find(guest => guest.id === user.id)?.status === "accepted")));
+  }, [bookingsContainingUser, user])
 
   return (
     <div className="bg-grey text-white font-play font-bold">
       <div className="px-4 overflow-auto pb-[12vh]">
         <Navbar/>
         {
-          bookings.concat(bookingsContainingUser).length > 0 &&
+          bookings.concat(bookingsContainingUser.filter(booking => (booking.userAccepted === true || booking.tableGuests.find(guest => guest.id === user.id)?.status === "accepted"))).length > 0 &&
           <div>
             <TitleDivider title={"Foglalásaim"}/>
             <ReservationsSwiper/>

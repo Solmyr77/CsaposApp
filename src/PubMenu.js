@@ -35,7 +35,8 @@ function PubMenu() {
       }
       const response = await axios.post(`https://backend.csaposapp.hu/api/orders/create-order/`, {
         tableId: currentBooking.tableId,
-        orderItems: orderItems
+        orderItems: orderItems,
+        bookingId: id
       }, config);
       if (response.status === 204 || response.status === 201) {
         setIsLoading(false);

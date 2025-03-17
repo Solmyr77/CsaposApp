@@ -31,8 +31,7 @@ function Provider({ children }) {
   const [tableOrders, setTableOrders] = useState([]);
   const [currentBooking, setCurrentBooking] = useState({});
   //notifications
-  const [addedToTableNotifications, setAddedToTableNotifications] = useState([]);
-
+  const [newNotification, setNewNotification] = useState(false);
   
 
   async function getProfile(id, profile) {
@@ -366,43 +365,48 @@ function Provider({ children }) {
     return JSON.parse(decodedPayload);
   }
 
-  //user
-  // useEffect(() => {
-  //   if (bookingsContainingUser.length > 0 && Object.hasOwn(user, "id")) {
-  //     bookingsContainingUser.map(bookingInvite => bookingInvite.tableGuests.map(guest => (guest.id === user.id && guest.status == "accepted") ? Object.defineProperty(bookingInvite, "userAccepted", {value: true}) : Object.defineProperty(bookingInvite, "userAccepted", {value: false})));
-  //   }
-  // }, [bookingsContainingUser, user])
+  function registerUser() {
+    notificationConnection.invoke("RegisterUser", localStorage.getItem("accessToken").replaceAll(`"`, ""))
+    .then(() => console.log("Successfully registered user"));
+  }
+
+  function joinNotificationGroup() {
+    notificationConnection.invoke("JoinNotificationGroup")
+    .then(() => console.log(`✅ Joined group: notifications`))
+    .catch(err => console.error("❌ Failed to join group:", err));
+  }
 
   //hub connections
   useEffect(() => {
-    if (localStorage.getItem("accessToken") !== null) {
+    if (localStorage.getItem("accessToken") !== null && notificationConnection.state === "Disconnected") {
       notificationConnection.start()
       .then(() => {
-        notificationConnection.invoke("RegisterUser", localStorage.getItem("accessToken").replaceAll(`"`, "")).then((message) => console.log(message));
-        notificationConnection.invoke("JoinNotificationGroup")
-        .then(() => console.log(`✅ Joined group: notifications`))
-        .catch(err => console.error("❌ Failed to join group:", err));
-        
         notificationConnection.on("notifyaddedtotable", (message) => {
-            console.log("📨 Received from hub:", message);
-            setAddedToTableNotifications(state => [...state, message]);
-            setBookingsContainingUser(state => {
-              if (!state.some(booking => booking.id === message.id)) {
-                return [...state, message];
-              } 
-            });
+          console.log("📨 Received from hub:", message);
+          setBookingsContainingUser(state => {
+            if (!state.some(booking => booking.id === message.id)) {
+              return [...state, message];
+            } 
+          });
+          setNewNotification(true);
         });
-
-        console.log("✅ BookingHub connected successfully.");
+        registerUser();
+        joinNotificationGroup();
+        console.log("✅ NotificationHub connected successfully.");
       })
       .catch((err) => {
           console.error("❌ Connection failed:", err);
       });
-
+      
       return () => {
         notificationConnection.off("notifyaddedtotable");
       };
     }
+    notificationConnection.onreconnected(() => {
+      registerUser();
+      joinNotificationGroup();
+      console.log("Reconnected successfully.");
+    })
   }, [localStorage.getItem("accessToken")]);
 
   return (
@@ -442,9 +446,9 @@ function Provider({ children }) {
       setSelectedProduct,
       currentBooking,
       setCurrentBooking,
+      newNotification,
+      setNewNotification,
       removeBooking,
-      addedToTableNotifications,
-      setAddedToTableNotifications,
       getLocationTables,
       setTableFriends, 
       getProfile,

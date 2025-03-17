@@ -7,11 +7,12 @@ import Context from "./Context";
 import TableNotification from "./TableNotification";
 
 function Notifications() {
-    const { friendRequests, notificationFilter, previousRoutes, addedToTableNotifications } = useContext(Context);
+    const { friendRequests, notificationFilter, previousRoutes, bookingsContainingUser, user, setNewNotification } = useContext(Context);
     const [recordsToDisplay, setRecordsToDisplay] = useState([]);
-    const eventRecords = [""];
+    const eventRecords = [];
 
     useEffect(() => {
+        setNewNotification(false);
         switch (notificationFilter) {
             case "Összes":
                 setRecordsToDisplay(friendRequests.concat(eventRecords));
@@ -19,11 +20,11 @@ function Notifications() {
             case "Események":
                 setRecordsToDisplay(eventRecords);
                 break;
-            case "Barát felkérések":
+            case "Barátkérelmek":
                 setRecordsToDisplay(friendRequests);
                 break;
         }
-    }, [notificationFilter, friendRequests, addedToTableNotifications]);
+    }, [notificationFilter, friendRequests, bookingsContainingUser]);
 
   return (
     <div className="w-full h-screen bg-grey py-8 px-4 text-white flex flex-col overflow-hidden">
@@ -38,7 +39,7 @@ function Notifications() {
         </div>
         <div className="flex flex-grow flex-col mt-4 gap-y-2 pr-1 overflow-y-auto">
             {
-                addedToTableNotifications.length > 0 && addedToTableNotifications.map((booking) => <TableNotification key={booking.id} booking={booking}/>)
+                (bookingsContainingUser.length > 0 && user.id) && bookingsContainingUser.map(booking => booking.tableGuests.find(guest => guest.id === user.id)?.status === "pending" && <TableNotification key={booking.id} booking={booking}/>)
             }
             {
                 recordsToDisplay.map((record, i) => <NotificationItem key={i} record={record} isFriendRequest={Object.hasOwn(record, "id")}/>)

@@ -6,11 +6,11 @@ import { Outlet } from "react-router-dom";
 function Layout() {
   return (
     <div className="bg-grey min-h-screen">
-        <Header notification={true}/>
-        <main>
-            <Outlet/>
-        </main>
-        <Footer/>
+      <Header/>
+      <main>
+        <Outlet/>
+      </main>
+      <Footer/>
     </div>
   );
 }

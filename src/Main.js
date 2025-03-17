@@ -14,8 +14,7 @@ function Main() {
   useEffect(() => {
     setMenuState("Main");
     setPreviousRoutes(Array(location.pathname));
-    console.log(bookingsContainingUser.filter(booking => (booking.userAccepted === true || booking.tableGuests.find(guest => guest.id === user.id)?.status === "accepted")));
-  }, [bookingsContainingUser, user])
+  }, [])
 
   return (
     <div className="bg-grey text-white font-play font-bold">

@@ -88,7 +88,7 @@ function NotificationItem({ record, isFriendRequest }) {
 
   if (isFriendRequest === true) {
     return(
-      <div className="w-full min-h-16 bg-dark-grey rounded-md flex flex-col p-4 pb-2 drop-shadow-[0px_4px_4px_rgba(0,0,0,.5)]">
+      <div className="w-full min-h-16 bg-dark-grey rounded-md flex flex-col p-4 pb-2">
         <div className="flex flex-row basis-2/3 items-center">
           <img src={`https://assets.csaposapp.hu/assets/images/${profile.imageUrl}`} alt="" className="h-10 aspect-square rounded-full object-cover mr-2"/>
           <p className="flex flex-row items-center text-sm text-left text-nowrap basis-4/5"><span className="truncate inline-block max-w-20 mr-1 font-bold">{profile.displayName}</span> barátnak jelölt!</p>
@@ -103,7 +103,7 @@ function NotificationItem({ record, isFriendRequest }) {
     )
   }
   return (
-    <div className="w-full h-16 bg-dark-grey rounded-md flex flex-row items-center p-4 hover:cursor-pointer drop-shadow-[0px_4px_4px_rgba(0,0,0,.5)]" onClick={() => {
+    <div className="w-full h-16 bg-dark-grey rounded-md flex flex-row items-center p-4 hover:cursor-pointer" onClick={() => {
       setIsRead(true);
       setPreviousRoutes((state) => {
         if (!state.includes(location.pathname)) return [...state, location.pathname];

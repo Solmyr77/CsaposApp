@@ -14,7 +14,7 @@ function TableNotification({ booking }) {
 
     return (
         <Link to={`/reservation/${booking.id}`}>
-            <div className="flex w-full items-center justify-between bg-dark-grey px-4 py-2 rounded-md drop-shadow-[0px_4px_4px_rgba(0,0,0,.5)]">
+            <div className="flex w-full items-center justify-between bg-dark-grey px-4 py-2 rounded-md shadow-md">
                 <div className="flex flex-col">
                     <span className="font-bold text-md bg-gradient-to-t from-blue to-sky-400 bg-clip-text text-transparent">Új asztalmeghívás!</span>
                     <span className="text-sm text-gray-300">Részletekért koppints!</span>

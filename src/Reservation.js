@@ -55,6 +55,8 @@ function Reservation() {
             const response = await axios.post(`https://backend.csaposapp.hu/api/bookings/reject-invite?bookingId=${id}`, {}, config);
             if (response.status === 200) {
                 setIsAccepted(false);
+                await getBookingsContainingUser();
+                setTimeout(() => navigate("/"), 2000);
             }
         }
         catch (error) {
@@ -106,17 +108,10 @@ function Reservation() {
         if (isAccepted === true) {
             setTimeout(() => {
                 setWaiting(true);
-                const foundBooking = bookingsContainingUser.find(booking => booking.id === id);
-                Object.defineProperty(foundBooking, "userAccepted", {value: true});
-                console.log(foundBooking);
             }, 2000);
         }
-        else if (isAccepted === false) {
-            const foundBooking = bookingsContainingUser.find(booking => booking.id === id);
-            Object.defineProperty(foundBooking, "userAccepted", {value: false});        
-            console.log(foundBooking);
-        }
-    }, [isSuccessful, isAccepted, bookingsContainingUser]);
+
+    }, [isSuccessful, isAccepted]);
 
     useEffect(() => {
         if (bookings.length > 0 || bookingsContainingUser.length > 0) {

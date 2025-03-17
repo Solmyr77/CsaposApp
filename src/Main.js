@@ -21,7 +21,7 @@ function Main() {
       <div className="px-4 overflow-auto pb-[12vh]">
         <Navbar/>
         {
-          bookings.concat(bookingsContainingUser.filter(booking => (booking.userAccepted === true || booking.tableGuests.find(guest => guest.id === user.id)?.status === "accepted"))).length > 0 &&
+          bookings.concat(bookingsContainingUser?.filter(booking => (booking.userAccepted === true || booking.tableGuests.find(guest => guest.id === user.id)?.status === "accepted"))).length > 0 &&
           <div>
             <TitleDivider title={"Foglalásaim"}/>
             <ReservationsSwiper/>

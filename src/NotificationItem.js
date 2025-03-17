@@ -97,7 +97,7 @@ function NotificationItem({ record, isFriendRequest }) {
           <button className={`bg-transparent btn border-2 border-red-500 text-red-500 hover:bg-transparent hover:border-red-500 w-1/2 min-h-10 h-10 ${isAccepted !== null && "hidden"}`} onClick={() => handleReject(record.id)}>Elutasítás</button>
           <button className={`bg-gradient-to-tr from-blue to-sky-400 btn border-0 text-white w-1/2 min-h-10 h-10 ${isAccepted !== null && "hidden"}`} onClick={() => handleAccept(record.id)}>Elfogadás</button>
           <button className={`bg-gradient-to-tr from-blue to-sky-400 btn border-0 text-white w-full min-h-10 h-10 ${isAccepted === true ? "" : "hidden"}`}>Elfogadva</button>
-          <button className={`bg-transparent btn border-2 border-red-500 text-red-500 hover:bg-transparent hover:border-red-500 w-full min-h-10 h-10 ${isAccepted === false ? "" : "hidden"}`}>Elutasításva</button>
+          <button className={`bg-transparent btn border-2 border-red-500 text-red-500 hover:bg-transparent hover:border-red-500 w-full min-h-10 h-10 ${isAccepted === false ? "" : "hidden"}`}>Elutasítva</button>
         </div>
       </div>
     )

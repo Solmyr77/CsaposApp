@@ -22,10 +22,10 @@ function TableNotification({ booking }) {
                 <div className="flex gap-2 items-center">
                     <div className="avatar">
                         <div className="h-10 rounded-full border-2">
-                            <img src={`https://assets.csaposapp.hu/assets/images/${bookerProfile.imageUrl}`} alt="kép" />
+                            <img src={`https://assets.csaposapp.hu/assets/images/${bookerProfile?.imageUrl}`} alt="kép" />
                         </div>
                     </div>
-                    <span>{bookerProfile.displayName}</span>
+                    <span>{bookerProfile?.displayName}</span>
                 </div>
             </div>
         </Link>

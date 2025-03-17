@@ -110,7 +110,6 @@ function Reservation() {
                 setWaiting(true);
             }, 2000);
         }
-
     }, [isSuccessful, isAccepted]);
 
     useEffect(() => {
@@ -219,7 +218,7 @@ function Reservation() {
                         waiting ?
                         <div className="flex flex-col items-center gap-1">
                             <p className="font-bold text-lg">ELFOGADVA</p>
-                            <button className="btn bg-dark-grey hover:bg-dark-grey disabled:bg-dark-grey border-none gap-0 w-full disabled:opacity-50 text-md" onClick={() => navigate(`/pubmenu/${currentLocation.name}/${currentBooking.id}`)}><span className="bg-gradient-to-t from-blue to-sky-400 bg-clip-text leading-relaxed text-transparent">Kezdés</span></button>
+                            <button className="btn bg-dark-grey hover:bg-dark-grey disabled:bg-dark-grey border-none gap-0 w-full disabled:opacity-50 text-md" disabled={!isActive} onClick={() => navigate(`/pubmenu/${currentLocation.name}/${currentBooking.id}`)}><span className="bg-gradient-to-t from-blue to-sky-400 bg-clip-text leading-relaxed text-transparent">Kezdés</span></button>
                         </div> :
                         (
                             !isGuest ? 

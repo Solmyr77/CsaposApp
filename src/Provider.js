@@ -374,6 +374,21 @@ function Provider({ children }) {
     notificationConnection.invoke("JoinNotificationGroup")
     .then(() => console.log(`✅ Joined group: notifications`))
     .catch(err => console.error("❌ Failed to join group:", err));
+
+    notificationConnection.on("notifyaddedtotable", (message) => {
+      console.log("📨 Received from hub:", message);
+      setBookingsContainingUser(state => {
+        if (!state.some(booking => booking.id === message.id)) {
+          return [...state, message];
+        } 
+      });
+      setNewNotification(true);
+    });
+    notificationConnection.on("notifyincomingfriendrequest", (message) => {
+      console.log("New incoming friend request!");
+      setFriendRequests(state => [...state, message]);
+      setNewNotification(true);
+    });
   }
 
   //hub connections
@@ -381,15 +396,7 @@ function Provider({ children }) {
     if (localStorage.getItem("accessToken") !== null && notificationConnection.state === "Disconnected") {
       notificationConnection.start()
       .then(() => {
-        notificationConnection.on("notifyaddedtotable", (message) => {
-          console.log("📨 Received from hub:", message);
-          setBookingsContainingUser(state => {
-            if (!state.some(booking => booking.id === message.id)) {
-              return [...state, message];
-            } 
-          });
-          setNewNotification(true);
-        });
+        
         registerUser();
         joinNotificationGroup();
         console.log("✅ NotificationHub connected successfully.");

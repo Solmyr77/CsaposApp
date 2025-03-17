@@ -1,4 +1,3 @@
-
 using Microsoft.EntityFrameworkCore;
 using CsaposApi.Models;
 using Microsoft.AspNetCore.Hosting;
@@ -22,23 +21,17 @@ namespace CsaposApi
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddSignalR();
 
+            // Swagger Security
             builder.Services.AddSwaggerGen(c =>
             {
-                // Basic OpenAPI info
-                c.SwaggerDoc("v1", new OpenApiInfo
-                {
-                    Title = "Csapos API",
-                    Version = "v1"
-                });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Csapos API", Version = "v1" });
 
-                // 1. Add the Bearer security definition
+                // 1. Add Bearer authentication definition
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
@@ -49,7 +42,7 @@ namespace CsaposApi
                     Description = "JWT Authorization header. Example: \"Bearer {token}\""
                 });
 
-                // 2. Add a global security requirement
+                // 2. Apply global security requirement
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
                     {
@@ -66,36 +59,23 @@ namespace CsaposApi
                 });
             });
 
-            // Authorization policy
+            // Authorization policies
             builder.Services.AddAuthorization(options =>
             {
-                options.AddPolicy("MustBeGuest", policy =>
-                {
-                    policy.RequireRole("guest", "admin", "manager");
-                });
-
-                options.AddPolicy("MustBeAdmin", policy =>
-                {
-                    policy.RequireRole("admin");
-                });
-
-                options.AddPolicy("MustBeManager", policy =>
-                {
-                    policy.RequireRole("manager", "admin");
-                });
+                options.AddPolicy("MustBeGuest", policy => policy.RequireRole("guest", "admin", "manager"));
+                options.AddPolicy("MustBeAdmin", policy => policy.RequireRole("admin"));
+                options.AddPolicy("MustBeManager", policy => policy.RequireRole("manager", "admin"));
             });
 
+            // Services
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IPasswordService, PasswordService>();
             builder.Services.AddScoped<IFriendshipService, FriendshipService>();
-
-            // SignalR services
             builder.Services.AddScoped<IBookingNotificationService, BookingNotificationService>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
-
             builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
 
-            // 1. Bind JwtSettings
+            // 1. Bind JWT settings
             var jwtSection = builder.Configuration.GetSection("JwtSettings");
             builder.Services.Configure<JwtSettings>(jwtSection);
             var jwtSettings = jwtSection.Get<JwtSettings>();
@@ -121,47 +101,65 @@ namespace CsaposApi
                     ValidAudience = jwtSettings.Audience,
                     ClockSkew = TimeSpan.Zero
                 };
+
+                // Allow JWT tokens to be sent via WebSockets
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) &&
+                            (path.StartsWithSegments("/hubs/notifications") || path.StartsWithSegments("/hubs/booking")))
+                        {
+                            context.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
             });
 
-            builder.Services.AddDbContext<CsaposappContext>(option =>
+            // Database
+            builder.Services.AddDbContext<CsaposappContext>(options =>
             {
                 var connectionString = builder.Configuration.GetConnectionString("MySql");
-                option.UseMySQL(connectionString);
+                options.UseMySQL(connectionString);
             });
 
+            // JSON serialization fixes
             builder.Services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
-            builder.Services.AddCors(c => { c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()); });
+            // CORS (Allow only frontend domain)
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowFrontend", policy =>
+                {
+                    policy.WithOrigins("https://csaposapp.hu", "https://localhost:3000", "http://localhost:3000")
+                          .AllowAnyMethod()
+                          .AllowAnyHeader()
+                          .AllowCredentials(); // WebSockets require credentials
+                });
+            });
 
             var app = builder.Build();
 
             app.UseDeveloperExceptionPage();
 
-            // Configure the HTTP request pipeline.
-
-            // UNCOMMENT FOR PRODUCTION!!!!!
-            /*if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }*/
-
+            // Swagger UI
             app.UseSwagger();
             app.UseSwaggerUI();
 
-            // Use CORS
-            app.UseCors("AllowOrigin");
-
-            // app.UseHttpsRedirection();
+            // Use CORS policy
+            app.UseCors("AllowFrontend");
 
             app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();
 
-            // SignalR Hubs
-            app.MapHub<NotificationHub>("/hubs/notifications").RequireCors("AllowOrigin");
-            app.MapHub<BookingHub>("/hubs/booking").RequireCors("AllowOrigin");
+            // SignalR Hubs with Correct CORS Policy
+            app.MapHub<NotificationHub>("/hubs/notifications");
+            app.MapHub<BookingHub>("/hubs/booking");
 
             app.Run();
         }

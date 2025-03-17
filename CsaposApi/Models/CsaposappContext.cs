@@ -33,6 +33,8 @@ public partial class CsaposappContext : DbContext
 
     public virtual DbSet<OrderItem> OrderItems { get; set; }
 
+    public virtual DbSet<Payment> Payments { get; set; }
+
     public virtual DbSet<Product> Products { get; set; }
 
     public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
@@ -350,6 +352,8 @@ public partial class CsaposappContext : DbContext
 
             entity.ToTable("orders");
 
+            entity.HasIndex(e => e.BookingId, "booking_id");
+
             entity.HasIndex(e => e.LocationId, "location_id");
 
             entity.HasIndex(e => e.TableId, "table_id");
@@ -357,6 +361,7 @@ public partial class CsaposappContext : DbContext
             entity.HasIndex(e => e.UserId, "user_id");
 
             entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.BookingId).HasColumnName("booking_id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("timestamp")
@@ -373,6 +378,10 @@ public partial class CsaposappContext : DbContext
                 .HasColumnType("timestamp")
                 .HasColumnName("updated_at");
             entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.Booking).WithMany(p => p.Orders)
+                .HasForeignKey(d => d.BookingId)
+                .HasConstraintName("orders_ibfk_5");
 
             entity.HasOne(d => d.Location).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.LocationId)
@@ -428,6 +437,61 @@ public partial class CsaposappContext : DbContext
                 .HasForeignKey(d => d.ProductId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("order_items_ibfk_2");
+        });
+
+        modelBuilder.Entity<Payment>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("payments");
+
+            entity.HasIndex(e => e.OrderId, "fk_payments_order");
+
+            entity.HasIndex(e => e.TableBookingId, "fk_payments_table_booking");
+
+            entity.HasIndex(e => e.UserId, "fk_payments_user");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Amount)
+                .HasPrecision(10)
+                .HasColumnName("amount");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("created_at");
+            entity.Property(e => e.OrderId).HasColumnName("order_id");
+            entity.Property(e => e.PaymentDate)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("payment_date");
+            entity.Property(e => e.PaymentStatus)
+                .HasDefaultValueSql("'pending'")
+                .HasColumnType("enum('pending','completed','failed','refunded')")
+                .HasColumnName("payment_status");
+            entity.Property(e => e.TableBookingId).HasColumnName("table_booking_id");
+            entity.Property(e => e.TransactionId)
+                .HasMaxLength(100)
+                .HasColumnName("transaction_id");
+            entity.Property(e => e.UpdatedAt)
+                .ValueGeneratedOnAddOrUpdate()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("updated_at");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.Order).WithMany(p => p.Payments)
+                .HasForeignKey(d => d.OrderId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("fk_payments_order");
+
+            entity.HasOne(d => d.TableBooking).WithMany(p => p.Payments)
+                .HasForeignKey(d => d.TableBookingId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("fk_payments_table_booking");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Payments)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("fk_payments_user");
         });
 
         modelBuilder.Entity<Product>(entity =>

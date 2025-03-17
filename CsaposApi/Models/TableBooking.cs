@@ -19,6 +19,10 @@ public partial class TableBooking
 
     public virtual User? Booker { get; set; }
 
+    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+
+    public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
+
     public virtual Table? Table { get; set; }
 
     public virtual ICollection<TableGuest> TableGuests { get; set; } = new List<TableGuest>();

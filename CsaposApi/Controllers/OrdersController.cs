@@ -211,6 +211,7 @@ namespace CsaposApi.Controllers
                 Id = Guid.NewGuid(),
                 UserId = userId,
                 TableId = orderCreateDto.TableId,
+                BookingId = orderCreateDto.BookingId,
                 LocationId = locationId,
                 OrderStatus = "pending",
                 CreatedAt = DateTime.UtcNow,

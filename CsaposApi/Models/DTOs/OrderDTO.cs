@@ -20,7 +20,7 @@ namespace CsaposApi.Models.DTOs
         public class OrderCreateDTO
         {
             public Guid TableId { get; set; }
-
+            public Guid BookingId { get; set; }
             public List<OrderItemCreateDTO> OrderItems { get; set; } = new List<OrderItemCreateDTO>();
         }
     }

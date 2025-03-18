@@ -13,7 +13,6 @@ function Notifications() {
 
     useEffect(() => {
         setNewNotification(false);
-        console.log(friendRequests);
         switch (notificationFilter) {
             case "Összes":
                 setRecordsToDisplay(friendRequests.concat(eventRecords));

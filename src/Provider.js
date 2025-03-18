@@ -1,4 +1,4 @@
-import { React, useState, useEffect} from "react";
+import { React, useState, useEffect, useMemo, useRef} from "react";
 import Context from "./Context";
 import axios from "axios";
 import getAccessToken from "./refreshToken";
@@ -6,6 +6,8 @@ import { Navigate } from "react-router-dom";
 import notificationConnection from "./signalRBookingConnection";
 
 function Provider({ children }) {
+  //accessToken memo
+  const accessToken = useMemo(() => localStorage.getItem("accessToken"), [localStorage.getItem("accessToken")]);
   //basic states
   const [navState, setNavState] = useState("Összes");
   const [menuState, setMenuState] = useState("Main");
@@ -341,8 +343,8 @@ function Provider({ children }) {
 
   //main useffect to fetch data
   useEffect(() => {
-    if (localStorage.getItem("accessToken")) {
-      const userId = decodeJWT(localStorage.getItem("accessToken")).sub;
+    if (accessToken) {
+      const userId = decodeJWT(accessToken).sub;
       if (userId) {
        const fetch = async () => {
           await getProfile(userId, "user");
@@ -356,13 +358,47 @@ function Provider({ children }) {
         fetch()
       }
     }
-  }, [localStorage.getItem("accessToken")]);
+  }, [accessToken]);
 
   //function to get userId from JWT token
   function decodeJWT(token) {
     const payload = token.split('.')[1]; 
     const decodedPayload = atob(payload);
     return JSON.parse(decodedPayload);
+  }
+
+  function registerListeners() {
+    console.log("Started listening for event: notifyaddedtotable");
+    notificationConnection.on("notifyaddedtotable", (message) => {
+      console.log("📨 Received from hub:", message);
+      setBookingsContainingUser(state => {
+        if (!state.some(booking => booking.id === message.id)) {
+          return [...state, message];
+        }
+        return state;
+      });
+      setNewNotification(true);
+    });
+
+    console.log("Started listening for event: notifyincomingfriendrequest");
+    notificationConnection.on("notifyincomingfriendrequest", (message) => {
+      console.log("New incoming friend request!");
+      setFriendRequests(state => [...state, message]);
+      setNewNotification(true);
+    });
+
+    console.log("Started listening for event: notifyfriendrequestaccepted");
+    notificationConnection.on("notifyfriendrequestaccepted", (message) => {
+      console.log("Friend request accepted!", message);
+      getProfile(message.userId2).then((newFriend) => {
+        setFriends(state => {
+          if (!state.some(friend => friend.id === newFriend.id)) {
+            return [...state, newFriend];
+          }
+          return state;
+        })
+      })
+    })
   }
 
   function registerUser() {
@@ -372,49 +408,53 @@ function Provider({ children }) {
 
   function joinNotificationGroup() {
     notificationConnection.invoke("JoinNotificationGroup")
-    .then(() => console.log(`✅ Joined group: notifications`))
+    .then(() => {
+      console.log(`✅ Joined group: notifications`);
+    })
     .catch(err => console.error("❌ Failed to join group:", err));
-
-    notificationConnection.on("notifyaddedtotable", (message) => {
-      console.log("📨 Received from hub:", message);
-      setBookingsContainingUser(state => {
-        if (!state.some(booking => booking.id === message.id)) {
-          return [...state, message];
-        } 
-      });
-      setNewNotification(true);
-    });
-    notificationConnection.on("notifyincomingfriendrequest", (message) => {
-      console.log("New incoming friend request!");
-      setFriendRequests(state => [...state, message]);
-      setNewNotification(true);
-    });
   }
+
+  //ref for flagging reconnection
+  const isOnReconnectedFired = useRef(false);
 
   //hub connections
   useEffect(() => {
-    if (localStorage.getItem("accessToken") !== null && notificationConnection.state === "Disconnected") {
+    if (accessToken !== null && notificationConnection.state === "Disconnected") {
       notificationConnection.start()
       .then(() => {
-        
+        console.log("✅ NotificationHub connected successfully.");
+        registerListeners();
         registerUser();
         joinNotificationGroup();
-        console.log("✅ NotificationHub connected successfully.");
       })
       .catch((err) => {
           console.error("❌ Connection failed:", err);
       });
-      
-      return () => {
-        notificationConnection.off("notifyaddedtotable");
-      };
     }
-    notificationConnection.onreconnected(() => {
-      registerUser();
-      joinNotificationGroup();
-      console.log("Reconnected successfully.");
-    })
-  }, [localStorage.getItem("accessToken")]);
+
+    //reconnect only once to the connection
+    if (!isOnReconnectedFired.current) {
+      notificationConnection.onreconnected(() => {
+        console.log("Reconnected successfully.");
+        notificationConnection.off("notifyaddedtotable");
+        notificationConnection.off("notifyincomingfriendrequest");
+        notificationConnection.off("notifyfriendrequestaccepted");
+        console.log("Minden listener off");
+        registerListeners();
+        registerUser();
+        joinNotificationGroup();
+      });
+      isOnReconnectedFired.current = true;
+    }
+    
+    //cleanup function for listeners
+    return () => {
+      notificationConnection.off("notifyaddedtotable");
+      notificationConnection.off("notifyincomingfriendrequest");
+      notificationConnection.off("notifyfriendrequestaccepted");
+    };
+  }, [accessToken]);
+  
 
   return (
     <Context.Provider value={{ 

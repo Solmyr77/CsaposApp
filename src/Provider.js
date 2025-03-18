@@ -1,4 +1,4 @@
-import { React, useState, useEffect, useMemo, useRef} from "react";
+import { React, useState, useEffect, useMemo, useRef, useCallback} from "react";
 import Context from "./Context";
 import axios from "axios";
 import getAccessToken from "./refreshToken";
@@ -6,8 +6,6 @@ import { Navigate } from "react-router-dom";
 import notificationConnection from "./signalRBookingConnection";
 
 function Provider({ children }) {
-  //accessToken memo
-  const accessToken = useMemo(() => localStorage.getItem("accessToken"), [localStorage.getItem("accessToken")]);
   //basic states
   const [navState, setNavState] = useState("Összes");
   const [menuState, setMenuState] = useState("Main");
@@ -331,6 +329,11 @@ function Provider({ children }) {
   const logout = async () => {
     const response = await axios.post("https://backend.csaposapp.hu/api/auth/logout", {refreshToken : localStorage.getItem("refreshToken")});
     if (response.status === 204) {
+      notificationConnection.stop();
+      notificationConnection.off("notifyaddedtotable");
+      notificationConnection.off("notifyincomingfriendrequest");
+      notificationConnection.off("notifyfriendrequestaccepted");
+      console.log("Logged out");
       setIsAuthenticated(false);
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
@@ -343,8 +346,9 @@ function Provider({ children }) {
 
   //main useffect to fetch data
   useEffect(() => {
-    if (accessToken) {
-      const userId = decodeJWT(accessToken).sub;
+    console.log("NEW ACCESSTOKEN DETECTED, REFETCHING DATA!")
+    if (localStorage.getItem("accessToken")) {
+      const userId = decodeJWT(localStorage.getItem("accessToken")).sub;
       if (userId) {
        const fetch = async () => {
           await getProfile(userId, "user");
@@ -358,7 +362,7 @@ function Provider({ children }) {
         fetch()
       }
     }
-  }, [accessToken]);
+  }, [localStorage.getItem("accessToken")]);
 
   //function to get userId from JWT token
   function decodeJWT(token) {
@@ -367,38 +371,48 @@ function Provider({ children }) {
     return JSON.parse(decodedPayload);
   }
 
-  function registerListeners() {
-    console.log("Started listening for event: notifyaddedtotable");
-    notificationConnection.on("notifyaddedtotable", (message) => {
-      console.log("📨 Received from hub:", message);
-      setBookingsContainingUser(state => {
-        if (!state.some(booking => booking.id === message.id)) {
-          return [...state, message];
-        }
-        return state;
-      });
-      setNewNotification(true);
+  //define listeners
+  const handleNotifyAddedToTable = useCallback((message) => {
+    console.log("📨 Received from hub:", message);
+    setBookingsContainingUser(state => {
+      if (!state.some(booking => booking.id === message.id)) {
+        return [...state, message];
+      }
+      return state;
     });
+    setNewNotification(true);
+  }, [])
 
-    console.log("Started listening for event: notifyincomingfriendrequest");
-    notificationConnection.on("notifyincomingfriendrequest", (message) => {
-      console.log("New incoming friend request!");
+  const handleNotifyIncomingFriendRequest = useCallback((message) => {
+    console.log("New incoming friend request!", message);
       setFriendRequests(state => [...state, message]);
       setNewNotification(true);
-    });
+  }, [])
 
-    console.log("Started listening for event: notifyfriendrequestaccepted");
-    notificationConnection.on("notifyfriendrequestaccepted", (message) => {
-      console.log("Friend request accepted!", message);
-      getProfile(message.userId2).then((newFriend) => {
-        setFriends(state => {
-          if (!state.some(friend => friend.id === newFriend.id)) {
-            return [...state, newFriend];
-          }
-          return state;
-        })
-      })
-    })
+  const handleNotifyFriendRequestAccepted = useCallback((message) => {
+    console.log("Friend request accepted!", message);
+    getProfile(message.userId2).then((newFriend) => {
+    setFriends(state => {
+      if (!state.some(friend => friend.id === newFriend.id)) {
+        return [...state, newFriend];
+      }
+      return state;
+    });
+    });
+  }, [])
+
+  function registerListeners() {
+    // Remove existing listeners to avoid duplicates
+    notificationConnection.off("notifyaddedtotable", handleNotifyAddedToTable);
+    notificationConnection.off("notifyincomingfriendrequest", handleNotifyIncomingFriendRequest);
+    notificationConnection.off("notifyfriendrequestaccepted", handleNotifyFriendRequestAccepted);
+    console.log("Old listeners have been cleaned up.")
+  
+    // Register new listeners
+    notificationConnection.on("notifyaddedtotable", handleNotifyAddedToTable);
+    notificationConnection.on("notifyincomingfriendrequest", handleNotifyIncomingFriendRequest);
+    notificationConnection.on("notifyfriendrequestaccepted", handleNotifyFriendRequestAccepted);
+    console.log("New listeners have been set.")
   }
 
   function registerUser() {
@@ -419,7 +433,8 @@ function Provider({ children }) {
 
   //hub connections
   useEffect(() => {
-    if (accessToken !== null && notificationConnection.state === "Disconnected") {
+    console.log(notificationConnection.state);
+    if (localStorage.getItem("accessToken") !== null && notificationConnection.state === "Disconnected") {
       notificationConnection.start()
       .then(() => {
         console.log("✅ NotificationHub connected successfully.");
@@ -436,10 +451,6 @@ function Provider({ children }) {
     if (!isOnReconnectedFired.current) {
       notificationConnection.onreconnected(() => {
         console.log("Reconnected successfully.");
-        notificationConnection.off("notifyaddedtotable");
-        notificationConnection.off("notifyincomingfriendrequest");
-        notificationConnection.off("notifyfriendrequestaccepted");
-        console.log("Minden listener off");
         registerListeners();
         registerUser();
         joinNotificationGroup();
@@ -449,11 +460,11 @@ function Provider({ children }) {
     
     //cleanup function for listeners
     return () => {
-      notificationConnection.off("notifyaddedtotable");
-      notificationConnection.off("notifyincomingfriendrequest");
-      notificationConnection.off("notifyfriendrequestaccepted");
+      notificationConnection.off("notifyaddedtotable", handleNotifyAddedToTable);
+      notificationConnection.off("notifyincomingfriendrequest", handleNotifyIncomingFriendRequest);
+      notificationConnection.off("notifyfriendrequestaccepted", handleNotifyFriendRequestAccepted);
     };
-  }, [accessToken]);
+  }, [localStorage.getItem("accessToken")]);
   
 
   return (

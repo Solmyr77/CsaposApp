@@ -90,8 +90,8 @@ function NotificationItem({ record, isFriendRequest }) {
     return(
       <div className="w-full min-h-16 bg-dark-grey rounded-md flex flex-col p-4 pb-2">
         <div className="flex flex-row basis-2/3 items-center">
-          <img src={`https://assets.csaposapp.hu/assets/images/${profile.imageUrl}`} alt="" className="h-10 aspect-square rounded-full object-cover mr-2"/>
-          <p className="flex flex-row items-center text-sm text-left text-nowrap basis-4/5"><span className="truncate inline-block max-w-20 mr-1 font-bold">{profile.displayName}</span> barátnak jelölt!</p>
+          <img src={`https://assets.csaposapp.hu/assets/images/${profile?.imageUrl}`} alt="" className="h-10 aspect-square rounded-full object-cover mr-2"/>
+          <p className="flex flex-row items-center text-sm text-left text-nowrap basis-4/5"><span className="truncate inline-block max-w-20 mr-1 font-bold">{profile?.displayName}</span> barátnak jelölt!</p>
         </div>
         <div className="flex flex-row justify-center flex-grow gap-2 basis-1/3 h-24 items-end mt-2 text-sm">
           <button className={`bg-transparent btn border-2 border-red-500 text-red-500 hover:bg-transparent hover:border-red-500 w-1/2 min-h-10 h-10 ${isAccepted !== null && "hidden"}`} onClick={() => handleReject(record.id)}>Elutasítás</button>

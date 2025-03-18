@@ -58,6 +58,13 @@ function Provider({ children }) {
     catch (error) {
       console.log(error.data?.status);
       console.log(error.message);
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) await getProfile(id);
+        else {
+          await logout();
+          window.location.reload();
+        }
+      }
     }
   }
 
@@ -83,6 +90,13 @@ function Provider({ children }) {
     catch (error) {
       console.log(error.data?.status);
       console.log(error.message);
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) await getFriends();
+        else {
+          await logout();
+          window.location.reload();
+        }
+      }
     }
   }
 
@@ -97,6 +111,13 @@ function Provider({ children }) {
     }
     catch (error) {
       console.log(error);
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) await getFriendRequests();
+        else {
+          await logout();
+          window.location.reload();
+        }
+      }
     }
   }
 
@@ -177,6 +198,13 @@ function Provider({ children }) {
     catch (error) {
       console.log(error.response?.status);
       console.log(error.message);
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) await getTables();
+        else {
+          await logout();
+          window.location.reload();
+        }
+      }
     }
   }
 
@@ -224,6 +252,13 @@ function Provider({ children }) {
     catch (error) {
       console.log(error.response?.status);
       console.log(error.message);
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) await getBookingsByUser();
+        else {
+          await logout();
+          window.location.reload();
+        }
+      }
     }
   }
 
@@ -244,6 +279,13 @@ function Provider({ children }) {
     catch (error) {
       console.log(error.response?.status);
       console.log(error.message);
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) await getBookingsContainingUser();
+        else {
+          await logout();
+          window.location.reload();
+        }
+      }
     }
   }
 
@@ -457,6 +499,8 @@ function Provider({ children }) {
       });
       isOnReconnectedFired.current = true;
     }
+
+    //notificationConnection.onclose(() => console.log("closed connection due to refreshed token"));
     
     //cleanup function for listeners
     return () => {

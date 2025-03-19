@@ -72,8 +72,7 @@ function Provider({ children }) {
       const response = await axios.get(`https://backend.csaposapp.hu/api/Manager/manager-location`, config);
       const data = response.data;
 
-      // TODO: Will return json object
-      setManagerLocation(data);
+      setManagerLocation(data.locationId);
     }
     catch (error) {
       console.log(error.data?.status);

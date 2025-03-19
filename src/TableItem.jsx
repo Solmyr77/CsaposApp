@@ -13,8 +13,8 @@ export default function TableItem({ table }) {
                 <h1 className={`text-center text-xxl ${table.isBooked ? 'text-black' : ''}`}>{table.number}</h1>
             </div>
 
-            <div className=''>
-
+            <div className='flex flex-col justify-center items-center'>
+                <h2>{table.capacity}</h2>
             </div>
         </div>
     )

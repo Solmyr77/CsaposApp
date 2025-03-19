@@ -11,7 +11,8 @@ function TableNotification({ booking }) {
         if (friends.length > 0) {
             setBookerProfile(friends.find(friend => friend.id === booking.bookerId));
         }
-        setFormattedTime(booking.sentAt?.split("T")[0].replaceAll("-", "."));
+        Object.defineProperty(booking, "sentAt", {value: booking.createdAt});
+        setFormattedTime(new Date(booking.sentAt).getDate() === new Date().getDate() ? `Ma ${booking.sentAt.split("T")[1].slice(0, 5)}` : `${booking.sentAt.split("T")[0].slice(5).replace("-", ".")}`);
     }, [friends]);
 
     return (

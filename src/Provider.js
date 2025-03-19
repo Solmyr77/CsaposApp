@@ -34,6 +34,7 @@ function Provider({ children }) {
   //notifications
   const [newNotification, setNewNotification] = useState(false);
   
+  const allBookings = useMemo(() => bookings.concat(bookingsContainingUser), [bookings, bookingsContainingUser]);
 
   async function getProfile(id, profile) {
     try {
@@ -422,7 +423,6 @@ function Provider({ children }) {
       }
       return state;
     });
-
     joinBookingGroup(message.payload.id);
     setNewNotification(true);
   }, []);
@@ -446,8 +446,19 @@ function Provider({ children }) {
   }, []);
 
   const handleNotifyBookingDeleted = useCallback((message) => {
+    setBookingsContainingUser(state => state.filter(booking => booking.id !== message.bookingId));
     console.log(message);
-  });
+    bookingConnection.invoke("LeaveBookingGroup", message.bookingId);
+  }, []);
+
+  const handleNotifyUserAcceptedInvite = useCallback((message) => {
+    console.log("User accepted invite:", message);
+    console.log(allBookings);
+  }, []);
+
+  const handleNotifyUserRejectedInvite = useCallback((message) => {
+    console.log("User rejected invite:", message);
+  }, []);
 
   function registerNotificationListeners() {
     // Remove existing listeners to avoid duplicates
@@ -523,8 +534,13 @@ function Provider({ children }) {
 
   function registerBookingListeners() {
     bookingConnection.off("notifybookingdeleted", handleNotifyBookingDeleted);
+    bookingConnection.off("notifyuseracceptedinvite", handleNotifyUserAcceptedInvite);
+    bookingConnection.off("notifyuserrejectedinvite", handleNotifyUserRejectedInvite);
     console.log("CLEARED BOOKING DELETED LISTENER");
+
     bookingConnection.on("notifybookingdeleted", handleNotifyBookingDeleted);
+    bookingConnection.on("notifyuseracceptedinvite", handleNotifyUserAcceptedInvite);
+    bookingConnection.on("notifyuserrejectedinvite", handleNotifyUserRejectedInvite);
     console.log("ADDED BOOKING DELETED LISTENER");
   }
 
@@ -532,33 +548,36 @@ function Provider({ children }) {
   const isBookingOnReconnectedFired = useRef(false);
 
   //BookingHub connection
-  // useEffect(() => {
-  //   registerBookingListeners();
-  //   if (localStorage.getItem("accessToken") !== null && bookingConnection.state === "Disconnected") {
-  //     bookingConnection.start()
-  //     .then(() => {
-  //       console.log("✅ BookingHub connected successfully.");
-  //       registerUser();
-  //       console.log(bookings);
-  //     })
-  //     .catch((err) => {
-  //         console.error("❌ Connection failed:", err);
-  //     });
-  //   }
-  //   //reconnect only once to the connection
-  //   if (!isBookingOnReconnectedFired.current) {
-  //     bookingConnection.onreconnected(() => {
-  //       console.log("Reconnected successfully.");
-  //       registerUser();
-  //     });
-  //     isBookingOnReconnectedFired.current = true;
-  //   }
+  useEffect(() => {
+    registerBookingListeners();
+    if (localStorage.getItem("accessToken") !== null && bookingConnection.state === "Disconnected" && allBookings.length > 0) {
+      bookingConnection.start()
+      .then(() => {
+        console.log("✅ BookingHub connected successfully.");
+        registerUser();
+        allBookings.map((booking) => joinBookingGroup(booking.id));
+      })
+      .catch((err) => {
+        console.error("❌ Connection failed:", err);
+      });
+    }
+    //reconnect only once to the connection
+    if ((!isBookingOnReconnectedFired.current) && allBookings.length > 0) {
+      bookingConnection.onreconnected(() => {
+        console.log("Reconnected successfully.");
+        registerUser();
+        allBookings.map((booking) => joinBookingGroup(booking.id));
+      });
+      isBookingOnReconnectedFired.current = true;
+    }
 
-  //   //cleanup function for listeners
-  //   return () => {
-  //     bookingConnection.off("notifybookingdeleted", handleNotifyBookingDeleted);
-  //   };
-  // }, [localStorage.getItem("accessToken"), bookings]);
+    //cleanup function for listeners
+    return () => {
+      bookingConnection.off("notifybookingdeleted", handleNotifyBookingDeleted);
+      bookingConnection.off("notifyuseracceptedinvite", handleNotifyUserAcceptedInvite);
+      bookingConnection.off("notifyuserrejectedinvite", handleNotifyUserRejectedInvite);
+    };
+  }, [allBookings]);
 
   return (
     <Context.Provider value={{ 

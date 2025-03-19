@@ -12,6 +12,7 @@ function NotificationItem({ record, isFriendRequest }) {
   const [isAccepted, setIsAccepted] = useState(null);
   const [isRead, setIsRead] = useState(null);
   const [profile, setProfile] = useState({});
+  const [formattedTime, setFormattedTime] = useState("");
 
   async function handleAccept(id) {
     try {
@@ -84,20 +85,25 @@ function NotificationItem({ record, isFriendRequest }) {
       }
     }
     run();
+    Object.defineProperty(record, "sentAt", {value: record.updatedAt});
+    setFormattedTime(new Date(record.sentAt).getDate() === new Date().getDate() ? `Ma ${record.sentAt.split("T")[1].slice(0, 5)}` : `${record.sentAt.split("T")[0].slice(5).replace("-", ".")}`);
   }, [isAccepted, record]);
 
   if (isFriendRequest === true) {
     return(
-      <div className="w-full min-h-16 bg-dark-grey rounded-md flex flex-col p-4 pb-2">
-        <div className="flex flex-row basis-2/3 items-center">
-          <img src={`https://assets.csaposapp.hu/assets/images/${profile?.imageUrl}`} alt="" className="h-10 aspect-square rounded-full object-cover mr-2"/>
-          <p className="flex flex-row items-center text-sm text-left text-nowrap basis-4/5"><span className="truncate inline-block max-w-20 mr-1 font-bold">{profile?.displayName}</span> barátnak jelölt!</p>
-        </div>
-        <div className="flex flex-row justify-center flex-grow gap-2 basis-1/3 h-24 items-end mt-2 text-sm">
-          <button className={`bg-transparent btn border-2 border-red-500 text-red-500 hover:bg-transparent hover:border-red-500 w-1/2 min-h-10 h-10 ${isAccepted !== null && "hidden"}`} onClick={() => handleReject(record.id)}>Elutasítás</button>
-          <button className={`bg-gradient-to-tr from-blue to-sky-400 btn border-0 text-white w-1/2 min-h-10 h-10 ${isAccepted !== null && "hidden"}`} onClick={() => handleAccept(record.id)}>Elfogadás</button>
-          <button className={`bg-gradient-to-tr from-blue to-sky-400 btn border-0 text-white w-full min-h-10 h-10 ${isAccepted === true ? "" : "hidden"}`}>Elfogadva</button>
-          <button className={`bg-transparent btn border-2 border-red-500 text-red-500 hover:bg-transparent hover:border-red-500 w-full min-h-10 h-10 ${isAccepted === false ? "" : "hidden"}`}>Elutasítva</button>
+      <div className="w-full min-h-16 bg-dark-grey rounded-md flex flex-col px-4 py-2">
+        <div className="flex flex-col gap-1">
+          <span className="text-xs text-gray-300">{formattedTime}</span>
+          <div className="flex flex-row basis-2/3 items-center">
+            <img src={`https://assets.csaposapp.hu/assets/images/${profile?.imageUrl}`} alt="" className="h-10 aspect-square rounded-full object-cover mr-2"/>
+            <p className="flex flex-row items-center text-sm text-left text-nowrap basis-4/5"><span className="truncate inline-block max-w-20 mr-1 font-bold">{profile?.displayName}</span> barátnak jelölt!</p>
+          </div>
+          <div className="flex flex-row justify-center flex-grow gap-2 basis-1/3 h-24 items-end mt-2 text-sm">
+            <button className={`bg-transparent btn border-2 border-red-500 text-red-500 hover:bg-transparent hover:border-red-500 w-1/2 min-h-10 h-10 ${isAccepted !== null && "hidden"}`} onClick={() => handleReject(record.id)}>Elutasítás</button>
+            <button className={`bg-gradient-to-tr from-blue to-sky-400 btn border-0 text-white w-1/2 min-h-10 h-10 ${isAccepted !== null && "hidden"}`} onClick={() => handleAccept(record.id)}>Elfogadás</button>
+            <button className={`bg-gradient-to-tr from-blue to-sky-400 btn border-0 text-white w-full min-h-10 h-10 ${isAccepted === true ? "" : "hidden"}`}>Elfogadva</button>
+            <button className={`bg-transparent btn border-2 border-red-500 text-red-500 hover:bg-transparent hover:border-red-500 w-full min-h-10 h-10 ${isAccepted === false ? "" : "hidden"}`}>Elutasítva</button>
+          </div>
         </div>
       </div>
     )

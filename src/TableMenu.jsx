@@ -1,5 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
-import Sidebar from './Sidebar'
+import React, { useContext, useEffect, useState } from 'react';
 import Context from "./Context";
 import TableItem from './TableItem';
 
@@ -14,9 +13,9 @@ export default function TableMenu() {
     useEffect(() => {
         async function runGetLocationTables() {
             try {
-                const data = await getLocationTables(managerLocation);
+                const data = await getLocationTables(managerLocation.id);
                 setTables(data);
-                console.log("Location Tables:", data);
+                console.log("Location tables:", data);
             } catch (error) {
                 console.error("Error fetching location tables:", error);
             }
@@ -37,28 +36,8 @@ export default function TableMenu() {
     }, [managerLocation]);
 
     return (
-        <div className='bg-grey min-h-screen w-full flex'>
-            {/* Sidebar - Fixed Height */}
-            <div className='basis-1/12 h-screen'>
-                <Sidebar />
-            </div>
-
-            {/* Scrollable Content */}
-            <div className='basis-11/12 h-screen overflow-auto flex flex-wrap gap-4 p-4 mx-auto'>
-                {
-                    tables?.map((table, index) => <TableItem key={index} table={table} />)
-                }
-                {
-                    tables?.map((table, index) => <TableItem key={index} table={table} />)
-                }
-                {
-                    tables?.map((table, index) => <TableItem key={index} table={table} />)
-                }
-                {
-                    tables?.map((table, index) => <TableItem key={index} table={table} />)
-                }
-            </div>
+        <div className='grid grid-cols-4 gap-4 overflow-auto'>
+            {tables?.map((table, index) => <TableItem key={index} table={table} />)}
         </div>
     );
 }
-

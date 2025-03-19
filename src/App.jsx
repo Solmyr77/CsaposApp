@@ -8,46 +8,58 @@ import ReceiptsMenu from './ReceiptsMenu';
 import StockMenu from './StockMenu';
 import StatisticsMenu from './StatisticsMenu'
 import ExtraMenu from './ExtraMenu';
+import Layout from './Layout';
 
 function App() {
   return (
     <HashRouter>
       <Provider>
         <Routes>
-
           <Route path="/tables" element={
             <ProtectedRoute isProtected={true}>
-              <TableMenu />
+              <Layout>
+                <TableMenu />
+              </Layout>
             </ProtectedRoute>}
           />
 
           <Route path="/orders" element={
             <ProtectedRoute isProtected={true}>
-              <OrdersMenu />
+              <Layout>
+                <OrdersMenu />
+              </Layout>
             </ProtectedRoute>}
           />
 
           <Route path="/receipts" element={
             <ProtectedRoute isProtected={true}>
-              <ReceiptsMenu />
+              <Layout>
+                <ReceiptsMenu />
+              </Layout>
             </ProtectedRoute>}
           />
 
           <Route path="/stock" element={
             <ProtectedRoute isProtected={true}>
-              <StockMenu />
+              <Layout>
+                <StockMenu />
+              </Layout>
             </ProtectedRoute>}
           />
 
           <Route path="/statistics" element={
             <ProtectedRoute isProtected={true}>
-              <StatisticsMenu />
+              <Layout>
+                <StatisticsMenu />
+              </Layout>
             </ProtectedRoute>}
           />
 
           <Route path="/extra" element={
             <ProtectedRoute isProtected={true}>
-              <ExtraMenu />
+              <Layout>
+                <ExtraMenu />
+              </Layout>
             </ProtectedRoute>}
           />
 

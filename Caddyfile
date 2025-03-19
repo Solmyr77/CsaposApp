@@ -10,10 +10,9 @@ backend.csaposapp.hu {
         header_up Access-Control-Allow-Origin *
         header_up Access-Control-Allow-Methods *
         header_up Access-Control-Allow-Headers *
-        header_up Upgrade {>Upgrade}
-        header_up Connection {>Connection}
     }
 }
+
 
 assets.csaposapp.hu {
     handle_path /assets/images* {

@@ -1,11 +1,15 @@
 // electron/main.js
-const { app, BrowserWindow } = require('electron');
+const { app, session, BrowserWindow } = require('electron');
 const path = require('path');
 
 // Handle creating/removing/trashing windows in this file.
 let mainWindow;
 
 function createWindow() {
+  session.defaultSession.clearCache().then(() => {
+    console.log('Cache cleared!');
+  });
+
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
@@ -19,7 +23,7 @@ function createWindow() {
   // Load our React app (Vite dev server in dev mode, or production build).
   if (process.env.APP_DEV) {
     // Development: Vite's dev server URL
-    mainWindow.loadURL('http://localhost:5173'); 
+    mainWindow.loadURL('http://localhost:3000'); 
   } else {
     // Production: local index.html file in dist
     mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));

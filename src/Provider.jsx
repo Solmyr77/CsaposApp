@@ -15,6 +15,7 @@ function Provider({ children }) {
   const [locations, setLocations] = useState( localStorage.getItem("locations") || []);
   const [notificationFilter, setNotificationFilter] = useState("Összes");
   const [previousRoutes, setPreviousRoutes] = useState(["/"]);
+  const [managerLocation, setManagerLocation] = useState(null);
   //friends
   const [friends, setFriends] = useState([]);
   const [friendRequests, setFriendRequests] = useState([]);
@@ -53,6 +54,26 @@ function Provider({ children }) {
       else {
         return data;
       }
+    }
+    catch (error) {
+      console.log(error.data?.status);
+      console.log(error.message);
+    }
+  }
+
+  async function getManagerLocation() {
+    try {
+      const config = {
+        headers: { 
+          Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+          "Cache-Content": "no-cache"
+        }
+      }
+      const response = await axios.get(`https://backend.csaposapp.hu/api/Manager/manager-location`, config);
+      const data = response.data;
+
+      // TODO: Will return json object
+      setManagerLocation(data);
     }
     catch (error) {
       console.log(error.data?.status);
@@ -253,7 +274,7 @@ function Provider({ children }) {
       console.log(error.message);
     }
   }
-
+  
   async function getBookingsContainingUser() {
     try {
       const config = {
@@ -370,10 +391,10 @@ function Provider({ children }) {
   useEffect(() => {
     if (localStorage.getItem("accessToken")) {
       setUserId(decodeJWT(localStorage.getItem("accessToken")).sub);
-      setUserRole(decodeJWT(localStorage.getItem("accessToken")).role);
       if (userId) {
        const fetch = async () => {
           await getProfile(userId, "user");
+          await getManagerLocation();
           getLocations();
           getFriends();
           getFriendRequests();
@@ -384,7 +405,7 @@ function Provider({ children }) {
         fetch()
       }
     }
-  }, [localStorage.getItem("accessToken"), userId]);
+  }, [localStorage.getItem("accessToken"), userId, userRole]);
 
   function decodeJWT(token) {
     const payload = token.split('.')[1]; 
@@ -401,7 +422,11 @@ function Provider({ children }) {
       isAuthenticated, 
       setIsAuthenticated, 
       user,
-      setUser, 
+      setUser,
+      userRole,
+      setUserRole,
+      managerLocation,
+      setManagerLocation,
       locations, 
       setLocations, 
       notificationFilter, 
@@ -439,7 +464,8 @@ function Provider({ children }) {
       getOrdersByTable,
       setUserId,
       getBusinessHours,
-      logout
+      logout,
+      decodeJWT
       }}>
       {children}
     </Context.Provider>

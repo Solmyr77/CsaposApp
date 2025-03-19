@@ -1,4 +1,6 @@
-﻿namespace CsaposApi.Models.DTOs
+﻿using static CsaposApi.Models.DTOs.UserDTO;
+
+namespace CsaposApi.Models.DTOs
 {
     public class TableDTO
     {
@@ -9,6 +11,8 @@
             public sbyte Capacity { get; set; }
             public bool IsBooked { get; set; }
             public Guid LocationId { get; set; }
+
+            public IEnumerable<GetProfileWithBookingStatusDTO> TableGuests { get; set; } = new List<GetProfileWithBookingStatusDTO>();
         }
 
         public class CreateTableDTO

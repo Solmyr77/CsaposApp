@@ -1,9 +1,9 @@
 import * as signalR from "@microsoft/signalr";
 
-const notificationConnection = new signalR.HubConnectionBuilder()
-    .withUrl("https://backend.csaposapp.hu/hubs/notifications", {withCredentials: false})
+const bookingConnection = new signalR.HubConnectionBuilder()
+    .withUrl("https://backend.csaposapp.hu/hubs/booking", {withCredentials: false})
     .withAutomaticReconnect()
     .configureLogging(signalR.LogLevel.Debug)
     .build();
 
-export default notificationConnection;
+export default bookingConnection;

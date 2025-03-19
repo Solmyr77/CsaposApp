@@ -5,17 +5,20 @@ import { Link } from "react-router-dom";
 function TableNotification({ booking }) {
     const { friends } = useContext(Context);
     const [bookerProfile, setBookerProfile] = useState({});
+    const [formattedTime, setFormattedTime] = useState("");
 
     useEffect(() => {
         if (friends.length > 0) {
             setBookerProfile(friends.find(friend => friend.id === booking.bookerId));
-        } 
+        }
+        setFormattedTime(booking.sentAt?.split("T")[0].replaceAll("-", "."));
     }, [friends]);
 
     return (
         <Link to={`/reservation/${booking.id}`}>
-            <div className="flex w-full items-center justify-between bg-dark-grey px-4 py-2 rounded-md shadow-md">
+            <div className="flex w-full items-center justify-between bg-dark-grey px-4 py-2 rounded-md relative shadow-md">
                 <div className="flex flex-col">
+                    <span className="text-xs text-gray-300">{formattedTime}</span>
                     <span className="font-bold text-md bg-gradient-to-t from-blue to-sky-400 bg-clip-text text-transparent">Új asztalmeghívás!</span>
                     <span className="text-sm text-gray-300">Részletekért koppints!</span>
                 </div>

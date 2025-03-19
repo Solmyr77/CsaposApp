@@ -1,9 +1,10 @@
-import { React, useState, useEffect, useMemo, useRef, useCallback} from "react";
+import { React, useState, useEffect, useRef, useCallback, useMemo} from "react";
 import Context from "./Context";
 import axios from "axios";
 import getAccessToken from "./refreshToken";
 import { Navigate } from "react-router-dom";
-import notificationConnection from "./signalRBookingConnection";
+import notificationConnection from "./signalRNotificationConnection";
+import bookingConnection from "./signalRBookingConnection"
 
 function Provider({ children }) {
   //basic states
@@ -388,7 +389,6 @@ function Provider({ children }) {
 
   //main useffect to fetch data
   useEffect(() => {
-    console.log("NEW ACCESSTOKEN DETECTED, REFETCHING DATA!")
     if (localStorage.getItem("accessToken")) {
       const userId = decodeJWT(localStorage.getItem("accessToken")).sub;
       if (userId) {
@@ -417,19 +417,21 @@ function Provider({ children }) {
   const handleNotifyAddedToTable = useCallback((message) => {
     console.log("📨 Received from hub:", message);
     setBookingsContainingUser(state => {
-      if (!state.some(booking => booking.id === message.id)) {
-        return [...state, message];
+      if (!state.some(booking => booking.id === message.payload.id)) {
+        return [...state, {...message.payload, sentAt: message.sentAt}];
       }
       return state;
     });
+
+    joinBookingGroup(message.payload.id);
     setNewNotification(true);
-  }, [])
+  }, []);
 
   const handleNotifyIncomingFriendRequest = useCallback((message) => {
     console.log("New incoming friend request!", message);
       setFriendRequests(state => [...state, message]);
       setNewNotification(true);
-  }, [])
+  }, []);
 
   const handleNotifyFriendRequestAccepted = useCallback((message) => {
     console.log("Friend request accepted!", message);
@@ -441,20 +443,24 @@ function Provider({ children }) {
       return state;
     });
     });
-  }, [])
+  }, []);
 
-  function registerListeners() {
+  const handleNotifyBookingDeleted = useCallback((message) => {
+    console.log(message);
+  });
+
+  function registerNotificationListeners() {
     // Remove existing listeners to avoid duplicates
     notificationConnection.off("notifyaddedtotable", handleNotifyAddedToTable);
     notificationConnection.off("notifyincomingfriendrequest", handleNotifyIncomingFriendRequest);
     notificationConnection.off("notifyfriendrequestaccepted", handleNotifyFriendRequestAccepted);
-    console.log("Old listeners have been cleaned up.")
+    console.log("Old listeners have been cleaned up.");
   
     // Register new listeners
     notificationConnection.on("notifyaddedtotable", handleNotifyAddedToTable);
     notificationConnection.on("notifyincomingfriendrequest", handleNotifyIncomingFriendRequest);
     notificationConnection.on("notifyfriendrequestaccepted", handleNotifyFriendRequestAccepted);
-    console.log("New listeners have been set.")
+    console.log("New listeners have been set.");
   }
 
   function registerUser() {
@@ -471,16 +477,15 @@ function Provider({ children }) {
   }
 
   //ref for flagging reconnection
-  const isOnReconnectedFired = useRef(false);
-
-  //hub connections
+  const isNotificationOnReconnectedFired = useRef(false);
+  
+  //NotificationHub connection
   useEffect(() => {
-    console.log(notificationConnection.state);
+    registerNotificationListeners();
     if (localStorage.getItem("accessToken") !== null && notificationConnection.state === "Disconnected") {
       notificationConnection.start()
       .then(() => {
         console.log("✅ NotificationHub connected successfully.");
-        registerListeners();
         registerUser();
         joinNotificationGroup();
       })
@@ -488,20 +493,16 @@ function Provider({ children }) {
           console.error("❌ Connection failed:", err);
       });
     }
-
     //reconnect only once to the connection
-    if (!isOnReconnectedFired.current) {
+    if (!isNotificationOnReconnectedFired.current) {
       notificationConnection.onreconnected(() => {
         console.log("Reconnected successfully.");
-        registerListeners();
         registerUser();
         joinNotificationGroup();
       });
-      isOnReconnectedFired.current = true;
+      isNotificationOnReconnectedFired.current = true;
     }
 
-    //notificationConnection.onclose(() => console.log("closed connection due to refreshed token"));
-    
     //cleanup function for listeners
     return () => {
       notificationConnection.off("notifyaddedtotable", handleNotifyAddedToTable);
@@ -509,7 +510,54 @@ function Provider({ children }) {
       notificationConnection.off("notifyfriendrequestaccepted", handleNotifyFriendRequestAccepted);
     };
   }, [localStorage.getItem("accessToken")]);
-  
+
+
+  function joinBookingGroup(bookingId) {
+    bookingConnection.invoke("JoinBookingGroup", bookingId)
+    .then(() => {
+      console.log(`✅ Joined group: bookings`);
+    })
+    .catch(err => console.error("❌ Failed to join group:", err));
+  }
+
+  function registerBookingListeners() {
+    bookingConnection.off("notifybookingdeleted", handleNotifyBookingDeleted);
+    console.log("CLEARED BOOKING DELETED LISTENER");
+    bookingConnection.on("notifybookingdeleted", handleNotifyBookingDeleted);
+    console.log("ADDED BOOKING DELETED LISTENER");
+  }
+
+  //ref for flagging reconnection
+  const isBookingOnReconnectedFired = useRef(false);
+
+  //BookingHub connection
+  useEffect(() => {
+    registerBookingListeners();
+    if (localStorage.getItem("accessToken") !== null && bookingConnection.state === "Disconnected") {
+      bookingConnection.start()
+      .then(() => {
+        console.log("✅ BookingHub connected successfully.");
+        registerUser();
+        console.log(bookings);
+      })
+      .catch((err) => {
+          console.error("❌ Connection failed:", err);
+      });
+    }
+    //reconnect only once to the connection
+    if (!isBookingOnReconnectedFired.current) {
+      bookingConnection.onreconnected(() => {
+        console.log("Reconnected successfully.");
+        registerUser();
+      });
+      isBookingOnReconnectedFired.current = true;
+    }
+
+    //cleanup function for listeners
+    return () => {
+      bookingConnection.off("notifybookingdeleted", handleNotifyBookingDeleted);
+    };
+  }, [localStorage.getItem("accessToken"), bookings]);
 
   return (
     <Context.Provider value={{ 

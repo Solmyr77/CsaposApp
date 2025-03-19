@@ -429,13 +429,13 @@ function Provider({ children }) {
 
   const handleNotifyIncomingFriendRequest = useCallback((message) => {
     console.log("New incoming friend request!", message);
-      setFriendRequests(state => [...state, message]);
+      setFriendRequests(state => [...state, {...message.payload, sentAt: message.sentAt}]);
       setNewNotification(true);
   }, []);
 
   const handleNotifyFriendRequestAccepted = useCallback((message) => {
     console.log("Friend request accepted!", message);
-    getProfile(message.userId2).then((newFriend) => {
+    getProfile(message.payload.userId2).then((newFriend) => {
     setFriends(state => {
       if (!state.some(friend => friend.id === newFriend.id)) {
         return [...state, newFriend];

@@ -274,7 +274,27 @@ function Provider({ children }) {
       console.log(error.message);
     }
   }
-  
+
+  async function getBookingsForLocation() {
+    try {
+      const config = {
+        headers: { 
+          Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+          "Cache-Content": "no-cache"
+        }
+      }
+      const response = await axios.get(`https://backend.csaposapp.hu/api/bookings/bookings-for-location?locationId=${managerLocation}`, config);
+      const data = await response.data;
+      if (response.status === 200 && data.length > 0) {
+        setBookings(data);
+      }
+    }
+    catch (error) {
+      console.log(error.response?.status);
+      console.log(error.message);
+    }
+  }
+
   async function getBookingsContainingUser() {
     try {
       const config = {
@@ -465,7 +485,8 @@ function Provider({ children }) {
       setUserId,
       getBusinessHours,
       logout,
-      decodeJWT
+      decodeJWT,
+      getBookingsForLocation
       }}>
       {children}
     </Context.Provider>

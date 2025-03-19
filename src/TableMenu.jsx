@@ -5,7 +5,7 @@ import TableItem from './TableItem';
 
 export default function TableMenu() {
     const [tables, setTables] = useState(null);
-    const { setMenuState, managerLocation, getLocationTables } = useContext(Context);
+    const { setMenuState, managerLocation, getLocationTables, getBookingsForLocation } = useContext(Context);
 
     useEffect(() => {
         setMenuState("Tables");
@@ -22,8 +22,17 @@ export default function TableMenu() {
             }
         }
 
+        async function runGetBookings() {
+            try {
+                await getBookingsForLocation();
+            } catch (error) {
+                console.error("Error fetching bookings:", error);
+            }
+        }
+
         if (managerLocation !== null) {
             runGetLocationTables();
+            runGetBookings();
         }
     }, [managerLocation]);
 
@@ -35,7 +44,7 @@ export default function TableMenu() {
             </div>
 
             {/* Scrollable Content */}
-            <div className='basis-11/12 h-screen overflow-auto flex flex-wrap gap-4 p-4'>
+            <div className='basis-11/12 h-screen overflow-auto flex flex-wrap gap-4 p-4 mx-auto'>
                 {
                     tables?.map((table, index) => <TableItem key={index} table={table} />)
                 }

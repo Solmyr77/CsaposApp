@@ -482,6 +482,7 @@ function Provider({ children }) {
   //NotificationHub connection
   useEffect(() => {
     registerNotificationListeners();
+    console.log(notificationConnection.state);
     if (localStorage.getItem("accessToken") !== null && notificationConnection.state === "Disconnected") {
       notificationConnection.start()
       .then(() => {
@@ -531,33 +532,33 @@ function Provider({ children }) {
   const isBookingOnReconnectedFired = useRef(false);
 
   //BookingHub connection
-  useEffect(() => {
-    registerBookingListeners();
-    if (localStorage.getItem("accessToken") !== null && bookingConnection.state === "Disconnected") {
-      bookingConnection.start()
-      .then(() => {
-        console.log("✅ BookingHub connected successfully.");
-        registerUser();
-        console.log(bookings);
-      })
-      .catch((err) => {
-          console.error("❌ Connection failed:", err);
-      });
-    }
-    //reconnect only once to the connection
-    if (!isBookingOnReconnectedFired.current) {
-      bookingConnection.onreconnected(() => {
-        console.log("Reconnected successfully.");
-        registerUser();
-      });
-      isBookingOnReconnectedFired.current = true;
-    }
+  // useEffect(() => {
+  //   registerBookingListeners();
+  //   if (localStorage.getItem("accessToken") !== null && bookingConnection.state === "Disconnected") {
+  //     bookingConnection.start()
+  //     .then(() => {
+  //       console.log("✅ BookingHub connected successfully.");
+  //       registerUser();
+  //       console.log(bookings);
+  //     })
+  //     .catch((err) => {
+  //         console.error("❌ Connection failed:", err);
+  //     });
+  //   }
+  //   //reconnect only once to the connection
+  //   if (!isBookingOnReconnectedFired.current) {
+  //     bookingConnection.onreconnected(() => {
+  //       console.log("Reconnected successfully.");
+  //       registerUser();
+  //     });
+  //     isBookingOnReconnectedFired.current = true;
+  //   }
 
-    //cleanup function for listeners
-    return () => {
-      bookingConnection.off("notifybookingdeleted", handleNotifyBookingDeleted);
-    };
-  }, [localStorage.getItem("accessToken"), bookings]);
+  //   //cleanup function for listeners
+  //   return () => {
+  //     bookingConnection.off("notifybookingdeleted", handleNotifyBookingDeleted);
+  //   };
+  // }, [localStorage.getItem("accessToken"), bookings]);
 
   return (
     <Context.Provider value={{ 

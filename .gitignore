@@ -1,1 +1,6 @@
 .vs/
+.github/
+.vite/
+.vs/
+node_modules/
+publish

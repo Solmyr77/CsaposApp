@@ -39,6 +39,8 @@ namespace CsaposApi.Services
                 return;
             }
 
+            payload = new { payload = payload, sentAt = DateTime.Now };
+
             foreach (var connectionId in connections)
             {
                 _logger.LogInformation($"Notifying user {userId} (connectionId: {connectionId}) via {method}");

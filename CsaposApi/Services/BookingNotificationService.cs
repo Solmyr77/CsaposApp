@@ -23,47 +23,25 @@ namespace CsaposApi.Services
         public async Task NotifyBookingDeleted(string bookingId)
         {
             _logger.LogInformation($"Notifying group {bookingId} about booking deletion.");
-            await _hubContext.Clients.Group(bookingId).SendAsync("NotifyBookingDeleted", "Booking deleted.");
-        }
-
-        private async Task NotifyUserAsync(string userId, string method, string message)
-        {
-            if (!Guid.TryParse(userId, out Guid userGuid))
-            {
-                _logger.LogWarning($"Invalid user ID: {userId}");
-                return;
-            }
-
-            var connections = _connectionManager.GetConnections(userGuid);
-            if (connections == null || connections.Count == 0)
-            {
-                _logger.LogWarning($"No active connections for user {userId}");
-                return;
-            }
-
-            foreach (var connectionId in connections)
-            {
-                _logger.LogInformation($"Notifying user {userId} (connectionId: {connectionId}) via {method}");
-                await _hubContext.Clients.Client(connectionId).SendAsync(method, message);
-            }
+            await _hubContext.Clients.Group(bookingId).SendAsync("NotifyBookingDeleted", new { bookingId = bookingId, sentAt = DateTime.Now });
         }
 
         public async Task NotifyUserRemovedFromTable(string bookingId, string userId)
         {
             _logger.LogInformation($"Notifying user {userId} about removal from booking {bookingId}.");
-            await NotifyUserAsync(userId, "NotifyUserRemovedFromBooking", $"You were removed from a booking with ID: {bookingId}.");
+            await _hubContext.Clients.Group(bookingId).SendAsync("NotifyUserRemovedFromBooking", new { removedUserId = userId, bookingId = bookingId, sentAt = DateTime.Now });
         }
 
         public async Task NotifyUserAcceptedInvite(string bookingId, string userId)
         {
             _logger.LogInformation($"User {userId} accepted invite for booking {bookingId}.");
-            await _hubContext.Clients.Group(bookingId).SendAsync("NotifyUserAcceptedInvite", $"{userId} accepted the invite.");
+            await _hubContext.Clients.Group(bookingId).SendAsync("NotifyUserAcceptedInvite", new { userId = userId, bookingId = bookingId, sentAt = DateTime.Now });
         }
 
         public async Task NotifyUserRejectedInvite(string bookingId, string userId)
         {
             _logger.LogInformation($"User {userId} rejected invite for booking {bookingId}.");
-            await _hubContext.Clients.Group(bookingId).SendAsync("NotifyUserRejectedInvite", $"{userId} rejected the invite.");
+            await _hubContext.Clients.Group(bookingId).SendAsync("NotifyUserRejectedInvite", new { userId = userId, bookingId = bookingId, sentAt = DateTime.Now });
         }
     }
 }

@@ -33,13 +33,10 @@ function Tables() {
         {
           locationTables?.length > 0 && locationTables?.some(table => table.isBooked === false) === true ?
           locationTables.sort((a,b) => {
-            if (a.isBooked === b.isBooked) {
-              if (a.capacity === b.capacity) {
-                return a.number - b.number;
-              }
-              return a.capacity - b.capacity;
+            if (a.capacity === b.capacity) {
+              return a.number - b.number;
             }
-            return a.isBooked - b.isBooked;
+            return a.capacity - b.capacity;
           }).map(record => <TableItem name={name} record={record}/>) :
           <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2">
             <p className="font-normal text-center">Jelenleg nincsenek szabad asztalok.</p>

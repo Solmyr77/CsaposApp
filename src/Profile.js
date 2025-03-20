@@ -11,6 +11,7 @@ import AddFriendModal from "./AddFriendModal";
 import PasswordModal from "./PasswordModal";
 import FriendModal from "./FriendModal";
 import { LuSquarePen, LuUserPlus, LuKeyRound } from "react-icons/lu";
+import UserImage from "./UserImage";
 
 function Profile() {
   const { setMenuState, user, friends, logout } = useContext(Context);
@@ -28,7 +29,8 @@ function Profile() {
   return (
     <div className="min-h-screen h-full w-full max-w-full bg-grey flex px-4 text-white font-bold font play flex-col items-center relative">
       <h1 className="text-center w-full pt-8 text-2xl mb-2">{user.displayName}</h1>
-      <img src={user.imageUrl} alt="avatar" className="w-28 object-cover aspect-square rounded-full mb-8"/>
+      {/* <img src={user.imageUrl} alt="avatar" className="w-28 object-cover aspect-square rounded-full mb-8"/> */}
+      <UserImage record={user} width={"w-28"} margin={"mb-8"}/>
       <TitleDivider title={"Barátok"}/>
       <div className="flex w-full mb-8 gap-2">
         <div className="flex justify-center cursor-pointer items-center h-20 min-w-16 bg-gradient-to-tr from-blue to-sky-400 text-white border-0 rounded-md" onClick={() => {

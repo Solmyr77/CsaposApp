@@ -14,6 +14,7 @@ import { MdOutlineTableRestaurant } from "react-icons/md";
 import AvatarGroupItem from "./AvatarGroupItem";
 import getAccessToken from "./refreshToken";
 import axios from "axios";
+import bookingConnection from "./signalRBookingConnection";
 registerLocale('hu', hu);
 
 const StyledDatePickerWrapper = styled.div`
@@ -146,6 +147,9 @@ function ReserveTable() {
         tableFriends.length > 0 && await handleAddToTable(data.id);
         setIsBooked(true);
         await getBookingsByUser();
+        bookingConnection.invoke("JoinBookingGroup", data.id)
+        .then(() => console.log("✅ Joined booking group", data.id))
+        .catch(err => console.log("Failed to join booking group", err));
       }
     }
     catch (error) {
@@ -216,34 +220,39 @@ function ReserveTable() {
   function generateTimeSlots(startDate) {
     setSelectedTable({});
     setSelectedTime("");
+
     const currentDay = getDayOfTheWeek(startDate);
-    let slots = [];
+    const slots = [];
 
-    const closingTime = new Date();
-    closingTime.setHours(Number(currentDay.close.split(":")[0]), Number(currentDay.close.split(":")[1]))
+    // Parse the day's closing time
+    const closingTime = new Date(startDate);
+    const [closeHour, closeMinute] = currentDay.close.split(":").map(Number);
+    closingTime.setHours(closeHour, closeMinute, 0, 0);
 
-    if (startDate.getDate() === new Date().getDate()) {
-      let start = new Date();
-      let minutes = start.getMinutes();
-      start.setMinutes(Math.ceil(minutes / 15) * 15);
-      start.setSeconds(0);
-      start.setMilliseconds(0);
-    
-      for (let i = 0; i < ((closingTime.getHours() - new Date().getHours()) * 60) / 15 - 2; i++) {
-        slots.push(new Date(start).toTimeString().slice(0, 5));
-        start = new Date(start.getTime() + 15 * 60000);
-      }
+    // Subtract 30 minutes from closing time
+    const latestTime = new Date(closingTime.getTime() - 45 * 60000);
+
+    // Set the starting time to now or the date's open time, whichever is later
+    let now = new Date();
+    if (startDate.toDateString() !== now.toDateString()) {
+      // if not today, set "now" to the opening time
+      now = new Date(startDate);
+      const [openHour, openMinute] = currentDay.open.split(":").map(Number);
+      now.setHours(openHour, openMinute, 0, 0);
     }
-    else {
-      let start = new Date(startDate);
-      start.setHours(Number(currentDay.open.split(":")[0]), Number(currentDay.open.split(":")[1]))
-      const openingTime = new Date();
-      openingTime.setHours(Number(currentDay.open.split(":")[0]), Number(currentDay.open.split(":")[1]))
-      for (let i = 0; i < ((closingTime.getHours() - openingTime.getHours()) * 60) / 15 - 1; i++) {
-        slots.push(new Date(start).toTimeString().slice(0, 5));
-        start = new Date(start.getTime() + 15 * 60000);
-      }
+
+    // Round up to the next 15-minute interval
+    const minutes = now.getMinutes();
+    now.setMinutes(Math.ceil(minutes / 15) * 15);
+    now.setSeconds(0);
+    now.setMilliseconds(0);
+
+    // Generate time slots from now to 30 minutes before closing
+    while (now < latestTime) {
+      slots.push(now.toTimeString().slice(0, 5));
+      now = new Date(now.getTime() + 15 * 60000);
     }
+
     return slots;
   }
 
@@ -353,11 +362,15 @@ function ReserveTable() {
               if (selectedTime === "Most") {
                 const newDate = new Date();
                 startDate.setHours(newDate.getHours(), newDate.getMinutes());
-              } 
+                console.log(a);
+              }
               else startDate.setHours(Number(selectedTime.slice(0,2)), Number(selectedTime.slice(3)), 0)
               if (a?.capacity === b?.capacity) return a?.number - b?.number;
               return a?.capacity - b?.capacity;
-            }).map(table => <TableItem key={table.id} table={table} date={startDate} time={selectedTime}/>)
+            }).map(table => {
+              console.log(table);
+              return <TableItem key={table.id} table={table} date={startDate} time={selectedTime}/>;
+            })
           }
         </div>
       </div>

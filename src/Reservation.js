@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import BackButton from "./BackButton";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { MdOutlineTableRestaurant } from "react-icons/md";
@@ -9,7 +9,7 @@ import getAccessToken from "./refreshToken";
 import axios from "axios";
 
 function Reservation() {
-    const { bookings, bookingsContainingUser, setBookingsContainingUser, getBookingsContainingUser, logout, getLocationTables, removeBooking, user, friends, locations } = useContext(Context); 
+    const { bookings, bookingsContainingUser, getBookingsContainingUser, logout, getLocationTables, removeBooking, user, friends, locations } = useContext(Context); 
     const { id } = useParams();
     const navigate = useNavigate();
     const confirmModal = useRef();

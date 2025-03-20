@@ -35,6 +35,7 @@ function Provider({ children }) {
   const [newNotification, setNewNotification] = useState(false);
   
   const allBookings = useMemo(() => bookings.concat(bookingsContainingUser), [bookings, bookingsContainingUser]);
+  const tempUser = useRef({});
 
   async function getProfile(id, profile) {
     try {
@@ -52,6 +53,11 @@ function Provider({ children }) {
           displayName: data.displayName,
           imageUrl: `https://assets.csaposapp.hu/assets/images/${data.imageUrl}?t=${new Date().getTime()}`
         });
+        tempUser.current = {
+          id: data.id,
+          displayName: data.displayName,
+          imageUrl: `https://assets.csaposapp.hu/assets/images/${data.imageUrl}?t=${new Date().getTime()}`
+        }
       }
       else {
         return data;
@@ -276,6 +282,12 @@ function Provider({ children }) {
       const data = await response.data;
       if (response.status === 200 && data.length > 0) {
         setBookingsContainingUser(data);
+        console.log(tempUser.current);
+        data.map(booking => {
+          if (booking.tableGuests.find(guest => guest.id === tempUser.current.id)?.status === "pending") {
+            setNewNotification(true);
+          }
+        })
       }
     }
     catch (error) {
@@ -303,14 +315,19 @@ function Provider({ children }) {
             }
         }
         const response = await axios.delete(`https://backend.csaposapp.hu/api/bookings/remove-booking`, config);
-        if (response.status === 204) setBookings(state => state.filter(record => record.id !== id));
+        if (response.status === 204) {
+          setBookings(state => state.filter(record => record.id !== id));
+          bookingConnection.invoke("LeaveBookingGroup", id)
+          .then(() => console.log("Left booking group:", id))
+          .catch((err) => console.log("Failed to leave booking group:", err));
+        }
         return true;
     } 
     catch (error) {
         console.log(error.message);
         if (error.response?.status === 401) {
             if (await getAccessToken()) {
-                await removeBooking(id);
+              await removeBooking(id);
             }
             else {
               await logout();
@@ -394,7 +411,7 @@ function Provider({ children }) {
       const userId = decodeJWT(localStorage.getItem("accessToken")).sub;
       if (userId) {
        const fetch = async () => {
-          await getProfile(userId, "user");
+          getProfile(userId, "user");
           getLocations();
           getFriends();
           getFriendRequests();
@@ -453,11 +470,42 @@ function Provider({ children }) {
 
   const handleNotifyUserAcceptedInvite = useCallback((message) => {
     console.log("User accepted invite:", message);
-    console.log(allBookings);
+    setBookings(state => {
+      const foundBooking = state.find(booking => booking.id === message.bookingId);
+      if (foundBooking) {
+        foundBooking.tableGuests.find(guest => guest.id === message.userId).status = "accepted";
+        console.log(foundBooking);
+      }
+      return [...state];
+    });
+    setBookingsContainingUser(state => {
+      const foundBooking = state.find(booking => booking.id === message.bookingId);
+      if (foundBooking) {
+        foundBooking.tableGuests.find(guest => guest.id === message.userId).status = "accepted";
+        console.log(foundBooking);
+      }
+      return [...state];
+    });
   }, []);
 
   const handleNotifyUserRejectedInvite = useCallback((message) => {
     console.log("User rejected invite:", message);
+    setBookings(state => {
+      const foundBooking = state.find(booking => booking.id === message.bookingId);
+      if (foundBooking) {
+        foundBooking.tableGuests.find(guest => guest.id === message.userId).status = "rejected";
+        console.log(foundBooking);
+      }
+      return [...state];
+    });
+    setBookingsContainingUser(state => {
+      const foundBooking = state.find(booking => booking.id === message.bookingId);
+      if (foundBooking) {
+        foundBooking.tableGuests.find(guest => guest.id === message.userId).status = "rejected";
+        console.log(foundBooking);
+      }
+      return [...state];
+    });
   }, []);
 
   function registerNotificationListeners() {
@@ -527,7 +575,7 @@ function Provider({ children }) {
   function joinBookingGroup(bookingId) {
     bookingConnection.invoke("JoinBookingGroup", bookingId)
     .then(() => {
-      console.log(`✅ Joined group: bookings`);
+      console.log(`✅ Joined group: bookings`, bookingId);
     })
     .catch(err => console.error("❌ Failed to join group:", err));
   }

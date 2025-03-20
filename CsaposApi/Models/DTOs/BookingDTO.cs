@@ -11,6 +11,8 @@ namespace CsaposApi.Models.DTOs
             public Guid? TableId { get; set; }
             public Guid LocationId { get; set; }
             public DateTime? BookedFrom { get; set; }
+            public DateTime CreatedAt { get; set; }
+            public DateTime UpdatedAt { get; set; }
             public List<GetProfileWithBookingStatusDTO> TableGuests { get; set; } = new List<GetProfileWithBookingStatusDTO>();
         }
 

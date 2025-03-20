@@ -10,6 +10,7 @@ using static CsaposApi.Models.DTOs.TableDTO;
 using Microsoft.AspNetCore.Authorization;
 using static CsaposApi.Models.DTOs.LocationDTO;
 using System.Net;
+using static CsaposApi.Models.DTOs.UserDTO;
 
 namespace CsaposApi.Controllers
 {
@@ -71,6 +72,8 @@ namespace CsaposApi.Controllers
         {
             var table = _context.Tables
                 .Where(t => t.LocationId == locationId)
+                .Include(t => t.TableBookings)
+                    .ThenInclude(b => b.TableGuests)
                 .Select(t => new TableResponseDTO
                 {
                     Id = t.Id,
@@ -78,6 +81,19 @@ namespace CsaposApi.Controllers
                     Capacity = t.Capacity,
                     LocationId = t.LocationId
                 });
+                    IsBooked = t.IsBooked,
+                    LocationId = t.LocationId,
+                    TableGuests = t.TableBookings
+                        .SelectMany(b => b.TableGuests)
+                        .Select(g => new GetProfileWithBookingStatusDTO
+                        {
+                            Id = g.Id,
+                            DisplayName = g.User != null ? g.User.DisplayName : "",
+                            ImageUrl = g.User != null ? g.User.ImgUrl : "",
+                            Status = g.Status
+                        })
+                        .ToList()
+                }).ToList();
 
             if (table == null)
             {

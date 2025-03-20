@@ -105,7 +105,7 @@ namespace CsaposApi.Controllers
                 return NotFound();
             }
 
-            return Ok(manager.LocationId);
+            return Ok(new { locationId = manager.LocationId });
         }
     }
 }

@@ -116,6 +116,8 @@ namespace CsaposApi.Controllers
                     TableId = tb.TableId,
                     BookedFrom = tb.BookedFrom,
                     LocationId = tb.Table.LocationId,
+                    CreatedAt = tb.CreatedAt,
+                    UpdatedAt = tb.UpdatedAt,
                     TableGuests = tb.TableGuests.Select(tg => new GetProfileWithBookingStatusDTO
                     {
                         Id = tg.User.Id,
@@ -152,6 +154,8 @@ namespace CsaposApi.Controllers
                     TableId = tb.TableId,
                     BookedFrom = tb.BookedFrom,
                     LocationId = tb.Table.LocationId,
+                    CreatedAt = tb.CreatedAt,
+                    UpdatedAt = tb.UpdatedAt,
                     TableGuests = tb.TableGuests.Select(tg => new GetProfileWithBookingStatusDTO
                     {
                         Id = tg.User.Id,
@@ -186,6 +190,8 @@ namespace CsaposApi.Controllers
                     TableId = tb.TableId,
                     BookedFrom = tb.BookedFrom,
                     LocationId = tb.Table.LocationId,
+                    CreatedAt = tb.CreatedAt,
+                    UpdatedAt = tb.UpdatedAt,
                     TableGuests = tb.TableGuests.Select(tg => new GetProfileWithBookingStatusDTO
                     {
                         Id = tg.User.Id,
@@ -424,6 +430,8 @@ namespace CsaposApi.Controllers
                             TableId = tb.TableId,
                             BookedFrom = tb.BookedFrom,
                             LocationId = tb.Table.LocationId,
+                            CreatedAt = tb.CreatedAt,
+                            UpdatedAt = tb.UpdatedAt,
                             TableGuests = tb.TableGuests.Select(tg => new GetProfileWithBookingStatusDTO
                             {
                                 Id = tg.User.Id,
@@ -626,6 +634,8 @@ namespace CsaposApi.Controllers
                         TableId = tg.Booking.TableId,
                         BookedFrom = tg.Booking.BookedFrom,
                         LocationId = tg.Booking.Table.LocationId,
+                        CreatedAt = tg.CreatedAt,
+                        UpdatedAt = tg.UpdatedAt,
                         TableGuests = tg.Booking.TableGuests.Select(g => new GetProfileWithBookingStatusDTO
                         {
                             Id = g.User.Id,

@@ -3,27 +3,26 @@ using CsaposApi.Services.IService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using static CsaposApi.Models.DTOs.RatingDTO;
 
 namespace CsaposApi.Controllers
 {
-    [Route("api/manager")]
+    [Route("api/ratings")]
     [ApiController]
-    public class ManagerController : ControllerBase
+    public class RatingsController : ControllerBase
     {
         private readonly CsaposappContext _context;
         private readonly IAuthService _authService;
-        private readonly IPasswordService _passwordService;
         private readonly ILogger<BookingController> _logger;
 
-        public ManagerController(
+        public RatingsController(
             CsaposappContext context,
             IAuthService authService,
-            IPasswordService passwordService,
             ILogger<BookingController> logger)
         {
             _context = context;
             _authService = authService;
-            _passwordService = passwordService;
             _logger = logger;
         }
 
@@ -89,23 +88,44 @@ namespace CsaposApi.Controllers
             }
         }
 
-        [HttpGet("manager-location")]
-        [Authorize(Policy = "MustBeManager")]
-        public IActionResult GetManagerLocation()
+        [HttpGet]
+        [Authorize(Policy = "MustBeGuest")]
+        public async Task<IActionResult> GetById(Guid locationId)
         {
-            if (GetUserRoleFromToken() != "manager")
+            var ratingAverage = await _context.LocationRatings.Where(x => x.LocationId == locationId).AverageAsync(x => x.Rating);
+
+            return Ok(new { Rating = ratingAverage });
+        }
+
+        [HttpPost]
+        [Authorize(Policy = "MustBeGuest")]
+        public async Task<IActionResult> CreateRating(CreateRatingDTO createRatingDTO)
+        {
+            if (!ModelState.IsValid)
             {
-                return Forbid();
+                return BadRequest(new
+                {
+                    error = "invalid_request",
+                    message = "Request body is missing, malformed, or incomplete."
+                });
             }
 
-            var manager = _context.ManagerMappings.FirstOrDefault(x => x.UserId == GetUserIdFromToken());
-
-            if (manager == null)
+            if (GetUserRoleFromToken() == "manager")
             {
-                return NotFound();
+                return Forbid("Managers cannot rate locations.");
             }
 
-            return Ok(manager.LocationId);
+            var locationRating = new LocationRating
+            {
+                Id = Guid.NewGuid(),
+                UserId = GetUserIdFromToken(),
+                LocationId = createRatingDTO.LocationId,
+                Rating = createRatingDTO.Rating
+            };
+
+            _context.Add(locationRating);
+
+            return CreatedAtAction(nameof(CreateRating), );
         }
     }
 }

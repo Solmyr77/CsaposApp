@@ -11,8 +11,6 @@ public partial class Table
 
     public sbyte Capacity { get; set; }
 
-    public bool IsBooked { get; set; }
-
     public Guid LocationId { get; set; }
 
     public DateTime CreatedAt { get; set; }

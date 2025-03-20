@@ -35,7 +35,6 @@ namespace CsaposApi.Controllers
                     Id = t.Id,
                     Number = t.Number,
                     Capacity = t.Capacity,
-                    IsBooked = t.IsBooked,
                     LocationId = t.LocationId
                 })
                 .ToListAsync());
@@ -53,7 +52,6 @@ namespace CsaposApi.Controllers
                     Id = t.Id,
                     Number = t.Number,
                     Capacity = t.Capacity,
-                    IsBooked = t.IsBooked,
                     LocationId = t.LocationId
                 })
                 .SingleOrDefaultAsync();
@@ -78,7 +76,6 @@ namespace CsaposApi.Controllers
                     Id = t.Id,
                     Number = t.Number,
                     Capacity = t.Capacity,
-                    IsBooked = t.IsBooked,
                     LocationId = t.LocationId
                 });
 
@@ -114,7 +111,6 @@ namespace CsaposApi.Controllers
                     Id = Guid.NewGuid(),
                     Number = createTableDTO.number,
                     Capacity = createTableDTO.capacity,
-                    IsBooked = false,
                     LocationId = createTableDTO.locationId
                 };
 

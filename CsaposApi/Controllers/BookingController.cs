@@ -241,8 +241,6 @@ namespace CsaposApi.Controllers
 
                 var currentTable = await _context.Tables.FindAsync(currentBooking.TableId);
 
-                currentTable.IsBooked = true;
-
                 _context.Tables.Update(currentTable);
                 await _context.TableBookings.AddAsync(currentBooking);
                 await _context.SaveChangesAsync();
@@ -314,7 +312,6 @@ namespace CsaposApi.Controllers
                 }
 
                 // Mark the table as available
-                currentTable.IsBooked = false;
                 _context.Tables.Update(currentTable);
 
                 // Remove the booking

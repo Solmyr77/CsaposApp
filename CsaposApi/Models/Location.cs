@@ -33,6 +33,8 @@ public partial class Location
 
     public virtual ICollection<Event> Events { get; set; } = new List<Event>();
 
+    public virtual ICollection<LocationRating> LocationRatings { get; set; } = new List<LocationRating>();
+
     public virtual ICollection<ManagerMapping> ManagerMappings { get; set; } = new List<ManagerMapping>();
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();

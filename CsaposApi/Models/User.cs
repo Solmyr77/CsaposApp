@@ -35,6 +35,8 @@ public partial class User
 
     public virtual ICollection<Friendship> FriendshipUserId2Navigations { get; set; } = new List<Friendship>();
 
+    public virtual ICollection<LocationRating> LocationRatings { get; set; } = new List<LocationRating>();
+
     public virtual ICollection<ManagerMapping> ManagerMappings { get; set; } = new List<ManagerMapping>();
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();

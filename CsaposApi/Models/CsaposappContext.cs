@@ -27,6 +27,8 @@ public partial class CsaposappContext : DbContext
 
     public virtual DbSet<Location> Locations { get; set; }
 
+    public virtual DbSet<LocationRating> LocationRatings { get; set; }
+
     public virtual DbSet<ManagerMapping> ManagerMappings { get; set; }
 
     public virtual DbSet<Order> Orders { get; set; }
@@ -314,6 +316,35 @@ public partial class CsaposappContext : DbContext
                 .HasColumnName("updated_at");
         });
 
+        modelBuilder.Entity<LocationRating>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("location_ratings");
+
+            entity.HasIndex(e => e.LocationId, "fk_rating_location");
+
+            entity.HasIndex(e => e.UserId, "fk_rating_user");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.LocationId).HasColumnName("location_id");
+            entity.Property(e => e.Rating)
+                .HasDefaultValueSql("'-1'")
+                .HasColumnType("int(11)")
+                .HasColumnName("rating");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.Location).WithMany(p => p.LocationRatings)
+                .HasForeignKey(d => d.LocationId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("fk_rating_location");
+
+            entity.HasOne(d => d.User).WithMany(p => p.LocationRatings)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("fk_rating_user");
+        });
+
         modelBuilder.Entity<ManagerMapping>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
@@ -430,7 +461,6 @@ public partial class CsaposappContext : DbContext
 
             entity.HasOne(d => d.Order).WithMany(p => p.OrderItems)
                 .HasForeignKey(d => d.OrderId)
-                .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("order_items_ibfk_1");
 
             entity.HasOne(d => d.Product).WithMany(p => p.OrderItems)
@@ -593,7 +623,6 @@ public partial class CsaposappContext : DbContext
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("timestamp")
                 .HasColumnName("created_at");
-            entity.Property(e => e.IsBooked).HasColumnName("is_booked");
             entity.Property(e => e.LocationId).HasColumnName("location_id");
             entity.Property(e => e.Number)
                 .HasColumnType("int(11)")
@@ -616,7 +645,7 @@ public partial class CsaposappContext : DbContext
 
             entity.ToTable("table_bookings");
 
-            entity.HasIndex(e => e.BookerId, "booker_id");
+            entity.HasIndex(e => e.BookerId, "table_bookings_ibfk_1");
 
             entity.HasIndex(e => new { e.TableId, e.BookerId }, "table_id");
 
@@ -638,12 +667,12 @@ public partial class CsaposappContext : DbContext
 
             entity.HasOne(d => d.Booker).WithMany(p => p.TableBookings)
                 .HasForeignKey(d => d.BookerId)
-                .OnDelete(DeleteBehavior.Restrict)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("table_bookings_ibfk_1");
 
             entity.HasOne(d => d.Table).WithMany(p => p.TableBookings)
                 .HasForeignKey(d => d.TableId)
-                .OnDelete(DeleteBehavior.Restrict)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("table_bookings_ibfk_2");
         });
 

@@ -7,7 +7,6 @@
             public Guid Id { get; set; }
             public int Number { get; set; }
             public sbyte Capacity { get; set; }
-            public bool IsBooked { get; set; }
             public Guid LocationId { get; set; }
         }
 

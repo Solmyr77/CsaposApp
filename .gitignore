@@ -3,3 +3,7 @@
 .vite/
 .vs/
 node_modules/
+
+#Build/Publish directories
+bin/
+obj/

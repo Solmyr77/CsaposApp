@@ -125,7 +125,7 @@ namespace CsaposApi.Controllers
 
             _context.Add(locationRating);
 
-            return CreatedAtAction(nameof(CreateRating), );
+            return CreatedAtAction(nameof(CreateRating), locationRating);
         }
     }
 }

@@ -68,9 +68,9 @@ namespace CsaposApi.Controllers
         // GET: api/Tables/5
         [HttpGet("location/{locationId}")]
         [Authorize(Policy = "MustBeGuest")]
-        public async Task<ActionResult<TableResponseDTO>> GetTablesByLocation(Guid locationId)
+        public async Task<ActionResult<IEnumerable<TableResponseDTO>>> GetTablesByLocation(Guid locationId)
         {
-            var table = _context.Tables
+            var tables = await _context.Tables
                 .Where(t => t.LocationId == locationId)
                 .Include(t => t.TableBookings)
                     .ThenInclude(b => b.TableGuests)
@@ -79,9 +79,6 @@ namespace CsaposApi.Controllers
                     Id = t.Id,
                     Number = t.Number,
                     Capacity = t.Capacity,
-                    LocationId = t.LocationId
-                });
-                    IsBooked = t.IsBooked,
                     LocationId = t.LocationId,
                     TableGuests = t.TableBookings
                         .SelectMany(b => b.TableGuests)
@@ -93,15 +90,17 @@ namespace CsaposApi.Controllers
                             Status = g.Status
                         })
                         .ToList()
-                }).ToList();
+                })
+                .ToListAsync();
 
-            if (table == null)
+            if (!tables.Any())
             {
                 return NotFound();
             }
 
-            return Ok(table);
+            return Ok(tables);
         }
+
 
         [HttpPost]
         [Authorize(Policy = "MustBeGuest")]

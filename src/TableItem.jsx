@@ -37,7 +37,7 @@ export default function TableItem({ table }) {
 
             <div className='flex flex-col justify-center items-center px-5'>
                 <h2 className="flex justify-start items-center text-center text-xxl text-gray-500 w-full ml-4">
-                    <BsPeople className='mr-4' /> {table.tableGuests.length}/{table.capacity}
+                    <BsPeople className='mr-4' /> {table.isBooked ? table.tableGuests.length + 1 : table.tableGuests.length}/{table.capacity}
                 </h2>
 
                 {booking ? (

@@ -30,7 +30,7 @@ function Provider({ children }) {
   const [locationProducts, setLocationProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState({});
   const [categories, setCategories] = useState([]);
-  const [tableOrders, setTableOrders] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [currentBooking, setCurrentBooking] = useState({});
   
   async function getProfile(id, profile) {
@@ -364,7 +364,30 @@ function Provider({ children }) {
       }
       const response = await axios.get(`https://backend.csaposapp.hu/api/orders/orders-by-table/${id}`, config);
       if (response.status === 200) {
-        setTableOrders(response.data);
+        setOrders(response.data);
+      }
+    }
+    catch (error) {
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) {
+          await getOrdersByTable(id);
+        }
+        else {
+          await logout();
+          window.location.reload();
+        }
+      } 
+    }
+  }
+
+  async function getOrdersByLocation(id) {
+    try {
+      const config = {
+        headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` }
+      }
+      const response = await axios.get(`https://backend.csaposapp.hu/api/orders/orders-by-table/${id}`, config);
+      if (response.status === 200) {
+        setOrders(response.data);
       }
     }
     catch (error) {
@@ -454,7 +477,7 @@ function Provider({ children }) {
       bookingsContainingUser,
       setBookingsContainingUser,
       locationProducts,
-      tableOrders,
+      orders,
       categories,
       selectedProduct,
       setSelectedProduct,

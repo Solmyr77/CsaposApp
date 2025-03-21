@@ -28,26 +28,35 @@ namespace CsaposApi.Services
             _logger.LogInformation("Service: entered service");
             try
             {
-                // Look for an existing friendship record regardless of its status.
-                var friendship = await _context.Friendships.FirstOrDefaultAsync(f =>
-                    ((f.UserId1 == senderId && f.UserId2 == receiverId) ||
-                     (f.UserId1 == receiverId && f.UserId2 == senderId)));
-
-                if (friendship == null)
+                // (Optional) Handle case where a user tries to befriend themselves
+                if (senderId == receiverId)
                 {
-                    _logger.LogInformation($"Service: friendship found: ID: {friendship.Id} UID1: {friendship.UserId1} UID2: {friendship.UserId2}");
+                    _logger.LogWarning("SenderId and ReceiverId are the same ({Id})", senderId);
+                    return false;
                 }
 
+                // Look for an existing friendship record, regardless of status.
+                var friendship = await _context.Friendships.FirstOrDefaultAsync(f =>
+                    (f.UserId1 == senderId && f.UserId2 == receiverId) ||
+                    (f.UserId1 == receiverId && f.UserId2 == senderId));
+
+                // If friendship == null, it does not exist; if it's not null, then it does exist.
                 if (friendship != null)
                 {
+                    _logger.LogInformation(
+                        "Service: friendship found: ID: {Id}, UID1: {Uid1}, UID2: {Uid2}",
+                        friendship.Id, friendship.UserId1, friendship.UserId2);
+
                     _logger.LogInformation("Service: friendship exists");
-                    // If a friendship exists with a "pending" or "accepted" status, then we don't allow a new request.
+
+                    // If a friendship exists with "pending" or "accepted", no new request is allowed.
                     if (friendship.Status == "pending" || friendship.Status == "accepted")
                     {
-                        _logger.LogWarning("Friend request already exists between {SenderId} and {ReceiverId}", senderId, receiverId);
+                        _logger.LogWarning("Friend request already exists between {SenderId} and {ReceiverId}",
+                            senderId, receiverId);
                         return false;
                     }
-                    // If the previous request was "rejected" (or any status that allows a new request),
+                    // If the previous request was "rejected" (or any status allowing a new request),
                     // update the existing record rather than creating a new one.
                     else if (friendship.Status == "rejected")
                     {
@@ -55,24 +64,33 @@ namespace CsaposApi.Services
                         friendship.UpdatedAt = DateTime.UtcNow;
                         await _context.SaveChangesAsync();
 
-                        _logger.LogInformation($"Service: Notifying user: {receiverId.ToString()}, UID1: {friendship.UserId1} UID2: {friendship.UserId2}");
-                        await _notificationService.NotifyFriendRequestReceived(receiverId.ToString(), new FriendshipResponseDTO
-                        {
-                            Id = friendship.Id,
-                            UserId1 = friendship.UserId1,
-                            UserId2 = friendship.UserId2,
-                            Status = friendship.Status,
-                            CreatedAt = friendship.CreatedAt,
-                            UpdatedAt = friendship.UpdatedAt
-                        });
+                        _logger.LogInformation(
+                            "Service: Notifying user: {ReceiverId}, UID1: {Uid1}, UID2: {Uid2}",
+                            receiverId.ToString(), friendship.UserId1, friendship.UserId2);
+
+                        await _notificationService.NotifyFriendRequestReceived(
+                            receiverId.ToString(),
+                            new FriendshipResponseDTO
+                            {
+                                Id = friendship.Id,
+                                UserId1 = friendship.UserId1,
+                                UserId2 = friendship.UserId2,
+                                Status = friendship.Status,
+                                CreatedAt = friendship.CreatedAt,
+                                UpdatedAt = friendship.UpdatedAt
+                            });
 
                         return true;
                     }
+                    // If none of the above statuses apply, no further action is taken.
+                    // Could also handle other statuses here if you want.
+                    return false;
                 }
                 else
                 {
-                    _logger.LogInformation("Service: friendship does not exist");
-                    // No existing record found - create a new friend request.
+                    // Friendship does not exist; create a new one.
+                    _logger.LogInformation("Service: friendship does not exist; creating new request.");
+
                     friendship = new Friendship
                     {
                         Id = Guid.NewGuid(),
@@ -83,25 +101,26 @@ namespace CsaposApi.Services
                         UpdatedAt = DateTime.UtcNow
                     };
 
-                    _logger.LogInformation($"Service: Notifying user: {receiverId.ToString()}, UID1: {friendship.UserId1} UID2: {friendship.UserId2}");
-                    await _notificationService.NotifyFriendRequestReceived(receiverId.ToString(), new FriendshipResponseDTO
-                    {
-                        Id = friendship.Id,
-                        UserId1 = friendship.UserId1,
-                        UserId2 = friendship.UserId2,
-                        Status = friendship.Status,
-                        CreatedAt = friendship.CreatedAt,
-                        UpdatedAt = friendship.UpdatedAt
-                    });
+                    _logger.LogInformation(
+                        "Service: Notifying user: {ReceiverId}, UID1: {Uid1}, UID2: {Uid2}",
+                        receiverId.ToString(), friendship.UserId1, friendship.UserId2);
+
+                    await _notificationService.NotifyFriendRequestReceived(
+                        receiverId.ToString(),
+                        new FriendshipResponseDTO
+                        {
+                            Id = friendship.Id,
+                            UserId1 = friendship.UserId1,
+                            UserId2 = friendship.UserId2,
+                            Status = friendship.Status,
+                            CreatedAt = friendship.CreatedAt,
+                            UpdatedAt = friendship.UpdatedAt
+                        });
 
                     _context.Friendships.Add(friendship);
                     await _context.SaveChangesAsync();
                     return true;
                 }
-
-                _logger.LogCritical("How did we get here?");
-                // If no condition is met, return false (shouldn't normally reach here).
-                return false;
             }
             catch (Exception ex)
             {
@@ -109,6 +128,7 @@ namespace CsaposApi.Services
                 return false;
             }
         }
+
 
 
         public async Task<bool> AcceptFriendRequest(Guid friendshipId, Guid receiverId)

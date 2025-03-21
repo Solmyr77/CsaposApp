@@ -26,6 +26,8 @@ namespace CsaposApi.Services
 
         private async Task NotifyUserAsync(string userId, string method, object payload)
         {
+            _logger.LogInformation($"NotifService: User Receiving Notification: {userId}");
+
             if (!Guid.TryParse(userId, out Guid userGuid))
             {
                 _logger.LogWarning($"Invalid user ID: {userId}");

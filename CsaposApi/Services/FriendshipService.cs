@@ -55,6 +55,7 @@ namespace CsaposApi.Services
                         friendship.UpdatedAt = DateTime.UtcNow;
                         await _context.SaveChangesAsync();
 
+                        _logger.LogInformation($"Service: Notifying user: {receiverId.ToString()}, UID1: {friendship.UserId1} UID2: {friendship.UserId2}");
                         await _notificationService.NotifyFriendRequestReceived(receiverId.ToString(), new FriendshipResponseDTO
                         {
                             Id = friendship.Id,
@@ -82,6 +83,7 @@ namespace CsaposApi.Services
                         UpdatedAt = DateTime.UtcNow
                     };
 
+                    _logger.LogInformation($"Service: Notifying user: {receiverId.ToString()}, UID1: {friendship.UserId1} UID2: {friendship.UserId2}");
                     await _notificationService.NotifyFriendRequestReceived(receiverId.ToString(), new FriendshipResponseDTO
                     {
                         Id = friendship.Id,

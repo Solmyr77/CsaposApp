@@ -65,10 +65,16 @@ namespace CsaposApi.Controllers
         [Authorize(Policy = "MustBeGuest")]
         public async Task<IActionResult> SendFriendRequest([FromQuery] Guid receiverId)
         {
+            _logger.LogInformation("Controller: Sending friend request to {ReceiverId}", receiverId);
+
             try
             {
                 Guid senderId = GetUserIdFromToken();
+                
+                _logger.LogInformation("Controller: User {SenderId} sending friend request to {ReceiverId}", senderId, receiverId);
+                _logger.LogInformation("Controller: Passing to service");
                 var success = await _friendshipService.SendFriendRequest(senderId, receiverId);
+                _logger.LogInformation($"Controller: Friend request service returned with: {success}");
                 return success ? Ok(new { message = "Friend request sent successfully" })
                                : BadRequest(new { error = "Friend request already exists or failed to send"});
             }

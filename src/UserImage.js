@@ -16,7 +16,7 @@ function UserImage({ record, width, border, margin }) {
 
     const response = await cache.match(imageUrl);
 
-    if (response) {
+    if (response === undefined) {
       const blob = await response.blob();
 
       const url = URL.createObjectURL(blob);
@@ -28,7 +28,7 @@ function UserImage({ record, width, border, margin }) {
   }
 
   useEffect(() => {
-    if (!record.imageUrl) return;
+    if (!record) return;
     const isFullUrl = String(record.imageUrl).startsWith("http");
     const imageUrl = isFullUrl
       ? record.imageUrl
@@ -37,18 +37,15 @@ function UserImage({ record, width, border, margin }) {
     const newImage = new Image();
     newImage.src = imageUrl;
     newImage.onload = async () => {
-      if (!await loadCachedImage(record.id, imageUrl)) {
-        setUserImage(imageUrl);
-        //cacheImage(record.id, imageUrl);
-      }
+      localStorage.setItem(record.id, imageUrl);
     };
-  }, [record.imageUrl]);
+  }, [record]);
 
   return (
-    userImage ? 
+    userImage || localStorage.getItem(record?.id) ? 
     <div className={`avatar ${border ? "border-2 rounded-full" : ""} ${margin}`}>
       <div className={`${width} rounded-full bg-gray-300 flex items-center justify-center overflow-hidden`}>
-        <img src={userImage} alt="kép" className="w-full h-full object-cover"/>
+        <img src={ localStorage.getItem(record?.id) || userImage} alt="kép" className="w-full h-full object-cover"/>
       </div>
     </div> :
     <div className={`avatar placeholder ${border ? "border-2 rounded-full" : ""} ${margin}`}>

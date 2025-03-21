@@ -5,10 +5,11 @@ import { LuShoppingBag, LuX } from "react-icons/lu";
 
 const MenuItem = forwardRef(({ product }, ref) => {
   const { order, setOrder, setSelectedProduct } = useContext(Context);
+
   return (
     <div className="flex flex-row h-20 items-center bg-dark-grey rounded-md">
         <div className="flex items-center h-full basis-4/5 py-2 pl-2 pr-0">
-            <img src={img1} alt="kép" className="h-full p-2 bg-white aspect-square rounded-md"/>
+            <img src={`https://assets.csaposapp.hu/assets/images/${product.imgUrl}`} alt="kép" className="h-full p-2 bg-white aspect-square rounded-md" onError={(event) => event.target.src = img1}/>
             <div className="flex flex-col h-full justify-start items-start px-2 basis-3/4">
                 <p className="text-sm line-clamp-1">{product.name}</p>
                 <p className="text-gray-300 font-normal">{product?.description}</p>

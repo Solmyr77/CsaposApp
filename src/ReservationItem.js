@@ -2,7 +2,8 @@ import React, { useContext, useEffect, useState } from "react";
 import AvatarGroupItem from "./AvatarGroupItem";
 import Context from "./Context";
 import { Link } from "react-router-dom";
-import { LuCalendar, LuClock, LuMapPin, LuUsers } from "react-icons/lu"
+import { LuCalendar, LuClock, LuMapPin, LuUsers } from "react-icons/lu";
+import UserImage from "./UserImage";
 
 function ReservationItem({ booking, isGuest }) {
     const { locations, friends } = useContext(Context);
@@ -28,7 +29,8 @@ function ReservationItem({ booking, isGuest }) {
                             <span className="badge bg-opacity-20 border-0 text-white text-xs">Foglalta:</span>
                             <div className="avatar border-2 rounded-full border-white">
                                 <div className="w-4 rounded-full">
-                                    <img src={`https://assets.csaposapp.hu/assets/images/${bookerProfile?.imageUrl}`} alt="kép" />
+                                    <UserImage record={bookerProfile}/>
+                                    {/* <img src={`https://assets.csaposapp.hu/assets/images/${bookerProfile?.imageUrl}`} alt="kép" /> */}
                                 </div>
                             </div>
                             <p>{bookerProfile?.displayName}</p>
@@ -58,7 +60,7 @@ function ReservationItem({ booking, isGuest }) {
                     <div className="avatar-group -space-x-4 rtl:space-x-reverse justify-end">
                         {
                             tableGuests.length > 0 && Array.from(tableGuests).map((tableGuest, i) => {
-                                if (i < 4) return <AvatarGroupItem key={i} height="h-10" imageUrl={tableGuest.imageUrl}/>
+                                if (i < 4) return <UserImage key={i} width={"w-10"} record={tableGuest} border/>
                                 else if (i === 4) return (
                                     <div className="avatar h-10 aspect-square border-2 placeholder">
                                         <div className="bg-neutral text-neutral-content w-12">

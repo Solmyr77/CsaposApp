@@ -14,6 +14,7 @@ import PubMenu from './PubMenu';
 import Reservation from './Reservation';
 import ReserveTable from './ReserveTable';
 import Table from './Table';
+import ReservationEnded from './ReservationEnded';
 
 function App() {
   return (
@@ -64,6 +65,10 @@ function App() {
           <Route path="/reservetable/:name" element={
             <ProtectedRoute isProtected={true}>
               <ReserveTable />
+            </ProtectedRoute>}/>
+          <Route path="/sessionended/:id" element={
+            <ProtectedRoute isProtected={true}>
+              <ReservationEnded />
             </ProtectedRoute>}/>
           <Route path="/register" element={
             <ProtectedRoute>

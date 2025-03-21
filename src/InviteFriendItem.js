@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { LuCheck } from "react-icons/lu";
 import Context from "./Context";
+import UserImage from "./UserImage";
 
 function InviteFriendItem({ friend }) {
     const { setTableFriends, selectedTable, tableFriends } = useContext(Context);
@@ -24,11 +25,7 @@ function InviteFriendItem({ friend }) {
             setTableFriends(state => state.filter(record => record.id !== friend?.id));
             }}>
             <div className="flex items-center gap-2">
-                <div className="avatar">
-                <div className="w-10 rounded-lg">
-                    <img src={`https://assets.csaposapp.hu/assets/images/${friend?.imageUrl}`} alt="kép"/>
-                </div>
-                </div>
+                    <UserImage record={friend} width={"w-10"} border/>
                 <p className="text-md">{friend.displayName}</p>
             </div>
             {

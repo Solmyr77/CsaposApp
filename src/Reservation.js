@@ -7,6 +7,7 @@ import AvatarGroupItem from "./AvatarGroupItem";
 import Context from "./Context";
 import getAccessToken from "./refreshToken";
 import axios from "axios";
+import UserImage from "./UserImage";
 
 function Reservation() {
     const { bookings, bookingsContainingUser, getBookingsContainingUser, logout, getLocationTables, removeBooking, user, friends, locations } = useContext(Context); 
@@ -125,7 +126,7 @@ function Reservation() {
                     setCurrentTable((await getLocationTables(foundBooking.locationId))?.find(table => table.id === foundBooking.tableId));
                 }
                 run();
-                setActiveTimeout(foundBooking)
+                setActiveTimeout(foundBooking);
             }
             else if (!foundBooking && !isSuccessful) navigate("/");
             if (bookings.find(booking => booking.id === id)) setIsGuest(false);
@@ -143,14 +144,15 @@ function Reservation() {
                 <div className="flex flex-col w-96 rounded-xl bg-gradient-to-tr from-blue to-sky-400 shadow-lg px-4 py-2 gap-1">
                     <div className="flex justify-between">
                         <p className="text-lg font-bold max-basis-2/3">{currentLocation?.name}</p>
-                        <div className="flex flex-col justify-between items-end gap-2">
+                        <div className="flex flex-col justify-between basis-1/3 items-end gap-2">
                             {
                                 isGuest &&
                                 <div className="flex items-center gap-1 basis-1/3">
                                     <span className="badge bg-opacity-20 border-0 font-bold text-white text-xs">Foglalta:</span>
                                     <div className="avatar border-2 rounded-full border-white">
                                         <div className="w-6 rounded-full">
-                                            <img src={`https://assets.csaposapp.hu/assets/images/${bookerProfile?.imageUrl}`} alt="kép" />
+                                            <UserImage record={bookerProfile}/>
+                                            {/* <img src={`https://assets.csaposapp.hu/assets/images/${bookerProfile?.imageUrl}`} alt="kép" /> */}
                                         </div>
                                     </div>
                                     <p className="line-clamp-1 font-bold">{bookerProfile?.displayName || "N/A"}</p>
@@ -191,7 +193,7 @@ function Reservation() {
                                     return (
                                         <div className="relative" key={friend.id}>
                                             <div className="h-4 w-4 bg-yellow-500 -right-1 top-0 absolute z-50 rounded-full flex justify-center items-center"><span className="text-sm font-bold">?</span></div>
-                                            <AvatarGroupItem height={"h-10"} imageUrl={friend.imageUrl}/>
+                                            <UserImage record={friend} width={"w-10"} border/>
                                         </div>
                                     )   
                                 } 
@@ -199,7 +201,7 @@ function Reservation() {
                                     return (
                                         <div className="relative" key={friend.id}>
                                             <div className="h-4 w-4 bg-green-500 -right-1 top-0 absolute z-50 rounded-full flex justify-center items-center"><span className="text-sm font-bold"><LuCheck/></span></div>
-                                            <AvatarGroupItem height={"h-10"} imageUrl={friend.imageUrl}/>
+                                            <UserImage record={friend} width={"w-10"} border/>
                                         </div>
                                     )
                                 }
@@ -207,7 +209,7 @@ function Reservation() {
                                     return (
                                         <div className="relative" key={friend.id}>
                                             <div className="h-4 w-4 bg-red-500 -right-1 top-0 absolute z-50 rounded-full flex justify-center items-center"><span className="text-sm font-bold"><LuX/></span></div>
-                                            <AvatarGroupItem height={"h-10"} imageUrl={friend.imageUrl}/>
+                                            <UserImage record={friend} width={"w-10"} border/>
                                         </div>
                                     ) 
                                 }

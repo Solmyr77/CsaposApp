@@ -163,7 +163,7 @@ function PubMenu() {
           <LuX className="absolute left-0 top-0 w-9 h-9 text-white font-bold bg-red-500 p-1 rounded-tl-md rounded-tr-none rounded-bl-none rounded-br-md hover:cursor-pointer" onClick={() => productModal.current.close()}/>
           <div className="flex flex-col items-center justify-between h-full">
             <div className="flex flex-col items-center w-full">
-              <img src={img1} alt="kép" className="w-28 aspect-square rounded-lg bg-white p-2"/>
+              <img src={`https://assets.csaposapp.hu/assets/images/${selectedProduct.imgUrl}`} alt="kép" className="w-28 aspect-square rounded-lg bg-white p-2" onError={(event) => event.target.src = img1}/>
               <p className="text-lg mt-2">{selectedProduct.name}</p>
               <p className="font-normal text-gray-300 leading-none">{selectedProduct.description}</p>
               <p className="text-md mt-1">{selectedProduct.price * selectedProduct.quantity} Ft</p>

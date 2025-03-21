@@ -11,6 +11,7 @@ function OrderItem({ product, isOrdered }) {
     if (locationProducts) {
       setCurrentProduct(locationProducts.find(locationProduct => locationProduct.id === product.productId));
     }
+    console.log(product)
   }, [locationProducts])
 
   return (
@@ -18,7 +19,7 @@ function OrderItem({ product, isOrdered }) {
     <div className="flex flex-col">
       <div className="flex items-center justify-between select-none">
         <div className="flex gap-2">
-          <img src={img1} alt="kép" className="h-16 aspect-square bg-white p-1 rounded-md"/>
+          <img src={`https://assets.csaposapp.hu/assets/images/${product.id}.webp`} alt="kép" className="h-16 aspect-square bg-white p-1 rounded-md" onError={(event) => event.target.src = img1}/>
           <div className="flex flex-col">
             <span className="leading-none">{product.name}</span>
             <span className="text-gray-300 font-normal">{product.description}</span>
@@ -56,7 +57,7 @@ function OrderItem({ product, isOrdered }) {
     <div className="flex flex-col">
       <div className="flex items-center justify-between select-none">
         <div className="flex gap-2">
-          <img src={img1} alt="kép" className="h-10 aspect-square bg-white p-1 rounded-md"/>
+          <img src={`https://assets.csaposapp.hu/assets/images/${currentProduct.imgUrl}`} alt="kép" className="h-10 aspect-square bg-white p-1 rounded-md" />
           <div className="flex flex-col">
             <span className="leading-none">{currentProduct?.name}</span>
             <span className="text-gray-300 font-normal">{currentProduct?.description}</span>

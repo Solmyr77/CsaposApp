@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef, useMemo } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import TitleDivider from "./TitleDivider";
 import ListItem from "./ListItem";
 import BackButton from "./BackButton";
@@ -101,9 +101,9 @@ function Pub() {
             <BackButton isInset/>
         </Link>
         <div className="w-full h-fit relative">
-            <img src={img1} alt="kep" className="w-full h-48 object-cover"/>
+            <img src={`https://assets.csaposapp.hu/assets/images/${currentLocation.imgUrl}`} alt="kep" className="w-full h-48 object-cover" onError={(event) => event.target.src = img1}/>
             <div className="w-full h-full bg-gradient-to-t from-dark-grey via-15% via-dark-grey bg-opacity-65 absolute inset-0 flex flex-col justify-end text-wrap">
-                <p className="font-bold text-xl px-1 break-words text-center leading-tight w-full">{currentLocation?.name}</p>
+              <p className="font-bold text-xl px-1 break-words text-center leading-tight w-full">{currentLocation?.name}</p>
             </div>
         </div>
         <div className="rounded-b-md bg-gradient-to-b from-dark-grey pt-0.5 px-4">

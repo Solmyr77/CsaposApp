@@ -51,12 +51,12 @@ function Provider({ children }) {
         setUser({
           id: data.id,
           displayName: data.displayName,
-          imageUrl: `https://assets.csaposapp.hu/assets/images/${data.imageUrl}?t=${new Date().getTime()}`
+          imageUrl: `https://assets.csaposapp.hu/assets/images/${data.imageUrl}`
         });
         tempUser.current = {
           id: data.id,
           displayName: data.displayName,
-          imageUrl: `https://assets.csaposapp.hu/assets/images/${data.imageUrl}?t=${new Date().getTime()}`
+          imageUrl: `https://assets.csaposapp.hu/assets/images/${data.imageUrl}`
         }
       }
       else {
@@ -116,6 +116,7 @@ function Provider({ children }) {
       const response = await axios.get("https://backend.csaposapp.hu/api/friends/requests", config);
       const data = response.data;
       setFriendRequests(data.pendingRequests);
+      data.pendingRequests.length > 0 && setNewNotification(true); 
     }
     catch (error) {
       console.log(error);
@@ -535,6 +536,32 @@ function Provider({ children }) {
     .catch(err => console.error("❌ Failed to join group:", err));
   }
 
+  //function to make sure that connection state is connected before trying to invoke any other function
+  const ensureConnected = async (connection) => {
+    if (connection.state === "Disconnected") {
+      try {
+        await connection.start();
+        console.log("✅ Connection started successfully.");
+      } catch (err) {
+        console.error("❌ Failed to start connection:", err);
+        return false;
+      }
+    }
+    // Wait until the state is "Connected"
+    const maxAttempts = 10;
+    let attempts = 0;
+    while (connection.state !== "Connected" && attempts < maxAttempts) {
+      await new Promise((resolve) => setTimeout(resolve, 100)); // Wait 100ms
+      attempts++;
+    }
+    if (connection.state === "Connected") {
+      return true;
+    } else {
+      console.error("❌ Connection failed to reach 'Connected' state:", connection.state);
+      return false;
+    }
+  };
+
   //ref for flagging reconnection
   const isNotificationOnReconnectedFired = useRef(false);
   
@@ -543,22 +570,22 @@ function Provider({ children }) {
     registerNotificationListeners();
     console.log(notificationConnection.state);
     if (localStorage.getItem("accessToken") !== null && notificationConnection.state === "Disconnected") {
-      notificationConnection.start()
-      .then(() => {
-        console.log("✅ NotificationHub connected successfully.");
-        registerUser();
-        joinNotificationGroup();
-      })
-      .catch((err) => {
-          console.error("❌ Connection failed:", err);
-      });
+      const startConnection = async () => {
+        if (await ensureConnected(notificationConnection)) {
+          registerUser();
+          joinNotificationGroup();
+        }
+      }
+      startConnection();
     }
     //reconnect only once to the connection
     if (!isNotificationOnReconnectedFired.current) {
-      notificationConnection.onreconnected(() => {
+      notificationConnection.onreconnected(async () => {
         console.log("Reconnected successfully.");
-        registerUser();
-        joinNotificationGroup();
+        if (await ensureConnected(notificationConnection)) {
+          registerUser();
+          joinNotificationGroup();
+        }
       });
       isNotificationOnReconnectedFired.current = true;
     }
@@ -599,22 +626,22 @@ function Provider({ children }) {
   useEffect(() => {
     registerBookingListeners();
     if (localStorage.getItem("accessToken") !== null && bookingConnection.state === "Disconnected" && allBookings.length > 0) {
-      bookingConnection.start()
-      .then(() => {
-        console.log("✅ BookingHub connected successfully.");
-        registerUser();
-        allBookings.map((booking) => joinBookingGroup(booking.id));
-      })
-      .catch((err) => {
-        console.error("❌ Connection failed:", err);
-      });
+      const startConnection = async () => {
+        if (await ensureConnected(bookingConnection)) {
+          registerUser();
+          allBookings.map((booking) => joinBookingGroup(booking.id));
+        }
+      }
+      startConnection();
     }
     //reconnect only once to the connection
     if ((!isBookingOnReconnectedFired.current) && allBookings.length > 0) {
-      bookingConnection.onreconnected(() => {
+      bookingConnection.onreconnected(async () => {
         console.log("Reconnected successfully.");
-        registerUser();
-        allBookings.map((booking) => joinBookingGroup(booking.id));
+        if (await ensureConnected(bookingConnection)) {
+          registerUser();
+          allBookings.map((booking) => joinBookingGroup(booking.id));
+        }
       });
       isBookingOnReconnectedFired.current = true;
     }

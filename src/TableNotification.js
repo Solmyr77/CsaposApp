@@ -18,7 +18,7 @@ function TableNotification({ booking }) {
     return (
         <Link to={`/reservation/${booking.id}`}>
             <div className="flex w-full items-center justify-between bg-dark-grey px-4 py-2 rounded-md relative shadow-md">
-                <div className="flex flex-col">
+                <div className="flex flex-col basis-2/3">
                     <span className="text-xs text-gray-300">{formattedTime}</span>
                     <span className="font-bold text-md bg-gradient-to-t from-blue to-sky-400 bg-clip-text text-transparent">Új asztalmeghívás!</span>
                     <span className="text-sm text-gray-300">Részletekért koppints!</span>
@@ -29,7 +29,7 @@ function TableNotification({ booking }) {
                             <img src={`https://assets.csaposapp.hu/assets/images/${bookerProfile?.imageUrl}`} alt="kép" />
                         </div>
                     </div>
-                    <span>{bookerProfile?.displayName}</span>
+                    <span className="line-clamp-1">{bookerProfile?.displayName}</span>
                 </div>
             </div>
         </Link>

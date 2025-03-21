@@ -6,14 +6,6 @@ import UserImage from "./UserImage";
 
 function Header() {
   const { user, newNotification } = useContext(Context);
-  const [userImage, setUserImage] = useState(null);
-
-  useEffect(() => {
-   const userImage = new Image().src = user.imageUrl;
-   console.log(userImage)
-   setUserImage(new Image().src = user.imageUrl);
-  }, [user]);
-  
 
   return (
     <div className="w-full flex flex-row justify-between items-center pt-8 font-play font-bold px-4">

@@ -4,6 +4,7 @@ import axios from "axios";
 import Context from "./Context";
 import { useNavigate } from "react-router-dom";
 import { LuX } from "react-icons/lu";
+import UserImage from "./UserImage";
 
 const FriendModal = forwardRef(({ record }, ref) => {
   const { setFriends, logout } = useContext(Context);
@@ -51,7 +52,7 @@ const FriendModal = forwardRef(({ record }, ref) => {
           <LuX className="absolute left-0 top-0 w-9 h-9 text-red-500 font-bold bg-dark-grey p-1 rounded-tl-md rounded-tr-none rounded-bl-none rounded-br-md hover:cursor-pointer" onClick={() => ref.current.close()}/>
           <p className="text-md text-center mb-6">Barát kezelése</p>
           <div className="flex flex-col items-center">
-            <img src={`https://assets.csaposapp.hu/assets/images/${record.imageUrl}`} className="rounded-full object-cover aspect-square w-28"/>
+            <UserImage record={record} width={"w-28"}/>
             <p className="font-bold text-md mt-1">{record.displayName}</p>
             <p className="font-normal text-sm text-gray-300 mt-1"> Barátod 2024.12.03. óta</p>
           </div>

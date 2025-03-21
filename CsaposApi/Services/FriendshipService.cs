@@ -33,7 +33,10 @@ namespace CsaposApi.Services
                     ((f.UserId1 == senderId && f.UserId2 == receiverId) ||
                      (f.UserId1 == receiverId && f.UserId2 == senderId)));
 
-                _logger.LogInformation($"Service: friendship found: ID: {friendship.Id} UID1: {friendship.UserId1} UID2: {friendship.UserId2}");
+                if (friendship == null)
+                {
+                    _logger.LogInformation($"Service: friendship found: ID: {friendship.Id} UID1: {friendship.UserId1} UID2: {friendship.UserId2}");
+                }
 
                 if (friendship != null)
                 {

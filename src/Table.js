@@ -5,9 +5,10 @@ import { useNavigate, useParams, Link } from "react-router-dom";
 import Context from "./Context";
 import Order from "./Order";
 import OrderItem from "./OrderItem";
+import UserImage from "./UserImage";
 
 function Table() {
-  const { bookings, bookingsContainingUser, getOrdersByTable, tableOrders, locationProducts, getProductsByLocation, currentBooking, setCurrentBooking, user } = useContext(Context);
+  const { allBookings, getOrdersByTable, tableOrders, locationProducts, getProductsByLocation, currentBooking, setCurrentBooking, user, friends } = useContext(Context);
   const navigate = useNavigate();
   const { name, id } = useParams();
   const receiptModal = useRef();
@@ -43,8 +44,7 @@ function Table() {
   }, [tableOrders, user]);
 
   useEffect(() => {
-    const allBookings = bookings.concat(bookingsContainingUser);
-    if (allBookings.length > 0) {
+    if (allBookings?.length > 0) {
       const foundBooking = allBookings.find(booking => booking.id === id);
       if (foundBooking) {
         const run = async () => {
@@ -57,7 +57,7 @@ function Table() {
       }
       else navigate("/");
     }
-  }, [bookings, bookingsContainingUser]);
+  }, [allBookings]);
   
   return (
     <div className="flex flex-col max-h-screen h-screen overflow-y-hidden bg-grey text-white font-bold">
@@ -67,10 +67,16 @@ function Table() {
         <div className="flex justify-between items-center">
             <p className="text-md">Asztal <span className="text-gray-300">#1</span></p>
             <div className="avatar-group -space-x-4">
-              <AvatarGroupItem height={"h-10"} imageUrl={`${currentBooking.bookerId}.webp`}/>
-              {
-                currentBooking?.tableGuests?.map((friend, i) => friend.status === "accepted" && <AvatarGroupItem height={"h-10"} imageUrl={friend.imageUrl}/>)
-              }
+            {
+              (currentBooking.bookerId && user) && user.id === currentBooking.bookerId ?
+                <UserImage width={"w-10"} record={user} border/> : (
+                (friends.length > 0 && currentBooking.bookerId) &&
+                <UserImage width={"w-10"} border record={friends.find(friend => friend.id === currentBooking.bookerId)}/>
+              )
+            }
+            {
+              currentBooking?.tableGuests?.map((friend, i) => friend.status === "accepted" && <UserImage key={friend.id} width={"w-10"} record={friend} border/>)
+            }
             </div>
         </div>
         <button className="btn mt-2 w-fit min-h-0 h-10 bg-gradient-to-tr from-blue to-sky-400 border-0 text-white" onClick={() => receiptModal.current.showModal()}>

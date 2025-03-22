@@ -24,6 +24,7 @@ function Provider({ children }) {
   const [selectedTable, setSelectedTable] = useState({});
   const [bookings, setBookings] = useState([]);
   const [bookingsContainingUser, setBookingsContainingUser] = useState([]);
+  const [allBookings, setAllBookings] = useState([]);
   //order
   const [order, setOrder] = useState([]);
   const [locationProducts, setLocationProducts] = useState([]);
@@ -34,8 +35,8 @@ function Provider({ children }) {
   //notifications
   const [newNotification, setNewNotification] = useState(false);
   
-  const allBookings = useMemo(() => bookings.concat(bookingsContainingUser), [bookings, bookingsContainingUser]);
   const tempUser = useRef({});
+
 
   async function getProfile(id, profile) {
     try {
@@ -254,20 +255,22 @@ function Provider({ children }) {
       }
       const response = await axios.get(`https://backend.csaposapp.hu/api/bookings/bookings-by-user`, config);
       const data = await response.data;
-      if (response.status === 200 && data.length > 0) {
+      if (response.status === 200) {
         setBookings(data);
       }
+      return data;
     }
     catch (error) {
       console.log(error.response?.status);
       console.log(error.message);
       if (error.response?.status === 401) {
-        if (await getAccessToken()) await getBookingsByUser();
+        if (await getAccessToken()) return await getBookingsByUser();
         else {
           await logout();
           window.location.reload();
         }
       }
+      return [];
     }
   }
 
@@ -281,26 +284,27 @@ function Provider({ children }) {
       }
       const response = await axios.get(`https://backend.csaposapp.hu/api/bookings/bookings-containing-user`, config);
       const data = await response.data;
-      if (response.status === 200 && data.length > 0) {
+      if (response.status === 200) {
         setBookingsContainingUser(data);
-        console.log(tempUser.current);
         data.map(booking => {
           if (booking.tableGuests.find(guest => guest.id === tempUser.current.id)?.status === "pending") {
             setNewNotification(true);
           }
         })
       }
+      return data;
     }
     catch (error) {
       console.log(error.response?.status);
       console.log(error.message);
       if (error.response?.status === 401) {
-        if (await getAccessToken()) await getBookingsContainingUser();
+        if (await getAccessToken()) return await getBookingsContainingUser();
         else {
           await logout();
           window.location.reload();
         }
       }
+      return [];
     }
   }
 
@@ -392,9 +396,13 @@ function Provider({ children }) {
     const response = await axios.post("https://backend.csaposapp.hu/api/auth/logout", {refreshToken : localStorage.getItem("refreshToken")});
     if (response.status === 204) {
       notificationConnection.stop();
-      notificationConnection.off("notifyaddedtotable");
-      notificationConnection.off("notifyincomingfriendrequest");
-      notificationConnection.off("notifyfriendrequestaccepted");
+      bookingConnection.stop();
+      notificationConnection.off("notifyaddedtotable", handleNotifyAddedToTable);
+      notificationConnection.off("notifyincomingfriendrequest", handleNotifyIncomingFriendRequest);
+      notificationConnection.off("notifyfriendrequestaccepted", handleNotifyFriendRequestAccepted);
+      bookingConnection.off("notifybookingdeleted", handleNotifyBookingDeleted);
+      bookingConnection.off("notifyuseracceptedinvite", handleNotifyUserAcceptedInvite);
+      bookingConnection.off("notifyuserrejectedinvite", handleNotifyUserRejectedInvite);
       console.log("Logged out");
       setIsAuthenticated(false);
       localStorage.removeItem("accessToken");
@@ -403,6 +411,7 @@ function Provider({ children }) {
       setFriends([]);
       setBookings([]);
       setBookingsContainingUser([]);
+      setAllBookings([]);
     }
   }
 
@@ -417,13 +426,15 @@ function Provider({ children }) {
           getFriends();
           getFriendRequests();
           getTables();
-          getBookingsByUser();
-          getBookingsContainingUser();
+          Promise.all([await getBookingsByUser(), await getBookingsContainingUser()]).then((res) => {
+            console.log(res.flat());
+            setAllBookings(res.flat());
+          })
         }
         fetch()
       }
     }
-  }, [localStorage.getItem("accessToken")]);
+  }, [localStorage.getItem("accessToken") !== null]);
 
   //function to get userId from JWT token
   function decodeJWT(token) {
@@ -439,6 +450,10 @@ function Provider({ children }) {
       if (!state.some(booking => booking.id === message.payload.id)) {
         return [...state, {...message.payload, sentAt: message.sentAt}];
       }
+      return state;
+    });
+    setAllBookings(state => {
+      if (!state.some(booking => booking.id === message.payload.id)) return [...state, {...message.payload}]
       return state;
     });
     joinBookingGroup(message.payload.id);
@@ -583,8 +598,10 @@ function Provider({ children }) {
       notificationConnection.onreconnected(async () => {
         console.log("Reconnected successfully.");
         if (await ensureConnected(notificationConnection)) {
-          registerUser();
-          joinNotificationGroup();
+          setTimeout(() => {
+            registerUser();
+            joinNotificationGroup();
+          }, 500);
         }
       });
       isNotificationOnReconnectedFired.current = true;
@@ -629,7 +646,7 @@ function Provider({ children }) {
       const startConnection = async () => {
         if (await ensureConnected(bookingConnection)) {
           registerUser();
-          allBookings.map((booking) => joinBookingGroup(booking.id));
+          allBookings.map((booking) => booking?.id && joinBookingGroup(booking.id));
         }
       }
       startConnection();
@@ -639,8 +656,10 @@ function Provider({ children }) {
       bookingConnection.onreconnected(async () => {
         console.log("Reconnected successfully.");
         if (await ensureConnected(bookingConnection)) {
-          registerUser();
-          allBookings.map((booking) => joinBookingGroup(booking.id));
+          setTimeout(() => {
+            registerUser();
+            allBookings.map((booking) => joinBookingGroup(booking.id));
+          }, 500);
         }
       });
       isBookingOnReconnectedFired.current = true;
@@ -684,6 +703,8 @@ function Provider({ children }) {
       setBookings,
       bookingsContainingUser,
       setBookingsContainingUser,
+      allBookings,
+      setAllBookings,
       locationProducts,
       tableOrders,
       categories,

@@ -15,6 +15,7 @@ import AvatarGroupItem from "./AvatarGroupItem";
 import getAccessToken from "./refreshToken";
 import axios from "axios";
 import bookingConnection from "./signalRBookingConnection";
+import UserImage from "./UserImage";
 registerLocale('hu', hu);
 
 const StyledDatePickerWrapper = styled.div`
@@ -70,7 +71,7 @@ const StyledDatePickerWrapper = styled.div`
 `;
 
 function ReserveTable() {
-  const { previousRoutes, getLocationTables, selectedTable, locations, friends, tableFriends, setTableFriends, setSelectedTable, getBookingsByUser, logout } = useContext(Context);
+  const { previousRoutes, getLocationTables, selectedTable, locations, friends, tableFriends, setTableFriends, setSelectedTable, getBookingsByUser, logout, setAllBookings } = useContext(Context);
   const { name } = useParams();
   const navigate = useNavigate();
   const [currentLocation, setCurrentLocation] = useState({});
@@ -146,7 +147,13 @@ function ReserveTable() {
       if (response.status === 200) {
         tableFriends.length > 0 && await handleAddToTable(data.id);
         setIsBooked(true);
-        await getBookingsByUser();
+        const bookings = await getBookingsByUser();
+        setAllBookings(state => {
+          const newBooking = bookings.find(booking => booking.id === data.id);
+          console.log(newBooking);
+          if (newBooking) return [...state, newBooking]
+          return state;
+        });
         bookingConnection.invoke("JoinBookingGroup", data.id)
         .then(() => console.log("✅ Joined booking group", data.id))
         .catch(err => console.log("Failed to join booking group", err));
@@ -229,7 +236,7 @@ function ReserveTable() {
     const [closeHour, closeMinute] = currentDay.close.split(":").map(Number);
     closingTime.setHours(closeHour, closeMinute, 0, 0);
 
-    // Subtract 30 minutes from closing time
+    // Subtract 45 minutes from closing time
     const latestTime = new Date(closingTime.getTime() - 45 * 60000);
 
     // Set the starting time to now or the date's open time, whichever is later
@@ -247,7 +254,10 @@ function ReserveTable() {
     now.setSeconds(0);
     now.setMilliseconds(0);
 
-    // Generate time slots from now to 30 minutes before closing
+    //Adjust latestTime if close time is after midnight
+    if (now > latestTime) latestTime.setDate(latestTime.getDate() + 1);
+
+    // Generate time slots from now to 45 minutes before closing
     while (now < latestTime) {
       slots.push(now.toTimeString().slice(0, 5));
       now = new Date(now.getTime() + 15 * 60000);
@@ -362,13 +372,11 @@ function ReserveTable() {
               if (selectedTime === "Most") {
                 const newDate = new Date();
                 startDate.setHours(newDate.getHours(), newDate.getMinutes());
-                console.log(a);
               }
               else startDate.setHours(Number(selectedTime.slice(0,2)), Number(selectedTime.slice(3)), 0)
               if (a?.capacity === b?.capacity) return a?.number - b?.number;
               return a?.capacity - b?.capacity;
             }).map(table => {
-              console.log(table);
               return <TableItem key={table.id} table={table} date={startDate} time={selectedTime}/>;
             })
           }
@@ -410,7 +418,7 @@ function ReserveTable() {
           <div className="avatar-group -space-x-4 rtl:space-x-reverse">
             {
               tableFriends?.length > 0 &&
-              tableFriends?.map(friend => <AvatarGroupItem key={friend.id} imageUrl={friend.imageUrl}/>)
+              tableFriends?.map(friend => <UserImage key={friend.id} record={friend} width={"w-10"} border/>)
             }
           </div>
         </div>

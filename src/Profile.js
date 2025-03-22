@@ -19,7 +19,9 @@ function Profile() {
   const friendModalRef = useRef();
   const addfriendModalRef = useRef();
   const passwordModalRef = useRef();
+  const badgeModalRef = useRef();
   const [selectedFriend, setSelectedFriend] = useState({});
+  const [selectedBadge, setSelectedBadge] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -73,7 +75,11 @@ function Profile() {
         </div>
       </div>
       <TitleDivider title={"Eredmények"}/>
-      <div className="flex flex-row w-full overflow-x-scroll gap-4 mb-8">
+      <div className="flex flex-row w-full overflow-x-scroll gap-4 mb-8 cursor-pointer" onClick={() => {
+        badgeModalRef.current.inert = true;
+        badgeModalRef.current.showModal();
+        badgeModalRef.current.inert = false;
+      }}>
         <Badge image={img1} title={"Nagy ivó"}/>
       </div>
       <TitleDivider title={"Beállítások"} isNormal={true}/>
@@ -103,6 +109,30 @@ function Profile() {
       <AddFriendModal ref={addfriendModalRef}/>
       <PasswordModal ref={passwordModalRef}/>
       <Footer/>
+
+      <dialog className="modal" ref={badgeModalRef}>
+        <div className="modal-box bg-transparent shadow-none p-0 overflow-hidden">
+          <div className="flex justify-center">
+            <label className="swap swap-flip">
+              <input type="checkbox"/>
+              <div className="flex flex-col h-80 aspect-[.7] select-none rounded-lg swap-off">
+                <div className="flex basis-[70%] bg-dark-grey rounded-t-lg">
+                  <img src={img1} alt=""/>
+                </div>
+                <div className="flex basis-[30%] justify-center items-center bg-white text-black rounded-b-lg">
+                  <p className="text-xl">Nagy ivó</p>
+                </div>
+              </div>
+              <div className="flex flex-col justify-center items-center h-80 aspect-[.7] select-none rounded-lg swap-on bg-grey">
+                <span className="text-md">50 megivott sör</span>
+              </div>
+            </label>
+          </div>
+        </div>
+        <form method="dialog" className="modal-backdrop">
+          <button></button>
+        </form>
+      </dialog>
     </div>
   )
 }

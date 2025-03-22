@@ -9,10 +9,11 @@ import getAccessToken from "./refreshToken";
 import img1 from "./img/pilsner.png";
 import { MdOutlineTableRestaurant } from "react-icons/md";
 import AvatarGroupItem from "./AvatarGroupItem";
+import UserImage from "./UserImage";
 
 
 function PubMenu() {
-  const { order, setOrder, locationProducts, categories, tableOrders, selectedProduct, setSelectedProduct, logout, bookings, bookingsContainingUser, getProductsByLocation, getOrdersByTable, user } = useContext(Context);
+  const { order, setOrder, locationProducts, categories, tableOrders, selectedProduct, setSelectedProduct, logout, allBookings, getProductsByLocation, getOrdersByTable, user, friends } = useContext(Context);
   const productModal = useRef();
   const bagModal = useRef();
   const successModal = useRef();
@@ -74,27 +75,26 @@ function PubMenu() {
   }, [order]);
   
   useEffect(() => {
-    const allBookings = bookings.concat(bookingsContainingUser);
-    if (allBookings.length > 0) {
+    if (allBookings?.length > 0) {
       const foundBooking = allBookings.find(booking => booking.id === id);
       if (foundBooking) {
+        console.log(foundBooking);
+        console.log(categories);
         setCurrentBooking(foundBooking);
         const run = async () => {
           await getOrdersByTable(foundBooking.tableId);
-          if (categories.length === 0) {
-            await getProductsByLocation(foundBooking.locationId);
-          }
+          await getProductsByLocation(foundBooking.locationId);
         } 
         run();
       }
       else navigate("/");
     }
-  }, [bookings, bookingsContainingUser, categories]);
+  }, [allBookings]);
 
   return (
     <div className="flex flex-col max-h-screen h-screen overflow-y-hidden bg-grey text-white font-bold">
       <div className="flex flex-col mb-3 px-4 pt-4 pb-0 shadow-lg">
-        <button className="btn min-h-0 h-8 w-fit text-red-500 bg-dark-grey border-0 hover:bg-dark-grey" onClick={()=> navigate("/")}>
+        <button className="btn min-h-0 h-8 w-fit text-red-500 bg-dark-grey border-0 hover:bg-dark-grey" onClick={()=> navigate(`/sessionended/${id}`)}>
           <LuLogOut className="rotate-180"/>
           <span>Kilépés</span>
         </button>
@@ -103,9 +103,15 @@ function PubMenu() {
           <div className="relative">
             <button className="btn bg-dark-grey border-0 hover:bg-dark-grey" onClick={() => navigate(`/table/${name}/${id}`)}>
               <div className="avatar-group -space-x-3">
-                <AvatarGroupItem height={"h-7"} imageUrl={`${currentBooking.bookerId}.webp`}/>
                 {
-                  currentBooking?.tableGuests?.map((friend, i) => i < 3 ? friend.status === "accepted" && <AvatarGroupItem key={friend.id} height={"h-7"} imageUrl={friend.imageUrl}/> : (
+                  (currentBooking.bookerId && user) && user.id === currentBooking.bookerId ?
+                    <UserImage width={"w-7"} record={user} border/> : (
+                      (friends.length > 0 && currentBooking.bookerId) &&
+                      <UserImage width={"w-7"} border record={friends.find(friend => friend.id === currentBooking.bookerId)}/>
+                    )
+                }
+                {
+                  currentBooking?.tableGuests?.map((friend, i) => i < 3 ? friend.status === "accepted" && <UserImage key={friend.id} width={"w-7"} record={friend} border/> : (
                     i === currentBooking.tableGuests.length - 1 && 
                     <div className="avatar placeholder h-7 aspect-square border-2" key={friend.id}>
                       <div className="bg-neutral text-neutral-content w-12">
@@ -146,8 +152,12 @@ function PubMenu() {
         }
       </div>
       <div className="fixed bg-grey bottom-0 h-[10vh] w-full flex flex-row justify-between items-center rounded-t-lg px-6 shadow-dark-grey shadow-[0px_0px_18px_0px_rgba(0_0_0_0)]">
-        <div className="relative">
-          <LuShoppingBag className="w-8 h-8"/>
+        <div className="relative cursor-pointer">
+          <LuShoppingBag className="w-8 h-8" onClick={() => {
+            bagModal.current.inert = true;
+            bagModal.current.showModal();
+            bagModal.current.inert = false;
+          }}/>
           <div className="h-4 aspect-square bg-red-500 absolute -top-1 -right-1 rounded-full flex justify-center items-center font-normal">{orderQuantity}</div>
         </div>
         <button className="btn flex items-center border-0 text-white bg-gradient-to-tr from-blue to-sky-400 py-2 px-4 rounded-md text-md" onClick={() => {

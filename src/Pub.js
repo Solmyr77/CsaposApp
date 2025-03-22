@@ -109,7 +109,7 @@ function Pub() {
         <div className="rounded-b-md bg-gradient-to-b from-dark-grey pt-0.5 px-4">
             <div className="flex flex-row justify-center items-center mb-2 text-gray-300">
                 <LuMapPin className="h-[14px] w-[14px] mr-1 cursor-pointer"/>
-                <p className="text-center text-[14px]">3599 Sajószöged, Petőfi út 2.</p>
+                <p className="text-center text-[14px]">{currentLocation?.address || "3599 Sajószöged, Petőfi út 2."}</p>
             </div>
             {
                 Number(currentLocation?.rating) > 0 ?
@@ -155,7 +155,7 @@ function Pub() {
                 <EventSwiper/>
             </div>
             <div className="flex justify-center items-center self-center h-full py-10">
-                <button className={`btn bg-gradient-to-tr from-blue to-sky-400 text-white border-0 w-56 h-20 hover:bg-blue disabled:bg-blue disabled:text-white disabled:opacity-50 shadow-[0_4px_4px_rgba(0,0,0,.25)]`} disabled={isOpen !== null ? !isOpen : !currentLocation?.isOpen} onClick={() => {
+                <button className={`btn bg-gradient-to-tr text-xl from-blue to-sky-400 text-white border-0 w-56 h-20 hover:bg-blue disabled:bg-blue disabled:text-white disabled:opacity-50 shadow-[0_4px_4px_rgba(0,0,0,.25)]`} disabled={isOpen !== null ? !isOpen : !currentLocation?.isOpen} onClick={() => {
                     if (isOpen !== null ? isOpen : currentLocation?.isOpen) {
                         setPreviousRoutes((state) => {
                             if (!state.includes(location.pathname)) return [...state, location.pathname];
@@ -164,7 +164,7 @@ function Pub() {
                         navigate(`/reservetable/${name}`);
                     }
                 }}>
-                    <p className="font-bold text-xl">Foglalok</p>
+                  Foglalok
                 </button>
             </div>
         </div>

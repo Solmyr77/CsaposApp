@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import heic2any from "heic2any";
 import imageCompression from "browser-image-compression";
 import { LuX, LuImagePlus } from "react-icons/lu";
+import UserImage from "./UserImage";
 
 const ModifyModal = forwardRef((props, ref) => {
   const { user, setUser, getProfile, logout } = useContext(Context);
@@ -15,6 +16,7 @@ const ModifyModal = forwardRef((props, ref) => {
   const [isSucceeded, setIsSucceeded] = useState(false);
   const [formData, setFormData] = useState(new FormData());
   const [isConversionFinished, setIsConversionFinished] = useState(null);
+  const [isPlaceholderImage, setIsPlaceholderImage] = useState(false);
   const imageInput = useRef();
   const navigate = useNavigate();
 
@@ -162,7 +164,15 @@ const ModifyModal = forwardRef((props, ref) => {
                 isConversionFinished === false ?
                 <span className="loading loading-spinner text-sky-400 w-20"></span> :
                 <div className="relative select-none hover:cursor-pointer" onClick={triggerFileInputClick}>
-                  <img src={previewProfilePicture} className="rounded-full object-cover aspect-square w-24 opacity-50"/>
+                  {
+                    isPlaceholderImage ? 
+                    <div className="avatar placeholder opacity-50">
+                      <div className="w-24 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                        <span className="text-lg text-grey">{user?.displayName?.slice(0, 2).toUpperCase()}</span>
+                      </div>
+                    </div> :
+                    <img src={previewProfilePicture} className="rounded-full object-cover aspect-square w-24 opacity-50" onError={() => setIsPlaceholderImage(true)}/>
+                  }
                   <LuImagePlus className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-12 w-12"/>
                   <input ref={imageInput} id="fileInput" type="file" style={{"display" : "none"}} onChange={(event) => showImagePreview(event)}/>
                 </div>

@@ -7,7 +7,6 @@ function TableItem({ table, date, time }) {
   const [isBooked, setIsBooked] = useState(false);
 
   useEffect(() => {
-    console.log(table.number, isBooked);
     setIsBooked(false);
     if (table.bookings) {
       Object.values(table.bookings).map(value => new Date(value).getDate() === new Date(date).getDate() && setIsBooked(true));

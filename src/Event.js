@@ -6,10 +6,11 @@ import img2 from "./img/pub.jpg";
 import TitleDivider from "./TitleDivider";
 import Context from "./Context";
 import { ChevronRightIcon } from "@heroicons/react/20/solid";
+import { LuCheck, LuX } from "react-icons/lu";
 
 function Event() {
   const { previousRoutes, setPreviousRoutes } = useContext(Context);
-  const [isAttending, setIsAttending] = useState(null);
+  const [isAttending, setIsAttending] = useState(false);
   const [isDescriptionWrapped, setIsDescriptionWrapped] = useState(true);  
   const [isClamped, setIsClamped] = useState(false);
   const textRef = useRef(null);
@@ -47,15 +48,13 @@ function Event() {
         <p className="text-center text-[14px] leading-snug mb-4"><span className="font-bold">Félidő Söröző</span> eseménye</p>
         <div className="flex flex-row justify-between items-center w-full gap-x-2">
           <p className="text-md font-bold pb-0.5">Ott leszel?</p>
-          <div className="flex flex-row gap-2">
-            <div className={`${isAttending === true ? "bg-green-500" : "bg-transparent text-green-500"} border-green-500 border-[1px] basis-1/2 flex justify-center items-center  rounded-md px-3 text-md hover:cursor-pointer select-none`} onClick={() => setIsAttending(true)}>
-              Igen
-            </div>
-            <div className={`${isAttending === false ? "bg-red-500" : "bg-transparent text-red-500"} border-red-500 border-[1px] basis-1/2 flex justify-center items-center  rounded-md px-3 text-md hover:cursor-pointer select-none`} onClick={() => setIsAttending(false)}>
-              Nem
-            </div>
-          </div>
+         <div className="flex flex-row gap-2">
+          <button className={`btn group transition-all duration-150 min-h-0 h-8 border-green-500 border-2 text-green-500 text-sm ${isAttending ? "bg-green-500 text-white hover:bg-green-500 hover:border-green-500" : "bg-transparent hover:bg-transparent hover:border-green-500"} overflow-hidden`} onClick={() => setIsAttending(state => !state)}>
+            Igen
+            <LuCheck className={`${isAttending ? "block" : "hidden"}`}/>
+          </button>
         </div>
+      </div>
       <TitleDivider title={"Leírás"}/>
       <p ref={textRef} className={`max-w-full ${isDescriptionWrapped ? "line-clamp-[8]" : "line-clamp-none"}`}>
         Lorem ipsum dolor sit amet...
@@ -71,13 +70,13 @@ function Event() {
       </div>
       <TitleDivider title={"Helyszín"}/>
       <Link to={`/pub/${"Félidő Söröző"}`}>
-        <div className="relative drop-shadow-sm select-none" onClick={() => setPreviousRoutes((state) => {
+        <div className="relative shadow-dark-grey shadow-md rounded-md select-none" onClick={() => setPreviousRoutes((state) => {
           if (!state.includes(location.pathname)) return [...state, location.pathname];
           return state;
         })}>
           <img src={img2} alt="pub" className="h-full max-h-20 w-full object-cover rounded-md"/>
           <div className={`absolute inset-0 ${true ? 'bg-opacity-70' : 'bg-opacity-85'} bg-black flex flex-col rounded-md`}>
-            <p className="absolute top-1/2 -translate-y-1/2 text-lg font-normal pl-5">Félidő Söröző</p>
+            <p className="absolute top-1/2 -translate-y-1/2 text-lg font-bold pl-5">Félidő Söröző</p>
           </div>
         </div>
       </Link>      

@@ -50,10 +50,9 @@ function UserImage({ record, width, border, margin }) {
     </div> :
     <div className={`avatar placeholder ${border ? "border-2 rounded-full" : ""} ${margin}`}>
       <div className={`${width} rounded-full bg-gray-300 flex items-center justify-center overflow-hidden`}>
-        <span className="text-lg text-grey">{record?.displayName?.slice(0, 2).toUpperCase()}</span>
+        <span className="text-lg font-bold text-grey">{record?.displayName?.slice(0, 2).toUpperCase()}</span>
       </div>
     </div>
-
   );
 }
 

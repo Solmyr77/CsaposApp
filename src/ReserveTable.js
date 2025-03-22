@@ -255,14 +255,13 @@ function ReserveTable() {
     now.setMilliseconds(0);
 
     //Adjust latestTime if close time is after midnight
-    if (now > latestTime) latestTime.setDate(latestTime.getDate() + 1);
+    if (now > latestTime && latestTime.getHours() < 10) latestTime.setDate(latestTime.getDate() + 1);
 
     // Generate time slots from now to 45 minutes before closing
     while (now < latestTime) {
       slots.push(now.toTimeString().slice(0, 5));
       now = new Date(now.getTime() + 15 * 60000);
     }
-
     return slots;
   }
 

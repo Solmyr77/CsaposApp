@@ -421,7 +421,7 @@ function Provider({ children }) {
       const userId = decodeJWT(localStorage.getItem("accessToken")).sub;
       if (userId) {
        const fetch = async () => {
-          getProfile(userId, "user");
+          await getProfile(userId, "user");
           getLocations();
           getFriends();
           getFriendRequests();
@@ -434,7 +434,7 @@ function Provider({ children }) {
         fetch()
       }
     }
-  }, [localStorage.getItem("accessToken") !== null]);
+  }, [localStorage.getItem("accessToken")]);
 
   //function to get userId from JWT token
   function decodeJWT(token) {

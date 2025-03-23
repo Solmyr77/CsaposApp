@@ -65,5 +65,10 @@ namespace CsaposApi.Services
         {
             await NotifyUserAsync(userId, "NotifyAddedToTable", currentBooking);
         }
+
+        public async Task NotifyFriendshipRemoved(string userId, Guid removedFriendId)
+        {
+            await NotifyUserAsync(userId, "NotifyRemovedFriendship", removedFriendId);
+        }
     }
 }

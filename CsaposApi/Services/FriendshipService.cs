@@ -209,6 +209,9 @@ namespace CsaposApi.Services
 
                 _context.Friendships.Remove(friendship);
                 await _context.SaveChangesAsync();
+
+                await _notificationService.NotifyFriendshipRemoved(friendId.ToString(), userId);
+
                 return true;
             }
             catch (Exception ex)

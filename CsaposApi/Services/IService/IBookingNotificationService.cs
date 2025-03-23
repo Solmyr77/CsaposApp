@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using static CsaposApi.Models.DTOs.BookingDTO;
+using static CsaposApi.Models.DTOs.OrderDTO;
 
 namespace CsaposApi.Services.IService
 {
@@ -9,5 +10,6 @@ namespace CsaposApi.Services.IService
         Task NotifyUserRemovedFromTable(string bookingId, string userId);
         Task NotifyUserAcceptedInvite(string bookingId, string userId);
         Task NotifyUserRejectedInvite(string bookingId, string userId);
+        Task NotifyOrderCreated(string bookingId, OrderResponseDTO order);
     }
 }

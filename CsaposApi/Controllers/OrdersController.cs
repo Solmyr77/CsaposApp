@@ -21,12 +21,14 @@ namespace CsaposApi.Controllers
         private readonly CsaposappContext _context;
         private readonly IAuthService _authService;
         private readonly ILogger<OrdersController> _logger;
+        private readonly IBookingNotificationService _bookingNotificationService;
 
-        public OrdersController(CsaposappContext context, IAuthService authService, ILogger<OrdersController> logger)
+        public OrdersController(CsaposappContext context, IAuthService authService, ILogger<OrdersController> logger, IBookingNotificationService bookingNotificationService)
         {
             _context = context;
             _authService = authService;
             _logger = logger;
+            _bookingNotificationService = bookingNotificationService;
         }
 
         [HttpGet]
@@ -273,6 +275,8 @@ namespace CsaposApi.Controllers
                     UpdatedAt = oi.UpdatedAt
                 }).ToList()
             };
+            
+            await _bookingNotificationService.NotifyOrderCreated(orderCreateDto.BookingId.ToString() ,responseDto);
 
             return CreatedAtAction(nameof(GetOrder), new { id = order.Id }, responseDto);
         }

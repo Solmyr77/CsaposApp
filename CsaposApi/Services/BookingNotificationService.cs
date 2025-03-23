@@ -1,9 +1,12 @@
 ﻿using CsaposApi.Hubs;
+using CsaposApi.Models;
+using CsaposApi.Models.DTOs;
 using CsaposApi.Services.IService;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
+using static CsaposApi.Models.DTOs.OrderDTO;
 
 namespace CsaposApi.Services
 {
@@ -42,6 +45,12 @@ namespace CsaposApi.Services
         {
             _logger.LogInformation($"User {userId} rejected invite for booking {bookingId}.");
             await _hubContext.Clients.Group(bookingId).SendAsync("NotifyUserRejectedInvite", new { userId = userId, bookingId = bookingId, sentAt = DateTime.Now });
+        }
+
+        public async Task NotifyOrderCreated(string bookingId, OrderResponseDTO order)
+        {
+            _logger.LogInformation($"Order has been created for booking {bookingId}.");
+            await _hubContext.Clients.Group(bookingId).SendAsync("NotifyOrderCreated", new { order = order, bookingId = bookingId, sentAt = DateTime.Now });
         }
     }
 }

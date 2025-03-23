@@ -12,6 +12,7 @@ import PasswordModal from "./PasswordModal";
 import FriendModal from "./FriendModal";
 import { LuSquarePen, LuUserPlus, LuKeyRound } from "react-icons/lu";
 import UserImage from "./UserImage";
+import BadgeSwiper from "./BadgeSwiper";
 
 function Profile() {
   const { setMenuState, user, friends, logout } = useContext(Context);
@@ -31,7 +32,6 @@ function Profile() {
   return (
     <div className="min-h-screen h-full w-full max-w-full bg-grey flex px-4 text-white font-bold font play flex-col items-center relative">
       <h1 className="text-center w-full pt-8 text-2xl mb-2">{user.displayName}</h1>
-      {/* <img src={user.imageUrl} alt="avatar" className="w-28 object-cover aspect-square rounded-full mb-8"/> */}
       <UserImage record={user} width={"w-28"} margin={"mb-8"}/>
       <TitleDivider title={"Barátok"}/>
       <div className="flex w-full mb-8 gap-2">
@@ -42,7 +42,7 @@ function Profile() {
         }}>
           <LuUserPlus className="w-8 h-8"/>
         </div>
-        <div className="flex flex-row w-full h-full overflow-x-scroll">
+        <div className="flex flex-row w-full min-h-20 items-center overflow-x-scroll">
         { friends.length > 0 ? 
           friends.sort((a, b) => a.displayName?.localeCompare(b.displayName)).map(friend =>
             {
@@ -70,7 +70,7 @@ function Profile() {
                 </div>
               )
             }):
-          <p className="font-normal text-center w-full">Nincsenek barátaid</p>
+          <p className="font-normal text-center text-gray-300 w-full">Nincsenek barátaid</p>
         }
         </div>
       </div>
@@ -111,19 +111,49 @@ function Profile() {
       <Footer/>
 
       <dialog className="modal" ref={badgeModalRef}>
-        <div className="modal-box bg-transparent shadow-none p-0 overflow-hidden">
-          <div className="flex justify-center">
+        <div
+          className="modal-box bg-transparent shadow-none w-fit p-16 overflow-hidden"
+          onClick={(e) => {
+            const box = e.currentTarget;
+            const rect = box.getBoundingClientRect();
+            const styles = window.getComputedStyle(box);
+
+            const paddingTop = parseFloat(styles.paddingTop);
+            const paddingLeft = parseFloat(styles.paddingLeft);
+            const paddingRight = parseFloat(styles.paddingRight);
+            const paddingBottom = parseFloat(styles.paddingBottom);
+
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
+            const contentLeft = paddingLeft;
+            const contentRight = rect.width - paddingRight;
+            const contentTop = paddingTop;
+            const contentBottom = rect.height - paddingBottom;
+
+            const isInPadding =
+              clickX < contentLeft ||
+              clickX > contentRight ||
+              clickY < contentTop ||
+              clickY > contentBottom;
+
+            if (isInPadding) {
+              badgeModalRef.current.close();
+            } else {
+              e.stopPropagation(); // prevent bubbling if needed
+            }
+          }}>
+          <div className="flex justify-center items-center w-fit">
             <label className="swap swap-flip">
-              <input type="checkbox"/>
-              <div className="flex flex-col h-80 aspect-[.7] select-none rounded-lg swap-off">
+              <input type="checkbox" />
+              <div className="flex flex-col h-60 aspect-[.7] select-none rounded-lg swap-off">
                 <div className="flex basis-[70%] bg-dark-grey rounded-t-lg">
-                  <img src={img1} alt=""/>
+                  <img src={img1} alt="kép" />
                 </div>
                 <div className="flex basis-[30%] justify-center items-center bg-white text-black rounded-b-lg">
                   <p className="text-xl">Nagy ivó</p>
                 </div>
               </div>
-              <div className="flex flex-col justify-center items-center h-80 aspect-[.7] select-none rounded-lg swap-on bg-grey">
+              <div className="flex flex-col justify-center items-center h-60 aspect-[.7] select-none rounded-lg swap-on bg-grey">
                 <span className="text-md">50 megivott sör</span>
               </div>
             </label>

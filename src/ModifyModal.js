@@ -191,7 +191,7 @@ const ModifyModal = forwardRef((props, ref) => {
               </form>
             </div> :
             <div className="flex h-full w-full justify-center items-center">
-              {errorMessage === "" ? <p className="text-green-500">Sikeres módosítás</p> : <p className="text-red-500">{errorMessage}</p>}
+              {errorMessage === "" ? <p className="bg-gradient-to-t from-blue to-sky-400 bg-clip-text text-transparent">Sikeres módosítás!</p> : <p className="text-red-500">{errorMessage}</p>}
             </div>
           }
         </div>

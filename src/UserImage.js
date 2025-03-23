@@ -38,14 +38,15 @@ function UserImage({ record, width, border, margin }) {
     newImage.src = imageUrl;
     newImage.onload = async () => {
       localStorage.setItem(record.id, imageUrl);
+      setUserImage(newImage);
     };
   }, [record]);
 
   return (
-    userImage || localStorage.getItem(record?.id) ? 
+    localStorage.getItem(record?.id) && userImage ? 
     <div className={`avatar ${border ? "border-2 rounded-full" : ""} ${margin}`}>
       <div className={`${width} rounded-full bg-gray-300 flex items-center justify-center overflow-hidden`}>
-        <img src={ localStorage.getItem(record?.id) || userImage} alt="kép" className="w-full h-full object-cover"/>
+        <img src={localStorage.getItem(record?.id) || userImage} alt="kép" className="w-full h-full object-cover"/>
       </div>
     </div> :
     <div className={`avatar placeholder ${border ? "border-2 rounded-full" : ""} ${margin}`}>

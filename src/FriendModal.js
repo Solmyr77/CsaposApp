@@ -61,7 +61,7 @@ const FriendModal = forwardRef(({ record }, ref) => {
           </div>
         </div> :
         <div className="w-80 min-h-80 h-80 bg-grey rounded-xl flex flex-col items-center sticky top-1/2 -translate-y-1/2 px-4 justify-center">
-          <p className="text-green-500">{message}</p>
+          <p className="bg-gradient-to-t from-blue to-sky-400 bg-clip-text bg-transparent">{message}</p>
         </div>
       }
       <form method="dialog" className="modal-backdrop"><button></button></form>

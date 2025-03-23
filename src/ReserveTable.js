@@ -11,7 +11,6 @@ import TableItem from "./TableItem";
 import Context from "./Context";
 import InviteFriendItem from "./InviteFriendItem";
 import { MdOutlineTableRestaurant } from "react-icons/md";
-import AvatarGroupItem from "./AvatarGroupItem";
 import getAccessToken from "./refreshToken";
 import axios from "axios";
 import bookingConnection from "./signalRBookingConnection";
@@ -84,7 +83,7 @@ function ReserveTable() {
   const [counter, setCounter] = useState(3);
   const [timeSlots, setTimeSlots] = useState([]);
   const modalRef = useRef();
-  const ExampleCustomInput = forwardRef(
+  const CustomInput = forwardRef(
     ({ value, onClick, className }, ref) => (
       <button className={className} onClick={onClick} ref={ref}>
         <span className="bg-gradient-to-t from-blue to-sky-400 bg-clip-text text-transparent">{value}</span> <hr className="w-8 rotate-90 rounded-md"/> <LuCalendar/>
@@ -255,7 +254,7 @@ function ReserveTable() {
     now.setMilliseconds(0);
 
     //Adjust latestTime if close time is after midnight
-    if (now > latestTime && latestTime.getHours() < 10) latestTime.setDate(latestTime.getDate() + 1);
+    if (Number(currentDay.open.split(":")[0]) > latestTime.getHours()) latestTime.setDate(latestTime.getDate() + 1);
 
     // Generate time slots from now to 45 minutes before closing
     while (now < latestTime) {
@@ -319,7 +318,6 @@ function ReserveTable() {
   useEffect(() => {
     currentLocation.businessHours && setTimeSlots(generateTimeSlots(startDate));
   }, [startDate, currentLocation]);
-  
 
   return (
     <div className="min-h-screen w-full bg-grey text-white overflow-y-auto flex flex-col py-8 px-4 font-bold gap-8">
@@ -343,23 +341,31 @@ function ReserveTable() {
               locale={"hu"}
               timeCaption="Idő"
               className="font-play"
-              customInput={<ExampleCustomInput className="bg-dark-grey px-4 py-2 rounded-lg text-lg flex flex-row items-center"/>}/>
+              customInput={<CustomInput className="bg-dark-grey px-4 py-2 rounded-lg text-lg flex flex-row items-center"/>}/>
           </StyledDatePickerWrapper>
           {
             startDate.getDate() === new Date().getDate() ?
-            <div className="flex gap-2">
-                <button className={`btn w-fit bg-dark-grey hover:bg-dark-grey border-0 text-white text-sm ${selectedTime === "Most" && "bg-gradient-to-tr from-blue to-sky-400 hover:bg-gradient-to-tr"}`} onClick={() => setSelectedTime("Most")}>Most</button>
-                <div className="flex gap-2 overflow-x-auto">
-                  {
-                    timeSlots.map(time => <button key={time} className={`btn w-fit bg-dark-grey hover:bg-dark-grey border-0 text-white text-sm ${selectedTime === time && "bg-gradient-to-tr from-blue to-sky-400 hover:bg-gradient-to-tr"}`} onClick={() => setSelectedTime(time)}>{time}</button>)
-                  }
-                </div>
-            </div> :
-            <div className="flex gap-2 overflow-x-auto">
-              {
-                timeSlots.map(time => <button key={time} className={`btn w-fit bg-dark-grey hover:bg-dark-grey border-0 text-white text-sm ${selectedTime === time && "bg-gradient-to-tr from-blue to-sky-400 hover:bg-gradient-to-tr"}`} onClick={() => setSelectedTime(time)}>{time}</button>)
-              }
-            </div>  
+              <div className="flex gap-2">
+                {
+                  timeSlots.length > 0 ?
+                  <div className="flex gap-2 overflow-x-auto">
+                    <button className={`btn w-fit bg-dark-grey hover:bg-dark-grey border-0 text-white text-sm ${selectedTime === "Most" && "bg-gradient-to-tr from-blue to-sky-400 hover:bg-gradient-to-tr"}`} onClick={() => setSelectedTime("Most")}>Most</button>
+                    <div className="flex gap-2 overflow-x-auto">
+                      {
+                        timeSlots.map(time => <button key={time} className={`btn w-fit bg-dark-grey hover:bg-dark-grey border-0 text-white text-sm ${selectedTime === time && "bg-gradient-to-tr from-blue to-sky-400 hover:bg-gradient-to-tr"}`} onClick={() => setSelectedTime(time)}>{time}</button>)
+                      }
+                    </div>
+                  </div> :
+                  <div className="flex w-full justify-center items-center">
+                    <span className="text-gray-300 font-normal">A mai napra már nem tudsz asztalt foglalni</span>
+                  </div>
+                }
+              </div> :
+              <div className="flex gap-2 overflow-x-auto">
+                {
+                  timeSlots.map(time => <button key={time} className={`btn w-fit bg-dark-grey hover:bg-dark-grey border-0 text-white text-sm ${selectedTime === time && "bg-gradient-to-tr from-blue to-sky-400 hover:bg-gradient-to-tr"}`} onClick={() => setSelectedTime(time)}>{time}</button>)
+                }
+              </div>
           }
       </div>
       <div className={`flex flex-col gap-3 ${!selectedTime && "opacity-50"}`}>
@@ -381,18 +387,21 @@ function ReserveTable() {
           }
         </div>
       </div>
-      <div className={`flex flex-col gap-3 ${!Object.hasOwn(selectedTable, "id") && "opacity-50"}`}>
-        <div>
-          <p className="text-lg">Barátok meghívása</p>
-          <p className={`text-gray-300 font-normal ${!Object.hasOwn(selectedTable, "id") && "hidden"}`}>Max: {selectedTable?.capacity - 1} fő</p>
+      {
+        friends.length > 0 &&
+        <div className={`flex flex-col gap-3 ${!Object.hasOwn(selectedTable, "id") && "opacity-50"}`}>
+          <div>
+            <p className="text-lg">Barátok meghívása</p>
+            <p className={`text-gray-300 font-normal ${!Object.hasOwn(selectedTable, "id") && "hidden"}`}>Max: {selectedTable?.capacity - 1} fő</p>
+          </div>
+          <div className="flex flex-col max-h-80 flex-grow gap-2 overflow-y-auto">
+            {
+              friends.every(friend => Object.hasOwn(friend, "id")) &&
+              friends.map(friend => <InviteFriendItem key={friend.id} friend={friend}/>)
+            }
+          </div>
         </div>
-        <div className="flex flex-col max-h-80 flex-grow gap-2 overflow-y-auto">
-          {
-            friends.every(friend => Object.hasOwn(friend, "id")) &&
-            friends.map(friend => <InviteFriendItem key={friend.id} friend={friend}/>)
-          }
-        </div>
-      </div>
+      }
       <div className={`flex flex-col gap-3 text-md ${!(selectedTime && Object.hasOwn(selectedTable, "id")) && "hidden"}`}>
         <p className="text-lg">Összegzés</p>
         <div className="flex flex-col bg-dark-grey rounded-lg p-2 font-normal">

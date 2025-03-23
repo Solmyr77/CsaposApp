@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { forwardRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import BackButton from "./BackButton";
 import axios from "axios";
-import { LuIdCard, LuAtSign, LuCircleUser, LuKeyRound, LuEyeClosed, LuEye, LuCheck } from "react-icons/lu";
+import { LuIdCard, LuAtSign, LuCircleUser, LuKeyRound, LuEyeClosed, LuEye, LuCheck, LuCalendar } from "react-icons/lu";
 
 function Register() {
   const navigate = useNavigate();
@@ -12,7 +12,6 @@ function Register() {
   const [username, setUsername] = useState("");
   const [password1, setPassword1] = useState("");
   const [password2, setPassword2] = useState("");
-  const [usernameError, setUsernameError] = useState(false);
   const [password1Error, setPassword1Error] = useState(false);
   const [password2Error, setPassword2Error] = useState(false);
   const [isPassword1Visible, setIsPassword1Visible] = useState(false);
@@ -125,7 +124,7 @@ function Register() {
           <input id="date" name="birthdate" value={birthDate} type="date" className="bg-dark-grey px-5 rounded-md py-2 text-white mt-0.5 mb-4 w-full focus:outline-none shadow-[0px_2px_2px_rgba(0,0,0,.5)]" max={date.getFullYear()} required onChange={(event) => {
               setBirthDate(event.target.value);
               setErrorMessage("");
-            }}/>
+          }}/>
           <label className="text-left w-full">Email cím</label>
           <div className="relative mt-0.5 mb-4">
             <input type="email" value={email} className="w-full bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none shadow-[0px_2px_2px_rgba(0,0,0,.5)]" required onChange={(event) => {
@@ -180,9 +179,9 @@ function Register() {
           <button type="submit" className="btn hover:bg-blue border-0 bg-gradient-to-t from-blue to-sky-400 text-white text-lg mt-4 shadow-[0px_2px_2px_rgba(0,0,0,.5)] h-16 w-48">Regisztráció</button>
         </form> :
         <div className="flex flex-col justify-center flex-grow items-center h-full p-4">
-          <div className="flex flex-col items-center bg-dark-grey p-4 rounded-md text-green-500 shadow-[0px_2px_2px_rgba(0,0,0,.5)]">
-            <p className="text-lg">Sikeres regisztráció!</p>
-            <LuCheck className="w-12"/>
+          <div className="flex flex-col items-center bg-dark-grey p-4 rounded-md bg-gradient-to-t from-blue to-sky-400 bg-clip-text text-transparent font-bold gap-2">
+            <p className="text-xl">Sikeres regisztráció!</p>
+            <LuCheck className="text-sky-400 h-8 w-8"/>
           </div>
         </div>
         }

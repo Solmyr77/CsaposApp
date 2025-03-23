@@ -13,7 +13,6 @@ function Provider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState({});
   const [locations, setLocations] = useState( localStorage.getItem("locations") || []);
-  const [notificationFilter, setNotificationFilter] = useState("Összes");
   const [previousRoutes, setPreviousRoutes] = useState(["/"]);
   //friends
   const [friends, setFriends] = useState([]);
@@ -68,7 +67,7 @@ function Provider({ children }) {
       console.log(error.data?.status);
       console.log(error.message);
       if (error.response?.status === 401) {
-        if (await getAccessToken()) await getProfile(id);
+        if (await getAccessToken()) return await getProfile(id);
         else {
           await logout();
           window.location.reload();
@@ -405,9 +404,7 @@ function Provider({ children }) {
       bookingConnection.off("notifyuserrejectedinvite", handleNotifyUserRejectedInvite);
       console.log("Logged out");
       setIsAuthenticated(false);
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("user");
+      localStorage.clear();
       setFriends([]);
       setBookings([]);
       setBookingsContainingUser([]);
@@ -685,8 +682,6 @@ function Provider({ children }) {
       setUser, 
       locations, 
       setLocations, 
-      notificationFilter, 
-      setNotificationFilter, 
       previousRoutes, 
       setPreviousRoutes, 
       friends, 

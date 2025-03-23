@@ -1,30 +1,37 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import BackButton from "./BackButton";
 import NotificationItem from "./NotificationItem";
-import NavItem from "./NavItem";
 import Context from "./Context";
 import TableNotification from "./TableNotification";
+import { LuFilter } from "react-icons/lu";
 
 function Notifications() {
-    const { friendRequests, notificationFilter, previousRoutes, bookingsContainingUser, user, setNewNotification } = useContext(Context);
+    const { friendRequests, previousRoutes, bookingsContainingUser, user, setNewNotification } = useContext(Context);
     const [recordsToDisplay, setRecordsToDisplay] = useState([]);
+    const [notificationFilter, setNotificationFilter] = useState("Összes");
     const eventRecords = [];
+    const [isOpen, setIsOpen] = useState(false);
+
+    const filteredBookings = useMemo(() => bookingsContainingUser.filter(booking => booking.tableGuests.find(guest => guest.id === user.id).status === "pending"), [bookingsContainingUser, user]);
 
     useEffect(() => {
         setNewNotification(false);
         switch (notificationFilter) {
             case "Összes":
-                setRecordsToDisplay(friendRequests.concat(eventRecords));
+                setRecordsToDisplay(friendRequests.concat(eventRecords).concat(filteredBookings));
                 break;
-            case "Események":
-                setRecordsToDisplay(eventRecords);
+            case "Meghívók":
+                setRecordsToDisplay(filteredBookings);
                 break;
             case "Barátkérelmek":
                 setRecordsToDisplay(friendRequests);
                 break;
+            case "Események":
+                setRecordsToDisplay(eventRecords);
+                break;
         }
-    }, [notificationFilter, friendRequests, bookingsContainingUser]);
+    }, [notificationFilter, friendRequests, filteredBookings]);
 
   return (
     <div className="w-full h-screen bg-grey py-8 px-4 text-white flex flex-col overflow-hidden">
@@ -32,17 +39,48 @@ function Notifications() {
             <BackButton/>
         </Link>
         <p className="text-xl font-bold text-center mb-4">Értesítések</p>
-        <div className="flex flex-row justify-between font-bold">
-            <NavItem key="Összes" title={"Összes"} isNotificationPage/>
-            <NavItem key="Események" title={"Események"} isNotificationPage/>
-            <NavItem key="Barátkérelmek" title={"Barátkérelmek"} isNotificationPage/>
+        <div className="flex justify-end">
+            <div className="dropdown dropdown-end">
+                <div tabIndex={0} role="button" className={`btn min-h-0 h-10 mb-1 ${notificationFilter !== "Összes" && "bg-gradient-to-tr from-blue to-sky-400"} bg-dark-grey text-white border-0 hover:bg-dark-grey`} onClick={() => setIsOpen(true)}><LuFilter/> {notificationFilter}</div>
+                {
+                    isOpen && 
+                    <ul tabIndex={0} className="dropdown-content menu bg-dark-grey font-bold rounded-box z-[1] w-52 p-2 shadow gap-1">
+                        <li onClick={() => {
+                            setNotificationFilter("Összes");
+                            setIsOpen(false);
+                        }}><a className={`${notificationFilter === "Összes" && "bg-gradient-to-tr from-blue to-sky-400"} hover:bg-gradient-to-tr from-blue to-sky-400`}>Összes</a></li>
+                        <li onClick={() => {
+                            setNotificationFilter("Meghívók");
+                            setIsOpen(false);
+                        }}><a className={`${notificationFilter === "Meghívók" && "bg-gradient-to-tr from-blue to-sky-400"} hover:bg-gradient-to-tr from-blue to-sky-400`}>Meghívók</a></li>
+                        <li onClick={() => {
+                            setNotificationFilter("Barátkérelmek");
+                            setIsOpen(false);
+                        } }><a className={`${notificationFilter === "Barátkérelmek" && "bg-gradient-to-tr from-blue to-sky-400"} hover:bg-gradient-to-tr from-blue to-sky-400`}>Barátkérelmek</a></li>
+                        <li onClick={() => {
+                            setNotificationFilter("Események");
+                            setIsOpen(false);
+                        }}><a className={`${notificationFilter === "Események" && "bg-gradient-to-tr from-blue to-sky-400"} hover:bg-gradient-to-tr from-blue to-sky-400`}>Események</a></li>
+                    </ul>
+                }
+            </div>
         </div>
-        <div className="flex flex-grow flex-col mt-4 gap-y-2 pr-1 overflow-y-auto">
+        <div className="flex flex-grow flex-col mt-4 pr-1 overflow-y-auto">
             {
-                (bookingsContainingUser.length > 0 && user.id) && bookingsContainingUser.map(booking => booking.tableGuests.find(guest => guest.id === user.id)?.status === "pending" && <TableNotification key={booking.id} booking={booking}/>)
-            }
-            {
-                recordsToDisplay.map((record, i) => <NotificationItem key={i} record={record} isFriendRequest={Object.hasOwn(record, "id")}/>)
+                recordsToDisplay.length > 0 ?
+                <div className="flex flex-grow flex-col gap-y-2 pr-1 overflow-y-auto">
+                    {
+                        recordsToDisplay.sort((a, b) => new Date(b.sentAt).getTime() - new Date(a.sentAt).getTime())
+                        .map((record, i) => {
+                            console.log(recordsToDisplay);
+                            if (record.tableId) return <TableNotification key={record.id} booking={record}/>
+                            else return <NotificationItem key={i} record={record} isFriendRequest={Object.hasOwn(record, "userId1")}/>
+                        })
+                    }
+                </div> : 
+                <div className="flex w-full h-full justify-center items-center">
+                    <span className="text-gray-300">Nincs értesítés</span>
+                </div>
             }
         </div>
     </div>

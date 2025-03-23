@@ -183,7 +183,7 @@ const PasswordModal = forwardRef((props, ref) =>  {
               </div>
           </form> : 
           <div className="flex flex-grow w-full justify-center items-center">
-            <p className="text-green-500">Sikeres módosítás!</p>
+            <p className="bg-gradient-to-t from-blue to-sky-400 bg-clip-text text-transparent">Sikeres módosítás!</p>
           </div>
         }
       </div>

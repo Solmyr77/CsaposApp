@@ -143,9 +143,14 @@ function Provider({ children }) {
       const events = await getEvents();
       data.map(location => {
         const foundOpeningHours = openingHours.find(item => item.locationId === location.id);
-        foundOpeningHours ? locations.push({...location, businessHours: foundOpeningHours}) : locations.push({...location});
+        const foundEvents = events.filter(event => event.locationId === location.id);
+        if (foundEvents.length > 0 && foundOpeningHours) locations.push({...location, businessHours: foundOpeningHours, events: foundEvents});
+        else if (foundEvents.length > 0 && !foundOpeningHours) locations.push({...location, events: foundEvents});
+        else if (foundOpeningHours) locations.push({...location, businessHours: foundOpeningHours});
+        else locations.push({...location});
       })
       setLocations(locations);
+      setEvents(events);
       return true;
     }
     catch (error) {
@@ -313,11 +318,11 @@ function Provider({ children }) {
     try {
         const config = {
             headers: {
-                Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
-                "Content-Type" : "application/json"
+              Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+              "Content-Type" : "application/json"
             },
             data: {
-                bookingId: id
+              bookingId: id
             }
         }
         const response = await axios.delete(`https://backend.csaposapp.hu/api/bookings/remove-booking`, config);
@@ -400,7 +405,7 @@ function Provider({ children }) {
       }
       const response = await axios.get(`https://backend.csaposapp.hu/api/events/`, config);
       if (response.status === 200) {
-        console.log(response.data);
+        return response.data;
       }
     }
     catch (error) {

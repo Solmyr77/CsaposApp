@@ -8,6 +8,7 @@ function InviteFriendItem({ friend }) {
     const [isInvited, setIsInvited] = useState(false);
 
     useEffect(() => {
+        !tableFriends.some(tableFriend => tableFriend.id === friend.id) && setIsInvited(false);
         if (selectedTable.capacity - 1 < tableFriends.length) {
             setIsInvited(false);
             setTableFriends([]);

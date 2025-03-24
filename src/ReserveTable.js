@@ -258,7 +258,6 @@ function ReserveTable() {
     now.setMinutes(Math.ceil(minutes / 15) * 15);
     now.setSeconds(0);
     now.setMilliseconds(0);
-    console.log(now)
 
     //Adjust latestTime if close time is after midnight
     if (Number(currentDay.open.split(":")[0]) > latestTime.getHours()) latestTime.setDate(latestTime.getDate() + 1);
@@ -332,6 +331,7 @@ function ReserveTable() {
       currentDate.setHours(Number(currentDay.open.split(":")[0]), Number(currentDay.open.split(":")[1]));
       setOpenTime(currentDate);
       setTimeSlots(generateTimeSlots(startDate));
+      setSelectedTable({});
     }
   }, [startDate, currentLocation]);
 

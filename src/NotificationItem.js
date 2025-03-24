@@ -3,7 +3,8 @@ import Context from "./Context";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import getAccessToken from "./refreshToken";
-import { LuMail } from "react-icons/lu"
+import { LuMail } from "react-icons/lu";
+import UserImage from "./UserImage";
 
 function NotificationItem({ record, isFriendRequest }) {
   const { getProfile, setFriendRequests, setFriends, setPreviousRoutes, logout } = useContext(Context);
@@ -94,8 +95,8 @@ function NotificationItem({ record, isFriendRequest }) {
       <div className="w-full min-h-16 bg-dark-grey rounded-md flex flex-col px-4 py-2">
         <div className="flex flex-col gap-1">
           <span className="text-xs text-gray-300">{formattedTime}</span>
-          <div className="flex flex-row basis-2/3 items-center">
-            <img src={`https://assets.csaposapp.hu/assets/images/${profile?.imageUrl}`} alt="" className="h-10 aspect-square rounded-full object-cover mr-2"/>
+          <div className="flex flex-row basis-2/3 gap-1 items-center">
+            <UserImage record={profile} width={"w-10"}/>
             <p className="flex flex-row items-center text-sm text-left text-nowrap basis-4/5"><span className="truncate inline-block max-w-20 mr-1 font-bold">{profile?.displayName}</span> barátnak jelölt!</p>
           </div>
           <div className="flex flex-row justify-center flex-grow gap-2 basis-1/3 h-24 items-end mt-2 text-sm">

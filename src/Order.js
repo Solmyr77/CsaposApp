@@ -33,7 +33,7 @@ function Order({ record, num }) {
           </div>
         }
         {
-          record.orderStatus === "pending" && <span className="badge bg-yellow-500 border-0 h-fit">Teljesítésre vár</span>
+          record.orderStatus === "pending" && <span className="badge bg-yellow-500 text-dark-grey border-0 h-fit">Teljesítésre vár</span>
         }
         {
           record.orderStatus === "rejected" && <span className="badge bg-red-500 border-0 h-fit">Elutasítva</span>

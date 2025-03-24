@@ -74,7 +74,7 @@ function Notifications() {
                         .map((record, i) => {
                             console.log(recordsToDisplay);
                             if (record.tableId) return <TableNotification key={record.id} booking={record}/>
-                            else return <NotificationItem key={i} record={record} isFriendRequest={Object.hasOwn(record, "userId1")}/>
+                            else return <NotificationItem key={record.id} record={record} isFriendRequest={Object.hasOwn(record, "userId1")}/>
                         })
                     }
                 </div> : 

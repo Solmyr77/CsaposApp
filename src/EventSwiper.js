@@ -8,17 +8,12 @@ const StyledSwipers = styled(Swiper)`.swiper-pagination-bullet-active{
 background-color: white;
 }`;
 
-function EventSwiper() {
+function EventSwiper({ events }) {
   return (
     <StyledSwipers pagination={{dynamicBullets: true}} modules={[Pagination, Autoplay]} spaceBetween={10} className="mySwiper mb-3 drop-shadow-[0_4px_4px_rgba(0,0,0,0.25)] w-full">
-        <SwiperSlide><EventCard/></SwiperSlide>
-        <SwiperSlide><EventCard/></SwiperSlide>
-        <SwiperSlide><EventCard/></SwiperSlide>
-        <SwiperSlide><EventCard/></SwiperSlide>
-        <SwiperSlide><EventCard/></SwiperSlide>
-        <SwiperSlide><EventCard/></SwiperSlide>
-        <SwiperSlide><EventCard/></SwiperSlide>
-        <SwiperSlide><EventCard/></SwiperSlide>
+      {
+        events.map(event => <SwiperSlide key={event.id}><EventCard record={event}/></SwiperSlide>)
+      }
     </StyledSwipers>
   );
 }

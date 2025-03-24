@@ -154,20 +154,26 @@ function Pub() {
             <div className="flex w-full justify-center">
                 <LuChevronRight className={`w-10 h-10 ${isDescriptionWrapped ? "rotate-90" : "-rotate-90"} ${isClamped ? "flex" : "hidden"}`} onClick={() => setIsDescriptionWrapped((state) => !state)}/>
             </div>
-            <TitleDivider title={"Események"}/>
-            <div className="flex flex-col gap-y-2">
-                <EventSwiper/>
-            </div>
+            {
+              currentLocation?.events?.length > 0 && (
+                <div className="flex flex-col">
+                  <TitleDivider title={"Események"}/>
+                  <div className="flex flex-col gap-y-2">
+                    <EventSwiper events={currentLocation.events}/>
+                  </div>
+                </div>
+              )
+            }
             <div className="flex justify-center items-center self-center h-full py-10">
-                <button className={`btn bg-gradient-to-tr text-xl from-blue to-sky-400 text-white border-0 w-56 h-20 hover:bg-blue disabled:bg-blue disabled:text-white disabled:opacity-50 shadow-[0_4px_4px_rgba(0,0,0,.25)]`} disabled={isOpen !== null ? !isOpen : !currentLocation?.isOpen} onClick={() => {
-                    if (isOpen !== null ? isOpen : currentLocation?.isOpen) {
-                        setPreviousRoutes((state) => {
-                            if (!state.includes(location.pathname)) return [...state, location.pathname];
-                            return state;
-                          });
-                        navigate(`/reservetable/${name}`);
-                    }
-                }}>
+              <button className={`btn bg-gradient-to-tr text-xl from-blue to-sky-400 text-white border-0 w-56 h-20 hover:bg-blue disabled:bg-blue disabled:text-white disabled:opacity-50 shadow-[0_4px_4px_rgba(0,0,0,.25)]`} disabled={isOpen !== null ? !isOpen : !currentLocation?.isOpen} onClick={() => {
+                if (isOpen !== null ? isOpen : currentLocation?.isOpen) {
+                  setPreviousRoutes((state) => {
+                    if (!state.includes(location.pathname)) return [...state, location.pathname];
+                    return state;
+                  });
+                  navigate(`/reservetable/${name}`);
+                }
+              }}>
                   Foglalok
                 </button>
             </div>

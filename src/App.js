@@ -46,7 +46,7 @@ function App() {
             <ProtectedRoute isProtected={true}>
               <Notifications />
             </ProtectedRoute>}/>
-          <Route path="/event" element={
+          <Route path="/event/:id" element={
             <ProtectedRoute isProtected={true}>
               <Event />
             </ProtectedRoute>}/>

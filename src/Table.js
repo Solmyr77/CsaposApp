@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import AvatarGroupItem from "./AvatarGroupItem";
 import { LuArrowLeft, LuReceiptText, LuX } from "react-icons/lu";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import Context from "./Context";
@@ -15,7 +14,7 @@ function Table() {
   const [receipt, setReceipt] = useState([]);
   const [total, setTotal] = useState();
 
-
+  //function for grouping orderitems
   function groupOrderItems() {
     //group orderItems
     let summary = [];
@@ -39,10 +38,12 @@ function Table() {
     setTotal(currentPrice);
   }
 
+  //group orderItems
   useEffect(() => {
     if (tableOrders && user) groupOrderItems();
   }, [tableOrders, user]);
 
+  //main useffect for fetching data
   useEffect(() => {
     if (allBookings?.length > 0) {
       const foundBooking = allBookings.find(booking => booking.id === id);

@@ -4,6 +4,7 @@ import axios from "axios";
 import getAccessToken from "./refreshToken";
 import { useNavigate } from "react-router-dom";
 import { LuPlus, LuUserPlus, LuCheck } from "react-icons/lu";
+import UserImage from "./UserImage";
 
 function AddFriendItem({ record, plusIcon }) {
   const { tableFriends, setTableFriends, currentTable, friends, logout } = useContext(Context);
@@ -11,6 +12,7 @@ function AddFriendItem({ record, plusIcon }) {
   const [isAddedToTable, setIsAddedToTable] = useState(false);
   const navigate = useNavigate();
 
+  //send friendrequest to user
   async function handleFriendRequest(id) {
     try {
       const config = {
@@ -48,7 +50,7 @@ function AddFriendItem({ record, plusIcon }) {
     !plusIcon ? (
       <div className="w-full flex flex-row justify-between relative">
         <div className="flex flex-row justify-center items-center select-none">
-            <img src={`https://assets.csaposapp.hu/assets/images/${record.imageUrl}`} alt="kép" className="w-12 aspect-square rounded-full object-cover"/>
+          <UserImage record={record} width={"w-12"}/>
             <p className="text-md ml-2 font-normal">{record.displayName}</p>
         </div>
         <div className={`flex absolute right-0 top-1/2 -translate-y-1/2 items-center ${isFriendRequestSent ? "hover:cursor-default" : "hover:cursor-pointer"}`} onClick={() => !isFriendRequestSent && handleFriendRequest(record.id)}>

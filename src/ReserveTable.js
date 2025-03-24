@@ -82,6 +82,7 @@ function ReserveTable() {
   const [bookingsForLocation, setBookingsForLocation] = useState([]);
   const [counter, setCounter] = useState(3);
   const [timeSlots, setTimeSlots] = useState([]);
+  const [openTime, setOpenTime] = useState(new Date());
   const modalRef = useRef();
   const CustomInput = forwardRef(
     ({ value, onClick, className }, ref) => (
@@ -91,6 +92,7 @@ function ReserveTable() {
     )
   );
 
+  //add friends to table booking
   async function handleAddToTable(bookingId) {
     try {
       const userIds = Array.from(tableFriends.map(friend => friend.id));
@@ -110,7 +112,7 @@ function ReserveTable() {
     catch (error) {
       if (error.response?.status === 401) {
         if (await getAccessToken()) {
-          handleAddToTable(bookingId);
+          await handleAddToTable(bookingId);
         }
         else {
           await logout();
@@ -120,6 +122,7 @@ function ReserveTable() {
     }
   }
 
+  //book selected table
   async function handleTableBooking() {
     setIsLoading(true);
     try {
@@ -171,6 +174,7 @@ function ReserveTable() {
     }
   }
 
+  //fetch bookings for current location
   async function getBookingsForLocation(id) {
     try {
       const config = {
@@ -198,6 +202,7 @@ function ReserveTable() {
     }
   }
 
+  //select todays opening and closing time
   function getDayOfTheWeek(startDate) {
     switch (startDate.getDay()) {
       case 1:
@@ -223,6 +228,7 @@ function ReserveTable() {
     }
   }
 
+  //generate timeslots in 15 mintues interval from opening time to closing time
   function generateTimeSlots(startDate) {
     setSelectedTable({});
     setSelectedTime("");
@@ -230,20 +236,20 @@ function ReserveTable() {
     const currentDay = getDayOfTheWeek(startDate);
     const slots = [];
 
-    // Parse the day's closing time
+    //parse the day's closing time
     const closingTime = new Date(startDate);
     const [closeHour, closeMinute] = currentDay.close.split(":").map(Number);
     closingTime.setHours(closeHour, closeMinute, 0, 0);
 
-    // Subtract 45 minutes from closing time
+    //subtract 45 minutes from closing time
     const latestTime = new Date(closingTime.getTime() - 45 * 60000);
 
-    // Set the starting time to now or the date's open time, whichever is later
+    // set the starting time to now or the date's open time, whichever is later
     let now = new Date();
-    if (startDate.toDateString() !== now.toDateString()) {
-      // if not today, set "now" to the opening time
+    const [openHour, openMinute] = currentDay.open.split(":").map(Number);
+    if (startDate.toDateString() !== now.toDateString() || now.getHours() < openHour) {
+      //if not today, set "now" to the opening time
       now = new Date(startDate);
-      const [openHour, openMinute] = currentDay.open.split(":").map(Number);
       now.setHours(openHour, openMinute, 0, 0);
     }
 
@@ -252,18 +258,20 @@ function ReserveTable() {
     now.setMinutes(Math.ceil(minutes / 15) * 15);
     now.setSeconds(0);
     now.setMilliseconds(0);
+    console.log(now)
 
     //Adjust latestTime if close time is after midnight
     if (Number(currentDay.open.split(":")[0]) > latestTime.getHours()) latestTime.setDate(latestTime.getDate() + 1);
 
     // Generate time slots from now to 45 minutes before closing
     while (now < latestTime) {
-      slots.push(now.toTimeString().slice(0, 5));
+      slots.push(now);
       now = new Date(now.getTime() + 15 * 60000);
     }
     return slots;
   }
 
+  //handle successful booking, essential function calls
   useEffect(() => {
     if (isBooked) {
       setIsLoading(false);
@@ -301,6 +309,7 @@ function ReserveTable() {
     }
   }, [locations, isBooked]);
 
+  //add bookings to tables as a new property
   useEffect(() => {
     if (locationTables?.length > 0 && bookingsForLocation.length > 0) {
       for (let locationTable of locationTables) {
@@ -315,8 +324,15 @@ function ReserveTable() {
     }
   }, [locationTables, bookingsForLocation]);
 
+  //set todays opening time, generate timeslots
   useEffect(() => {
-    currentLocation.businessHours && setTimeSlots(generateTimeSlots(startDate));
+    if (startDate, currentLocation.businessHours) {
+      const currentDay = getDayOfTheWeek(startDate);
+      const currentDate = new Date();
+      currentDate.setHours(Number(currentDay.open.split(":")[0]), Number(currentDay.open.split(":")[1]));
+      setOpenTime(currentDate);
+      setTimeSlots(generateTimeSlots(startDate));
+    }
   }, [startDate, currentLocation]);
 
   return (
@@ -347,13 +363,15 @@ function ReserveTable() {
             startDate.getDate() === new Date().getDate() ?
               <div className="flex gap-2">
                 {
-                  timeSlots.length > 0 ?
-                  <div className="flex gap-2 overflow-x-auto">
-                    <button className={`btn w-fit bg-dark-grey hover:bg-dark-grey border-0 text-white text-sm ${selectedTime === "Most" && "bg-gradient-to-tr from-blue to-sky-400 hover:bg-gradient-to-tr"}`} onClick={() => setSelectedTime("Most")}>Most</button>
+                  timeSlots.length > 0  ?
+                  <div className="flex gap-2 overflow-x-auto"> 
+                    {
+                      openTime.getTime() < new Date().getTime() && <button className={`btn w-fit bg-dark-grey hover:bg-dark-grey border-0 text-white text-sm ${selectedTime === "Most" && "bg-gradient-to-tr from-blue to-sky-400 hover:bg-gradient-to-tr"}`} onClick={() => setSelectedTime("Most")}>Most</button>
+                    }
                     <div className="flex gap-2 overflow-x-auto">
-                      {
-                        timeSlots.map(time => <button key={time} className={`btn w-fit bg-dark-grey hover:bg-dark-grey border-0 text-white text-sm ${selectedTime === time && "bg-gradient-to-tr from-blue to-sky-400 hover:bg-gradient-to-tr"}`} onClick={() => setSelectedTime(time)}>{time}</button>)
-                      }
+                    {
+                      timeSlots.map((time, i) => <button key={i} className={`btn w-fit bg-dark-grey hover:bg-dark-grey border-0 text-white text-sm ${selectedTime === time.toTimeString().slice(0, 5) && "bg-gradient-to-tr from-blue to-sky-400 hover:bg-gradient-to-tr"}`} onClick={() => setSelectedTime(time.toTimeString().slice(0,5))}>{time.toTimeString().slice(0,5)}</button>)
+                    }
                     </div>
                   </div> :
                   <div className="flex w-full justify-center items-center">
@@ -363,7 +381,7 @@ function ReserveTable() {
               </div> :
               <div className="flex gap-2 overflow-x-auto">
                 {
-                  timeSlots.map(time => <button key={time} className={`btn w-fit bg-dark-grey hover:bg-dark-grey border-0 text-white text-sm ${selectedTime === time && "bg-gradient-to-tr from-blue to-sky-400 hover:bg-gradient-to-tr"}`} onClick={() => setSelectedTime(time)}>{time}</button>)
+                  timeSlots.map((time, i) => <button key={i} className={`btn w-fit bg-dark-grey hover:bg-dark-grey border-0 text-white text-sm ${selectedTime === time.toTimeString().slice(0, 5) && "bg-gradient-to-tr from-blue to-sky-400 hover:bg-gradient-to-tr"}`} onClick={() => setSelectedTime(time.toTimeString().slice(0,5))}>{time.toTimeString().slice(0,5)}</button>)
                 }
               </div>
           }

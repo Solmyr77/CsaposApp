@@ -105,10 +105,11 @@ function PubMenu() {
               <div className="avatar-group -space-x-3">
                 {
                   (currentBooking.bookerId && user) && user.id === currentBooking.bookerId ?
-                    <UserImage width={"w-7"} record={user} border/> : (
-                      (friends.length > 0 && currentBooking.bookerId) &&
-                      <UserImage width={"w-7"} border record={friends.find(friend => friend.id === currentBooking.bookerId)}/>
-                    )
+                  <UserImage width={"w-7"} record={user} border/> : 
+                  (
+                    (friends.length > 0 && currentBooking.bookerId) &&
+                    <UserImage width={"w-7"} border record={friends.find(friend => friend.id === currentBooking.bookerId)}/>
+                  )
                 }
                 {
                   currentBooking?.tableGuests?.map((friend, i) => i < 3 ? friend.status === "accepted" && <UserImage key={friend.id} width={"w-7"} record={friend} border/> : (
@@ -125,7 +126,7 @@ function PubMenu() {
             </button>
             {
               tableOrders?.length > 0 &&
-              <div className="h-4 w-fit bg-yellow-500 absolute -right-1 -top-1 rounded-full flex justify-center items-center p-1">
+              <div className="h-4 w-fit bg-yellow-500 text-dark-grey absolute -right-1 -top-1 rounded-full flex justify-center items-center p-1">
                 <span>{tableOrders.length}</span>
               </div>
             }

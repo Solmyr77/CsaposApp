@@ -1,4 +1,4 @@
-import React, { forwardRef, useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import BackButton from "./BackButton";
 import axios from "axios";
@@ -17,7 +17,7 @@ function Register() {
   const [isPassword1Visible, setIsPassword1Visible] = useState(false);
   const [isPassword2Visible, setIsPassword2Visible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [isSucceeded, setIsSucceeded] = useState(false);
+  const modalRef = useRef();
   const date = new Date();
   
   function validateBirthDate() {
@@ -76,11 +76,14 @@ function Register() {
   function validateForm(event) {
     event.preventDefault();
     if (validateBirthDate() && validateInput() && checkPasswords(password1, password2)) {
-      const register = async() => {
+      const register = async () => {
         if (await handleRegister()) {
+          modalRef.current.inert = true;
+          modalRef.current.showModal();
+          modalRef.current.inert = false;
           setErrorMessage("");
-          setIsSucceeded(true);
           setTimeout(() => {
+            modalRef.current.close();
             navigate("/login");
           }, 1000);
         }
@@ -109,9 +112,7 @@ function Register() {
       </Link>
       <div className="flex items-center flex-grow flex-col">
         <h1 className="font-bold text-3xl">Regisztráció</h1>
-        {
-          !isSucceeded ?
-          <form className="flex flex-col mt-8 justify-evenly items-center" onSubmit={(event) => validateForm(event)}>
+        <form className="flex flex-col mt-8 justify-evenly items-center" onSubmit={(event) => validateForm(event)}>
           <label className="text-left w-full">Teljes név</label>
           <div className="relative mt-0.5 mb-4">
             <input type="text" name="fullname" value={legalName} className="w-full bg-dark-grey pl-5 pr-10 py-2 rounded-md font-normal focus:outline-none shadow-[0px_2px_2px_rgba(0,0,0,.5)]" required onChange={(event) => {
@@ -176,16 +177,23 @@ function Register() {
             }
           </div>
           <p id="errorText" className="text-center text-red-500 invisible text-wrap max-w-44" style={{"visibility" : `${errorMessage !== "" ? "visible" : "hidden"}`}}>{errorMessage}</p>
-          <button type="submit" className="btn hover:bg-blue border-0 bg-gradient-to-t from-blue to-sky-400 text-white text-lg mt-4 shadow-[0px_2px_2px_rgba(0,0,0,.5)] h-16 w-48">Regisztráció</button>
-        </form> :
-        <div className="flex flex-col justify-center flex-grow items-center h-full p-4">
-          <div className="flex flex-col items-center bg-dark-grey p-4 rounded-md bg-gradient-to-t from-blue to-sky-400 bg-clip-text text-transparent font-bold gap-2">
-            <p className="text-xl">Sikeres regisztráció!</p>
-            <LuCheck className="text-sky-400 h-8 w-8"/>
-          </div>
-        </div>
-        }
+        <button type="submit" className="btn hover:bg-blue border-0 bg-gradient-to-t from-blue to-sky-400 text-white text-lg mt-4 shadow-[0px_2px_2px_rgba(0,0,0,.5)] h-16 w-48">Regisztráció</button>
+        </form>
       </div>
+      <dialog className="modal" ref={modalRef}>
+        <div className="modal-box flex flex-col items-center bg-grey">
+          <p className="bg-gradient-to-t from-blue to-sky-400 text-transparent bg-clip-text text-lg font-bold">Sikeres regisztráció!</p>
+          <LuCheck className="fill-none stroke-[url(#gradient)] h-12 w-12"/>
+        </div>
+      </dialog>
+      <svg width="0" height="0">
+        <defs>
+          <linearGradient id="gradient" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#3b82f6" />
+            <stop offset="100%" stopColor="#38bdf8" />
+          </linearGradient>
+        </defs>
+      </svg>
     </div>
   )
 }

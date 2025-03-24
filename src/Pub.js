@@ -22,6 +22,7 @@ function Pub() {
   const textRef = useRef(null);
   const navigate = useNavigate();
 
+  //function for checking if pub's description is clamped or not
   const checkIfClamped = () => {
     const element = textRef.current;
     if (element) {
@@ -32,6 +33,7 @@ function Pub() {
     }
   };
 
+  //get current days opening and closing time
   function getDayOfTheWeek(foundLocation) {
     switch (new Date().getDay()) {
       case 1:
@@ -57,6 +59,7 @@ function Pub() {
     }
   }
 
+  //timeouts for closing/opening pub
   function handleBusinessHours(foundLocation) {
     const foundDay = getDayOfTheWeek(foundLocation);
     setCurrentDay(foundDay);
@@ -65,7 +68,7 @@ function Pub() {
     const openDate = new Date();
     openDate.setHours(Number(foundDay.open.split(":")[0]), Number(foundDay.open.split(":")[1]), 0);
 
-    if (closeDate.getTime() < new Date().getTime()) {
+    if (closeDate.getTime() < new Date().getTime() || openDate.getTime() > new Date().getTime()) {
       setIsOpen(false);
       const timeout = setTimeout(() => {
           setIsOpen(true);
@@ -81,6 +84,7 @@ function Pub() {
     }
   }
 
+  //main useefect for setting current location and business hours
   useEffect(() => {
     if (locations.length > 0) {
       const foundLocation = locations.find(location => location.name === name);
@@ -112,19 +116,19 @@ function Pub() {
                 <p className="text-center text-[14px]">{currentLocation?.address || "3599 Sajószöged, Petőfi út 2."}</p>
             </div>
             {
-                Number(currentLocation?.rating) > 0 ?
-                (
-                    <div className="flex flex-row justify-between w-full">
-                        <Rating readOnly precision={0.5} value={Number(currentLocation?.rating)}/>
-                        <p>1 értékelés</p>
-                    </div>
-                ) :
-                (
-                    <div className="flex flex-row justify-between w-full">
-                        <Rating readOnly value={0} sx={{"& .MuiSvgIcon-root" : { fill: "#d1d5db" }}}/>
-                        <p className="text-gray-300">Nincs értékelés</p>
-                    </div>
-                )
+              Number(currentLocation?.rating) > 0 ?
+              (
+                <div className="flex flex-row justify-between w-full">
+                  <Rating readOnly precision={0.5} value={Number(currentLocation?.rating)}/>
+                  <p>1 értékelés</p>
+                </div>
+              ) :
+              (
+                <div className="flex flex-row justify-between w-full">
+                  <Rating readOnly value={0} sx={{"& .MuiSvgIcon-root" : { fill: "#d1d5db" }}}/>
+                  <p className="text-gray-300">Nincs értékelés</p>
+                </div>
+              )
             }
             <div className="flex flex-row justify-between items-center max-w-full mb-2 pt-2">
                 <div className="flex flex-row items-center">

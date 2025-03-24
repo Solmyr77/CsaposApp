@@ -13,6 +13,7 @@ function Provider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState({});
   const [locations, setLocations] = useState( localStorage.getItem("locations") || []);
+  const [events, setEvents] = useState([]);
   const [previousRoutes, setPreviousRoutes] = useState(["/"]);
   //friends
   const [friends, setFriends] = useState([]);
@@ -139,6 +140,7 @@ function Provider({ children }) {
       const data = await response.data;
       let locations = [];
       const openingHours = await getBusinessHours();
+      const events = await getEvents();
       data.map(location => {
         const foundOpeningHours = openingHours.find(item => item.locationId === location.id);
         foundOpeningHours ? locations.push({...location, businessHours: foundOpeningHours}) : locations.push({...location});
@@ -391,6 +393,29 @@ function Provider({ children }) {
     }
   }
 
+  async function getEvents() {
+    try {
+      const config = {
+        headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` }
+      }
+      const response = await axios.get(`https://backend.csaposapp.hu/api/events/`, config);
+      if (response.status === 200) {
+        console.log(response.data);
+      }
+    }
+    catch (error) {
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) {
+          await getEvents();
+        }
+        else {
+          await logout();
+          window.location.reload();
+        }
+      } 
+    }
+  }
+  
   const logout = async () => {
     const response = await axios.post("https://backend.csaposapp.hu/api/auth/logout", {refreshToken : localStorage.getItem("refreshToken")});
     if (response.status === 204) {
@@ -423,6 +448,7 @@ function Provider({ children }) {
           getFriends();
           getFriendRequests();
           getTables();
+          //getEvents();
           Promise.all([await getBookingsByUser(), await getBookingsContainingUser()]).then((res) => {
             console.log(res.flat());
             setAllBookings(res.flat());
@@ -461,6 +487,11 @@ function Provider({ children }) {
     console.log("New incoming friend request!", message);
       setFriendRequests(state => [...state, {...message.payload, sentAt: message.sentAt}]);
       setNewNotification(true);
+  }, []);
+
+  const handleNotifyFriendshipRemoved = useCallback((message) => {
+    console.log("Removed friendship!", message);
+    setFriends(state => state.filter(friend => friend.id !== message.payload));
   }, []);
 
   const handleNotifyFriendRequestAccepted = useCallback((message) => {
@@ -521,17 +552,27 @@ function Provider({ children }) {
     });
   }, []);
 
+  const handleNotifyOrderCreated = useCallback((message) => {
+    console.log("New order created", message);
+    setTableOrders(state => {
+      if (!state.some(tableOrder => tableOrder.id === message.order.id)) return [...state, message.order];
+      return state;
+    })
+  }, []);
+
   function registerNotificationListeners() {
     // Remove existing listeners to avoid duplicates
     notificationConnection.off("notifyaddedtotable", handleNotifyAddedToTable);
     notificationConnection.off("notifyincomingfriendrequest", handleNotifyIncomingFriendRequest);
     notificationConnection.off("notifyfriendrequestaccepted", handleNotifyFriendRequestAccepted);
+    notificationConnection.off("notifyremovedfriendship", handleNotifyFriendshipRemoved);
     console.log("Old listeners have been cleaned up.");
   
     // Register new listeners
     notificationConnection.on("notifyaddedtotable", handleNotifyAddedToTable);
     notificationConnection.on("notifyincomingfriendrequest", handleNotifyIncomingFriendRequest);
     notificationConnection.on("notifyfriendrequestaccepted", handleNotifyFriendRequestAccepted);
+    notificationConnection.on("notifyremovedfriendship", handleNotifyFriendshipRemoved);
     console.log("New listeners have been set.");
   }
 
@@ -609,6 +650,7 @@ function Provider({ children }) {
       notificationConnection.off("notifyaddedtotable", handleNotifyAddedToTable);
       notificationConnection.off("notifyincomingfriendrequest", handleNotifyIncomingFriendRequest);
       notificationConnection.off("notifyfriendrequestaccepted", handleNotifyFriendRequestAccepted);
+      notificationConnection.off("notifyremovedfriendship", handleNotifyFriendshipRemoved);
     };
   }, [localStorage.getItem("accessToken")]);
 
@@ -625,11 +667,13 @@ function Provider({ children }) {
     bookingConnection.off("notifybookingdeleted", handleNotifyBookingDeleted);
     bookingConnection.off("notifyuseracceptedinvite", handleNotifyUserAcceptedInvite);
     bookingConnection.off("notifyuserrejectedinvite", handleNotifyUserRejectedInvite);
+    bookingConnection.off("notifyordercreated", handleNotifyOrderCreated);
     console.log("CLEARED BOOKING DELETED LISTENER");
 
     bookingConnection.on("notifybookingdeleted", handleNotifyBookingDeleted);
     bookingConnection.on("notifyuseracceptedinvite", handleNotifyUserAcceptedInvite);
     bookingConnection.on("notifyuserrejectedinvite", handleNotifyUserRejectedInvite);
+    bookingConnection.on("notifyordercreated", handleNotifyOrderCreated);
     console.log("ADDED BOOKING DELETED LISTENER");
   }
 
@@ -667,6 +711,7 @@ function Provider({ children }) {
       bookingConnection.off("notifybookingdeleted", handleNotifyBookingDeleted);
       bookingConnection.off("notifyuseracceptedinvite", handleNotifyUserAcceptedInvite);
       bookingConnection.off("notifyuserrejectedinvite", handleNotifyUserRejectedInvite);
+      bookingConnection.off("notifyordercreated", handleNotifyOrderCreated);
     };
   }, [allBookings]);
 
@@ -681,7 +726,8 @@ function Provider({ children }) {
       user,
       setUser, 
       locations, 
-      setLocations, 
+      setLocations,
+      events,
       previousRoutes, 
       setPreviousRoutes, 
       friends, 

@@ -79,7 +79,7 @@ function Login() {
 
         <p id="errorText" className={`text-center text-red-500 text-wrap max-w-40 ${errorMessage !== "" ? "visible" : "invisible"}`}>{errorMessage}</p>
 
-        <button type="submit" className="btn bg-yellow border-0 text-black text-lg h-16 w-44 mt-4" disabled={errorMessage}>Bejelentkezés</button>
+        <button type="submit" className="btn bg-yellow border-0 text-black text-lg h-16 w-44 mt-4 disabled:!bg-yellow disabled:opacity-50" disabled={errorMessage}>Bejelentkezés</button>
       </form>
     </div>
   );

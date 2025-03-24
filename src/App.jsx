@@ -9,12 +9,21 @@ import StockMenu from './StockMenu';
 import StatisticsMenu from './StatisticsMenu'
 import ExtraMenu from './ExtraMenu';
 import Layout from './Layout';
+import TableView from './TableView';
 
 function App() {
   return (
     <HashRouter>
       <Provider>
         <Routes>
+          <Route path="/tables/:number" element={
+            <ProtectedRoute isProtected={true}>
+              <Layout>
+                <TableView />
+              </Layout>
+            </ProtectedRoute>}
+          />
+
           <Route path="/tables" element={
             <ProtectedRoute isProtected={true}>
               <Layout>

@@ -46,7 +46,7 @@ function Profile() {
         { friends.length > 0 ? 
           friends.sort((a, b) => a.displayName?.localeCompare(b.displayName)).map(friend =>
             {
-              if(friend === friends[friends.length-1]) {
+              if(friend.id === friends[friends.length-1].id) {
                 return (
                   <div key={friend.id} className="flex hover:cursor-pointer" onClick={() => {
                     friendModalRef.current.inert = true;
@@ -66,7 +66,7 @@ function Profile() {
                   setSelectedFriend(friend);
                   }}>
                   <Friend record={friend} isVertical={true}/>
-                  <div className="h-4/5 w-[2px] rounded-md bg-dark-grey"></div>
+                  <div className="h-[4.5rem] w-[2px] rounded-md bg-dark-grey"></div>
                 </div>
               )
             }):

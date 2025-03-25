@@ -6,32 +6,22 @@ import { Navigate } from "react-router-dom";
 
 function Provider({ children }) {
   //basic states
-  const [navState, setNavState] = useState("Összes");
   const [menuState, setMenuState] = useState("Tables");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState({});
   const [userId, setUserId] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [locations, setLocations] = useState( localStorage.getItem("locations") || []);
-  const [notificationFilter, setNotificationFilter] = useState("Összes");
-  const [previousRoutes, setPreviousRoutes] = useState(["/"]);
   const [managerLocation, setManagerLocation] = useState(null);
-  //friends
-  const [friends, setFriends] = useState([]);
-  const [friendRequests, setFriendRequests] = useState([]);
-  //table reservation
-  const [tableFriends, setTableFriends] = useState([]);
+  //table states 
   const [tables, setTables] = useState([]);
   const [selectedTable, setSelectedTable] = useState({});
   const [bookings, setBookings] = useState([]);
-  const [bookingsContainingUser, setBookingsContainingUser] = useState([]);
-  //order
-  const [order, setOrder] = useState([]);
+  //order states
   const [locationProducts, setLocationProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState({});
   const [categories, setCategories] = useState([]);
   const [orders, setOrders] = useState([]);
-  const [currentBooking, setCurrentBooking] = useState({});
   
   async function getProfile(id, profile) {
     try {
@@ -55,8 +45,19 @@ function Provider({ children }) {
       }
     }
     catch (error) {
-      console.log(error.data?.status);
-      console.log(error.message);
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) {
+          await getProfile(id, profile ? profile : null);
+        }
+        else {
+          await logout();
+          window.location.reload();
+          return false;
+        }
+      } 
+      else {
+        return false;
+      }
     }
   }
 
@@ -74,47 +75,19 @@ function Provider({ children }) {
       await getLocation(data.locationId);
     }
     catch (error) {
-      console.log(error.data?.status);
-      console.log(error.message);
-    }
-  }
-
-  async function getFriends() {
-    try {
-      const config = {
-        headers: { 
-          Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
-          "Cache-Content": "no-cache"
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) {
+          await getManagerLocation();
         }
-      }
-      const response = await axios.get(`https://backend.csaposapp.hu/api/friends/list`, config);
-      const data = response.data;
-      if (data.friends.length > 0) {
-        const updatedFriends = [];
-        for (let friend of data.friends) {
-          const friendProfile = await getProfile(friend);
-          data.friends.every(record => record.id !== friend) && updatedFriends.push(friendProfile);
+        else {
+          await logout();
+          window.location.reload();
+          return false;
         }
-        setFriends(updatedFriends);
+      } 
+      else {
+        return false;
       }
-    }
-    catch (error) {
-      console.log(error.data?.status);
-      console.log(error.message);
-    }
-  }
-
-  async function getFriendRequests() {
-    try {
-      const config = {
-        headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` }
-      }
-      const response = await axios.get("https://backend.csaposapp.hu/api/friends/requests", config);
-      const data = response.data;
-      setFriendRequests(data.pendingRequests);
-    }
-    catch (error) {
-      console.log(error);
     }
   }
 
@@ -129,30 +102,9 @@ function Provider({ children }) {
       setManagerLocation(data);
     }
     catch (error) {
-      console.log(error);
-    }
-  }
-
-  async function getLocations() {
-    try {
-      const config = {
-        headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` }
-      }
-      const response = await axios.get("https://backend.csaposapp.hu/api/locations", config);
-      const data = await response.data;
-      let locations = [];
-      const openingHours = await getBusinessHours();
-      data.map(location => {
-        const foundOpeningHours = openingHours.find(item => item.locationId === location.id);
-        foundOpeningHours ? locations.push({...location, businessHours: foundOpeningHours}) : locations.push({...location});
-      })
-      setLocations(locations);
-      return true;
-    }
-    catch (error) {
       if (error.response?.status === 401) {
         if (await getAccessToken()) {
-          await getLocations();
+          await getLocation(id);
         }
         else {
           await logout();
@@ -167,35 +119,6 @@ function Provider({ children }) {
   }
 
   async function getBusinessHours() {
-      try {
-        const config = {
-          headers: { 
-            Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
-            "Cache-Content": "no-cache"
-          }
-        }
-        const response = await axios.get(`https://backend.csaposapp.hu/api/business-hours/`, config);
-        const data = await response.data;
-        if (response.status === 200) return data;
-      }
-      catch (error) {
-        if (error.response?.status === 401) {
-          if (await getAccessToken()) {
-            await getBusinessHours();
-          }
-          else {
-            await logout();
-            window.location.reload();
-            return false;
-          }
-        } 
-        else {
-          return false;
-        }
-      }
-    }
-
-  async function getTables() {
     try {
       const config = {
         headers: { 
@@ -203,13 +126,24 @@ function Provider({ children }) {
           "Cache-Content": "no-cache"
         }
       }
-      const response = await axios.get(`https://backend.csaposapp.hu/api/tables`, config);
-      const data = response.data;
-      if (response.status === 200 && data.length > 0) setTables(data);
+      const response = await axios.get(`https://backend.csaposapp.hu/api/business-hours/`, config);
+      const data = await response.data;
+      if (response.status === 200) return data;
     }
     catch (error) {
-      console.log(error.response?.status);
-      console.log(error.message);
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) {
+          await getBusinessHours();
+        }
+        else {
+          await logout();
+          window.location.reload();
+          return false;
+        }
+      } 
+      else {
+        return false;
+      }
     }
   }
 
@@ -281,52 +215,32 @@ function Provider({ children }) {
     }
   }
 
-  async function getBookingsContainingUser() {
-    try {
-      const config = {
-        headers: { 
-          Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
-          "Cache-Content": "no-cache"
-        }
-      }
-      const response = await axios.get(`https://backend.csaposapp.hu/api/bookings/bookings-containing-user`, config);
-      const data = await response.data;
-      if (response.status === 200 && data.length > 0) {
-        setBookingsContainingUser(data);
-      }
-    }
-    catch (error) {
-      console.log(error.response?.status);
-      console.log(error.message);
-    }
-  }
-
   async function removeBooking(id) {
     try {
-        const config = {
-            headers: {
-                Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
-                "Content-Type" : "application/json"
-            },
-            data: {
-                bookingId: id
-            }
+      const config = {
+        headers: {
+          Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+          "Content-Type" : "application/json"
+        },
+        data: {
+          bookingId: id
         }
-        const response = await axios.delete(`https://backend.csaposapp.hu/api/bookings/remove-booking`, config);
-        if (response.status === 204) setBookings(state => state.filter(record => record.id !== id));
-        return true;
+      }
+      const response = await axios.delete(`https://backend.csaposapp.hu/api/bookings/remove-booking`, config);
+      if (response.status === 204) setBookings(state => state.filter(record => record.id !== id));
+      return true;
     } 
     catch (error) {
-        console.log(error.message);
-        if (error.response?.status === 401) {
-            if (await getAccessToken()) {
-                await removeBooking(id);
-            }
-            else {
-              await logout();
-              <Navigate to={"/login"}/>
-            }
+      console.log(error.message);
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) {
+          await removeBooking(id);
         }
+        else {
+          await logout();
+          <Navigate to={"/login"}/>
+        }
+      }
     }
   }
 
@@ -411,9 +325,7 @@ function Provider({ children }) {
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("user");
       setUserId("");
-      setFriends([]);
       setBookings([]);
-      setBookingsContainingUser([]);
     }
   }
 
@@ -424,14 +336,8 @@ function Provider({ children }) {
        const fetch = async () => {
           await getProfile(userId, "user");
           await getManagerLocation();
-          getLocations();
-          getFriends();
-          getFriendRequests();
-          getTables();
-          getBookingsByUser();
-          getBookingsContainingUser();
         }
-        fetch()
+        fetch();
       }
     }
   }, [localStorage.getItem("accessToken"), userId, userRole]);
@@ -444,8 +350,6 @@ function Provider({ children }) {
 
   return (
     <Context.Provider value={{ 
-      navState, 
-      setNavState, 
       menuState, 
       setMenuState, 
       isAuthenticated, 
@@ -458,37 +362,19 @@ function Provider({ children }) {
       setManagerLocation,
       locations, 
       setLocations, 
-      notificationFilter, 
-      setNotificationFilter, 
-      previousRoutes, 
-      setPreviousRoutes, 
-      friends, 
-      setFriends, 
-      friendRequests, 
-      setFriendRequests, 
       tables, 
-      tableFriends, 
       selectedTable,
       setSelectedTable,
-      order, 
-      setOrder,
       bookings,
       setBookings,
-      bookingsContainingUser,
-      setBookingsContainingUser,
       locationProducts,
       orders,
       categories,
       selectedProduct,
       setSelectedProduct,
-      currentBooking,
-      setCurrentBooking,
       removeBooking,
       getLocationTables,
-      setTableFriends, 
       getProfile,
-      getBookingsByUser,
-      getBookingsContainingUser,
       getProductsByLocation,
       getOrdersByTable,
       setUserId,

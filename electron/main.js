@@ -17,6 +17,7 @@ function createWindow() {
       // NOTE: If you use preload scripts or enable Node Integration,
       // carefully handle security. For now, let's keep it off.
       nodeIntegration: false,
+      webSecurity: false
     },
   });
 

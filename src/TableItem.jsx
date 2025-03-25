@@ -1,15 +1,20 @@
-import { React, useContext } from 'react';
-import { BsPeople } from "react-icons/bs";
-import { FiClock } from "react-icons/fi";
-import { RiBeerFill } from "react-icons/ri";
+import { React, useContext, useEffect, useState } from 'react';
+import { LuUsers, LuClock } from "react-icons/lu";
+import { RiBeerLine } from "react-icons/ri";
 import Context from "./Context";
 import { Link } from "react-router-dom";
 
 export default function TableItem({ table }) {
     const { bookings } = useContext(Context);
+    const [currentBooking, setCurrentBooking] = useState({});
 
     // Find the booking associated with this table
-    const booking = bookings.find(booking => booking.tableId === table.id);
+    useEffect(() => {
+        if (bookings.length > 0 && table.id) {
+            const foundBooking = bookings.find(booking => booking.tableId === table.id);
+            setCurrentBooking(foundBooking);
+        }
+    }, [bookings, table]);
 
     // Function to format ISO time to HH:MM
     const formatTime = (isoString) => {
@@ -22,40 +27,34 @@ export default function TableItem({ table }) {
 
     return (
         <Link to={`/tables/${table.number}`}>
-            <div className={`flex flex-col aspect-square basis-1/5 bg-white border-[3px] ${table.isBooked ? 'border-blue' : 'border-emerald-600'} gap-4 rounded-lg`}>
-                <div className='flex justify-around items-center w-full py-4'>
-                    <h1 className={`text-center text-5xl font-bold text-black ${table.isBooked ? '' : ''}`}>{table.number}</h1>
-
-                    {table.isBooked ? (
-                        <h3 className='text-blue ring-blue px-3 py-1 ring-1 rounded-full bg-blue bg-opacity-15'>
-                            Foglalt
-                        </h3>
-                    ) : (
-                        <h3 className='text-emerald-600 ring-emerald-600 px-3 py-1 ring-1 rounded-full bg-emerald-600 bg-opacity-15'>
-                            Elérhető
-                        </h3>
-                    )}
+            <div className={`flex flex-col aspect-square bg-white border-[3px] shadow gap-4 rounded-lg p-4 justify-between`}>
+                <div className='flex justify-between items-center w-full'>
+                    <h1 className={`text-center text-5xl font-bold`}>{table.number}</h1>
+                    <div className="badge badge-success badge-lg font-bold">
+                        Foglalható
+                    </div>
                 </div>
 
-                <div className='flex flex-col justify-center items-center px-5'>
+                <div className='flex flex-col flex-grow justify-center items-center'>
                     <h2 className="flex justify-start items-center text-center text-xxl text-gray-500 w-full ml-4">
-                        <BsPeople className='mr-4' /> {table.isBooked ? table.tableGuests.length + 1 : table.tableGuests.length}/{table.capacity}
+                        <LuUsers className='mr-4' /> {table.isBooked ? table.tableGuests.length + 1 : table.tableGuests.length}/{table.capacity}
                     </h2>
 
-                    {booking ? (
+                    {currentBooking ? (
                         <h2 className="flex justify-start items-center text-center text-xxl text-gray-500 w-full ml-4 my-2">
-                            <FiClock className='mr-4' /> {formatTime(booking.bookedFrom)}
+                            <LuClock className='mr-4' /> {formatTime(currentBooking.bookedFrom)}
                         </h2>
                     ) : (
                         <h2 className="flex justify-start items-center text-center text-xxl text-gray-500 w-full ml-4 my-2">
-                            <FiClock className='mr-4 mt-[0.4rem]' /> -
+                            <LuClock className='mr-4 mt-[0.4rem]' /> -
                         </h2>
                     )}
 
-                    <h2 className="flex justify-start items-center text-center text-xxl text-black w-full ml-4">
-                        <RiBeerFill className='mr-4' /> {"16.000 Ft"}
-                    </h2>
                 </div>
+                
+                <span className="flex justify-start font-bold items-center text-xl w-full ml-4">
+                    Fogyasztás: 10.000 Ft
+                </span>
             </div>
         </Link>
     );

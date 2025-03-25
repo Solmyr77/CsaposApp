@@ -36,7 +36,7 @@ export default function TableMenu() {
     }, [managerLocation]);
 
     return (
-        <div className='grid lg:grid-cols-4 gap-4 overflow-auto p-4'>
+        <div className='grid lg:grid-cols-4 grid-cols-3 gap-4 overflow-auto p-4'>
             {tables?.map((table, index) => <TableItem key={index} table={table} />)}
         </div>
     );

@@ -62,7 +62,7 @@ function Login() {
 
         <label className="text-left w-full text-field">Felhasználónév</label>
         <div className="relative mt-0.5 mb-4">
-          <input name="username" type="text" value={username} className="w-full text-black bg-field pl-5 pr-10 py-2 font-normal focus:outline-none" required onChange={(event) => {
+          <input name="username" type="text" value={username} className="w-full text-black bg-field pl-5 pr-10 py-2 font-normal focus:outline-hidden" required onChange={(event) => {
             setErrorMessage("");
             setUsername(event.target.value);
           }} />
@@ -70,7 +70,7 @@ function Login() {
 
         <label className="text-left w-full text-field">Jelszó</label>
         <div className="relative mt-0.5 mb-4">
-          <input name="password" type={`${isPasswordVisible ? "text" : "password"}`} value={password} className="w-full text-black bg-field pl-5 pr-10 py-2 font-normal focus:outline-none" required onChange={(event) => {
+          <input name="password" type={`${isPasswordVisible ? "text" : "password"}`} value={password} className="w-full text-black bg-field pl-5 pr-10 py-2 font-normal focus:outline-hidden" required onChange={(event) => {
             setErrorMessage("");
             password === "" && setIsPasswordVisible(false);
             setPassword(event.target.value);
@@ -79,7 +79,7 @@ function Login() {
 
         <p id="errorText" className={`text-center text-red-500 text-wrap max-w-40 ${errorMessage !== "" ? "visible" : "invisible"}`}>{errorMessage}</p>
 
-        <button type="submit" className="btn bg-yellow border-0 text-black text-lg h-16 w-44 mt-4 disabled:!bg-yellow disabled:opacity-50" disabled={errorMessage}>Bejelentkezés</button>
+        <button type="submit" className="btn bg-yellow border-0 text-black text-lg h-16 w-44 mt-4 disabled:bg-yellow! disabled:opacity-50" disabled={errorMessage}>Bejelentkezés</button>
       </form>
     </div>
   );

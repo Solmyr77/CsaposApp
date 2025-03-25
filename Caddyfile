@@ -1,23 +1,60 @@
 phpmyadmin.csaposapp.hu {
-    reverse_proxy phpmyadmin:80
+    # If you want to protect phpMyAdmin with the bouncer,
+    # uncomment the route block and forward_auth lines:
+    #
+    #route {
+    #    forward_auth http://caddy-bouncer:8085 {
+    #        uri /
+    #        copy_headers X-Crowdsec-Decision-Type
+    #    }
+    #
+        reverse_proxy phpmyadmin:80
+    #}
 }
 
 backend.csaposapp.hu {
-    reverse_proxy csaposapi-container:8080 {
-        transport http {
-            versions 1.1
+    route {
+        # 1) Handle CORS preflight directly (OPTIONS)
+        @cors_preflight method OPTIONS
+        handle @cors_preflight {
+            header Access-Control-Allow-Origin https://csaposapp.hu
+            header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+            header Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With, Cache-Control, Accept, X-Signalr-User-Agent, Cache-Content"
+            header Access-Control-Allow-Credentials true
+            respond "" 204
         }
-        header_up Access-Control-Allow-Origin *
-        header_up Access-Control-Allow-Methods *
-        header_up Access-Control-Allow-Headers *
+
+        # 2) All other methods go through CrowdSec bouncer
+        @not_options not method OPTIONS
+        handle @not_options {
+            forward_auth http://caddy-bouncer:8085 {
+                uri /
+                copy_headers X-Crowdsec-Decision-Type
+                copy_headers Authorization
+                copy_headers Cookie
+            }
+
+            reverse_proxy csaposapi-container:8080 {
+                transport http {
+                    versions 1.1
+                }
+                header_up Access-Control-Allow-Origin https://csaposapp.hu
+                header_up Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+                header_up Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With, Cache-Control, Accept, X-Signalr-User-Agent, Cache-Content"
+                header_up Access-Control-Allow-Credentials true
+            }
+        }
     }
 }
-
 
 assets.csaposapp.hu {
     handle_path /assets/images* {
         root * /var/www/assets/images
         file_server
+
+        header Access-Control-Allow-Origin *
+        header Access-Control-Allow-Methods "GET, OPTIONS"
+        header Access-Control-Allow-Headers "Origin, Content-Type, Accept"
     }
 }
 

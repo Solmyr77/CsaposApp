@@ -21,6 +21,25 @@ services:
       - caddy_network
 
   #################################################
+  # Caddy CrowdSec Bouncer
+  #################################################
+  caddy-bouncer:
+    build:
+      context: ./caddy-crowdsec-bouncer
+      dockerfile: docker/Dockerfile
+    container_name: caddy-bouncer
+    restart: unless-stopped
+    environment:
+      CROWDSEC_BOUNCER_API_KEY: GpvJOTZZLV6ly4VMndOtR7IPYOLYOSbKx3rkniX9AJQ
+      CROWDSEC_AGENT_HOST: http://172.18.0.1:8081
+      LISTEN_URI: 0.0.0.0:8085
+    ports:
+      - "8085:8085"  # 👈 expose the new port
+    networks:
+      - caddy_network
+
+
+  #################################################
   # MySQL
   #################################################
   mysql:

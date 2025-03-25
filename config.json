@@ -1,0 +1,29 @@
+{
+  "apps": {
+    "crowdsec": {
+      "api_key": "GpvJOTZZLV6ly4VMndOtR7IPYOLYOSbKx3rkniX9AJQ",
+      "api_url": "http://172.18.0.1:8081"
+    },
+    "http": {
+      "servers": {
+        "bouncer": {
+          "listen": [":8085"],
+          "routes": [
+            {
+              "match": [{ "path": ["/health"] }],
+              "handle": [{
+                "handler": "static_response",
+                "body": "pong"
+              }]
+            },
+            {
+              "handle": [{
+                "handler": "crowdsec"
+              }]
+            }
+          ]
+        }
+      }
+    }
+  }
+}

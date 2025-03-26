@@ -3,6 +3,8 @@
 .vite/
 .vs/
 node_modules/
+dist-electron/
+dist
 
 #Build/Publish directories
 bin/

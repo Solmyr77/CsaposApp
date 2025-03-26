@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CsaposApi.Services.IService;
 using static CsaposApi.Models.DTOs.FriendshipDTO;
+using static CsaposApi.Models.DTOs.UserDTO;
+using Microsoft.EntityFrameworkCore;
 
 namespace CsaposApi.Controllers
 {
@@ -16,17 +18,19 @@ namespace CsaposApi.Controllers
     [Route("api/friends")]
     public class FriendshipController : ControllerBase
     {
+        private readonly CsaposappContext _context;
         private readonly IFriendshipService _friendshipService;
         private readonly IAuthService _authService;
         private readonly ILogger<FriendshipController> _logger;
         private readonly INotificationService _notificationService;
 
-        public FriendshipController(IFriendshipService friendshipService, IAuthService authService, ILogger<FriendshipController> logger, INotificationService notificationService)
+        public FriendshipController(IFriendshipService friendshipService, IAuthService authService, ILogger<FriendshipController> logger, INotificationService notificationService, CsaposappContext context)
         {
             _friendshipService = friendshipService;
             _authService = authService;
             _logger = logger;
             _notificationService = notificationService;
+            _context = context;
         }
 
         // Extract user ID from JWT token using AuthService
@@ -70,13 +74,13 @@ namespace CsaposApi.Controllers
             try
             {
                 Guid senderId = GetUserIdFromToken();
-                
+
                 _logger.LogInformation("Controller: User {SenderId} sending friend request to {ReceiverId}", senderId, receiverId);
                 _logger.LogInformation("Controller: Passing to service");
                 var success = await _friendshipService.SendFriendRequest(senderId, receiverId);
                 _logger.LogInformation($"Controller: Friend request service returned with: {success}");
                 return success ? Ok(new { message = "Friend request sent successfully" })
-                               : BadRequest(new { error = "Friend request already exists or failed to send"});
+                               : BadRequest(new { error = "Friend request already exists or failed to send" });
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -85,7 +89,7 @@ namespace CsaposApi.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error sending friend request");
-                return StatusCode(500, new { error = "An error occurred while sending the request" + ex.Message});
+                return StatusCode(500, new { error = "An error occurred while sending the request" + ex.Message });
             }
         }
 
@@ -182,7 +186,6 @@ namespace CsaposApi.Controllers
             }
         }
 
-        // Get Friends List
         [HttpGet("list")]
         [Authorize(Policy = "MustBeGuest")]
         public async Task<IActionResult> GetFriends()
@@ -190,7 +193,18 @@ namespace CsaposApi.Controllers
             try
             {
                 Guid userId = GetUserIdFromToken();
-                var friends = await _friendshipService.GetFriends(userId);
+                var friendIds = await _friendshipService.GetFriends(userId);
+
+                var friends = await _context.Users
+                    .Where(u => friendIds.Contains(u.Id))
+                    .Select(u => new GetProfileDTO
+                    {
+                        Id = u.Id,
+                        DisplayName = u.DisplayName,
+                        ImageUrl = u.ImgUrl
+                    })
+                    .ToListAsync();
+
                 return Ok(new { friends });
             }
             catch (UnauthorizedAccessException ex)
@@ -203,6 +217,7 @@ namespace CsaposApi.Controllers
                 return StatusCode(500, new { error = "An error occurred while retrieving the friends list" });
             }
         }
+
 
         // Get Pending Friend Requests
         [HttpGet("requests")]

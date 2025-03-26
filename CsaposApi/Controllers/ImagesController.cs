@@ -6,6 +6,7 @@ using SixLabors.ImageSharp.Formats.Webp;
 using Microsoft.AspNetCore.Authorization;
 using CsaposApi.Models;
 using CsaposApi.Services.IService;
+using Microsoft.CodeAnalysis;
 
 namespace CsaposApi.Controllers
 {
@@ -78,13 +79,19 @@ namespace CsaposApi.Controllers
                 });
 
                 // Compress and convert to WebP
-                var fileName = userId.ToString() + ".webp";
+                var fileName = userId.ToString() + "_" + Guid.NewGuid() + ".webp";
                 var filePath = Path.Combine(_uploadPath, fileName);
 
                 await image.SaveAsync(filePath, new WebpEncoder
                 {
                     Quality = 75 // Compression level (0-100)
                 });
+
+                var currentUser = await _context.Users.FindAsync(userId);
+
+                currentUser.ImgUrl = fileName;
+
+                await _context.SaveChangesAsync();
 
                 // Return the saved file's relative URL
                 var fileUrl = $"assets/images/{fileName}";
@@ -132,13 +139,19 @@ namespace CsaposApi.Controllers
                 });
 
                 // Compress and convert to WebP
-                var fileName = locationId.ToString() + ".webp";
+                var fileName = locationId.ToString() + "_" + Guid.NewGuid() + ".webp";
                 var filePath = Path.Combine(_uploadPath, fileName);
 
                 await image.SaveAsync(filePath, new WebpEncoder
                 {
                     Quality = 75 // Compression level (0-100)
                 });
+
+                var currentLocation = await _context.Locations.FindAsync(locationId);
+
+                currentLocation.ImgUrl = fileName;
+
+                await _context.SaveChangesAsync();
 
                 // Return the saved file's relative URL
                 var fileUrl = $"assets/images/{fileName}";
@@ -186,13 +199,19 @@ namespace CsaposApi.Controllers
                 });
 
                 // Compress and convert to WebP
-                var fileName = productId.ToString() + ".webp";
+                var fileName = productId.ToString() + "_" + Guid.NewGuid() + ".webp";
                 var filePath = Path.Combine(_uploadPath, fileName);
 
                 await image.SaveAsync(filePath, new WebpEncoder
                 {
                     Quality = 75 // Compression level (0-100)
                 });
+
+                var currentProduct = await _context.Products.FindAsync(productId);
+
+                currentProduct.ImgUrl = fileName;
+
+                await _context.SaveChangesAsync();
 
                 // Return the saved file's relative URL
                 var fileUrl = $"assets/images/{fileName}";
@@ -240,13 +259,19 @@ namespace CsaposApi.Controllers
                 });
 
                 // Compress and convert to WebP
-                var fileName = eventId.ToString() + ".webp";
+                var fileName = eventId.ToString() + "_" + Guid.NewGuid() + ".webp";
                 var filePath = Path.Combine(_uploadPath, fileName);
 
                 await image.SaveAsync(filePath, new WebpEncoder
                 {
                     Quality = 75 // Compression level (0-100)
                 });
+
+                var currentEvent = await _context.Events.FindAsync(eventId);
+
+                currentEvent.ImgUrl = fileName;
+
+                await _context.SaveChangesAsync();
 
                 // Return the saved file's relative URL
                 var fileUrl = $"assets/images/{fileName}";

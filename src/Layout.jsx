@@ -4,8 +4,8 @@ import Header from './Header';
 
 export default function Layout({ children }) {
     return (
-        <div className="grid grid-rows-12 max-h-screen flex-col h-screen max-w-screen">
-            <header className="bg-gray-800 text-white flex items-center justify-center w-full z-10 shadow-md">
+        <div className="grid grid-rows-12 flex-col max-h-screen max-w-screen">
+            <header className="bg-gray-800 text-white flex items-center justify-center h-24 w-full z-10 shadow-md">
                 <Header />
             </header>
 

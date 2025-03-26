@@ -71,8 +71,9 @@ function Provider({ children }) {
       }
       const response = await axios.get(`https://backend.csaposapp.hu/api/Manager/manager-location`, config);
       const data = response.data;
-
-      await getLocation(data.locationId);
+      getLocation(data.locationId);
+      getLocationTables(data.locationId);
+      getBookingsForLocation(data.locationId);
     }
     catch (error) {
       if (error.response?.status === 401) {
@@ -158,8 +159,9 @@ function Provider({ children }) {
       const response = await axios.get(`https://backend.csaposapp.hu/api/Tables/location/${id}`, config);
       const data = await response.data;
       if (response.status === 200 && data.length > 0) {
-        data.sort((a, b) => a.number - b.number);
-        return data;
+        const ordersByTable = await Promise.all(data.map(table => getOrdersByTable(table.id)));
+        data.map((table, i) => table.orders = ordersByTable[i]);
+        setTables(data.sort((a, b) => a.number - b.number));
       }
     }
     catch (error) {
@@ -175,7 +177,7 @@ function Provider({ children }) {
     }
   }
 
-  async function getBookingsByUser() {
+  async function getBookingsForLocation(id) {
     try {
       const config = {
         headers: { 
@@ -183,29 +185,14 @@ function Provider({ children }) {
           "Cache-Content": "no-cache"
         }
       }
-      const response = await axios.get(`https://backend.csaposapp.hu/api/bookings/bookings-by-user`, config);
+      const response = await axios.get(`https://backend.csaposapp.hu/api/bookings/bookings-for-location?locationId=${id}`, config);
       const data = await response.data;
       if (response.status === 200 && data.length > 0) {
-        setBookings(data);
-      }
-    }
-    catch (error) {
-      console.log(error.response?.status);
-      console.log(error.message);
-    }
-  }
-
-  async function getBookingsForLocation() {
-    try {
-      const config = {
-        headers: { 
-          Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
-          "Cache-Content": "no-cache"
+        for (const booking of data) {
+          const bookerProfile = await getProfile(booking.bookerId);
+          booking.tableGuests[booking.tableGuests.length] = bookerProfile;
+          booking.tableGuests.map((guest, i) => guest.number = i + 1);
         }
-      }
-      const response = await axios.get(`https://backend.csaposapp.hu/api/bookings/bookings-for-location?locationId=${managerLocation.id}`, config);
-      const data = await response.data;
-      if (response.status === 200 && data.length > 0) {
         setBookings(data);
       }
     }
@@ -279,12 +266,13 @@ function Provider({ children }) {
       const response = await axios.get(`https://backend.csaposapp.hu/api/orders/orders-by-table/${id}`, config);
       if (response.status === 200) {
         setOrders(response.data);
+        return response.data;
       }
     }
     catch (error) {
       if (error.response?.status === 401) {
         if (await getAccessToken()) {
-          await getOrdersByTable(id);
+          return await getOrdersByTable(id);
         }
         else {
           await logout();
@@ -299,15 +287,16 @@ function Provider({ children }) {
       const config = {
         headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` }
       }
-      const response = await axios.get(`https://backend.csaposapp.hu/api/orders/orders-by-table/${id}`, config);
+      const response = await axios.get(`https://backend.csaposapp.hu/api/orders/location/${id}`, config);
       if (response.status === 200) {
         setOrders(response.data);
+        return response.data;
       }
     }
     catch (error) {
       if (error.response?.status === 401) {
         if (await getAccessToken()) {
-          await getOrdersByTable(id);
+          return await getOrdersByLocation(id);
         }
         else {
           await logout();

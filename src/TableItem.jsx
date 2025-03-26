@@ -1,6 +1,5 @@
 import { React, useContext, useEffect, useState } from 'react';
 import { LuUsers, LuClock } from "react-icons/lu";
-import { RiBeerLine } from "react-icons/ri";
 import Context from "./Context";
 import { Link } from "react-router-dom";
 
@@ -37,7 +36,7 @@ export default function TableItem({ table }) {
 
                 <div className='flex flex-col flex-grow justify-center items-center'>
                     <h2 className="flex justify-start items-center text-center text-xxl text-gray-500 w-full ml-4">
-                        <LuUsers className='mr-4' /> {table.isBooked ? table.tableGuests.length + 1 : table.tableGuests.length}/{table.capacity}
+                        <LuUsers className='mr-4' /> {currentBooking?.tableGuests?.length ?? "0"}/{table.capacity}
                     </h2>
 
                     {currentBooking ? (

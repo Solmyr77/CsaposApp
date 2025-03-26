@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-function UserImage({ record, width, border, margin }) {
+function UserImage({ record, width, border, margin, user }) {
   const [userImage, setUserImage] = useState(null);
 
   async function cacheImage(id, imageUrl) {
@@ -32,7 +32,7 @@ function UserImage({ record, width, border, margin }) {
     const isFullUrl = String(record.imageUrl).startsWith("http");
     const imageUrl = isFullUrl
       ? record.imageUrl
-      : `https://assets.csaposapp.hu/assets/images/${record.imageUrl}`;
+      : `https://assets.csaposapp.hu/assets/images/${record.imageUrl}?t=${new Date().getTime()}`;
 
     const newImage = new Image();
     newImage.src = imageUrl;

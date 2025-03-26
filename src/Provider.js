@@ -87,14 +87,8 @@ function Provider({ children }) {
       }
       const response = await axios.get(`https://backend.csaposapp.hu/api/friends/list`, config);
       const data = response.data;
-      if (data.friends.length > 0) {
-        const updatedFriends = [];
-        for (let friend of data.friends) {
-          const friendProfile = await getProfile(friend);
-          data.friends.every(record => record.id !== friend) && updatedFriends.push(friendProfile);
-        }
-        setFriends(updatedFriends);
-      }
+      console.log(data)
+      setFriends(data.friends);
     }
     catch (error) {
       console.log(error.data?.status);

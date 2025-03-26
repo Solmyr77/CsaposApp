@@ -2,8 +2,7 @@
 layer(base);
 
 @import 'tailwindcss';
-
-/* @plugin 'daisyui'; */
+@plugin 'daisyui';
 
 @theme {
   --color-grey: #262626;

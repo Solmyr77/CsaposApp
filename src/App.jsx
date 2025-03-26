@@ -10,6 +10,7 @@ import StatisticsMenu from './StatisticsMenu'
 import ExtraMenu from './ExtraMenu';
 import Layout from './Layout';
 import TableView from './TableView';
+import "./index.css";
 
 function App() {
   return (

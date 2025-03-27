@@ -45,7 +45,7 @@ function TableView() {
           </div>
         </div>
 
-        <div className="flex flex-col border-2 rounded-md p-2 gap-4 col-span-3 row-span-2 max-h-2/5">
+        <div className="flex flex-col border-2 rounded-md p-2 gap-4 col-span-3 row-span-2 h-full" style={{maxHeight: "calc(100vh - 14rem)"}}>
           <div className="flex items-center justify-between">
             <span className="text-xl font-bold">Rendelések</span>
             <div className="flex items-center gap-4">
@@ -53,10 +53,10 @@ function TableView() {
               <button className="btn text-md font-bold border-2" onClick={() => setSelectedGuest({})}>Összes</button>
             </div>
           </div>
-          <div className="flex flex-col gap-4 overflow-auto">
+          <div className="flex flex-col gap-4 overflow-auto h-full">
             {
               currentTable?.orders?.length > 0 ?
-              currentTable.orders.map(() => <Order/>) :
+              currentTable.orders.map((order) => <Order key={order.id} order={order}/>) :
               <span>Nincsenek rendelések</span>
             }
           </div>

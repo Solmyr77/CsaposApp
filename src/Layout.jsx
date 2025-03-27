@@ -4,7 +4,7 @@ import Header from './Header';
 
 export default function Layout({ children }) {
     return (
-        <div className="grid grid-rows-12 flex-col max-h-screen max-w-screen">
+        <div className="grid grid-rows-12 flex-col max-h-screen max-w-screen text-gray-900">
             <header className="bg-gray-800 text-white flex items-center justify-center h-24 w-full z-10 shadow-md">
                 <Header />
             </header>
@@ -14,7 +14,7 @@ export default function Layout({ children }) {
                     <Sidebar />
                 </aside>
 
-                <main className="grow overflow-auto bg-white">
+                <main className="grow overflow-auto bg-white pt-4">
                     {children}
                 </main>
             </div>

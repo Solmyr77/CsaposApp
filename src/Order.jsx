@@ -1,36 +1,30 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
+import Context from "./Context";
+import OrderItem from "./OrderItem";
 
-function Order() {
+function Order({ order }) {
+  const { locationProducts } = useContext(Context);
+  const [currentProducts, setCurrentProducts] = useState([]);
+
+  useEffect(() => {
+    if (locationProducts.length > 0) {
+        setCurrentProducts(locationProducts.filter(product => order.orderItems.find(item => item.productId === product.id ? product.quantity = item.quantity : null)));
+        console.log(locationProducts.filter(product => order.orderItems.find(item => item.productId === product.id)));
+    }
+  }, [locationProducts])  
   return (
     <div className="flex flex-col bg-sky-200/75 p-2 rounded-md">
-        <div className="self-end badge badge-warning font-bold">Teljesítendő</div>
-        {/* Order items */}
-
+        {
+            order.orderStatus == "pending" ?
+            <div className="self-end badge badge-warning font-bold">Teljesítendő</div> :
+            <div className="self-end badge badge-success font-bold">Teljesítve</div>
+        }
         <div className="flex flex-col gap-4">
 
-        <div className="flex justify-between items-center px-2">
-            <div className="flex items-center gap-2">
-            <img src="https://assets.csaposapp.hu/assets/images/60d6b130-dd78-401d-ae22-ff910d2de993.webp" alt="kép" className="w-16 rounded-md"/>
-            <div className="flex flex-col">
-                <span className="text-lg font-bold">Pilsner Urquell</span>
-                <span>0.5l korsó</span>
-            </div>
-            </div>
-            <span className="font-bold">1200 Ft</span>
-            <span className="text-lg font-bold">2 DB</span>
-        </div>
-
-        <div className="flex justify-between items-center px-2">
-            <div className="flex items-center gap-2">
-            <img src="https://assets.csaposapp.hu/assets/images/60d6b130-dd78-401d-ae22-ff910d2de993.webp" alt="kép" className="w-16 rounded-md"/>
-            <div className="flex flex-col">
-                <span className="text-lg font-bold">Pilsner Urquell</span>
-                <span>0.5l korsó</span>
-            </div>
-            </div>
-            <span className="font-bold">1200 Ft</span>
-            <span className="text-lg font-bold">2 DB</span>
-        </div>
+        {
+            currentProducts.length > 0 &&
+            currentProducts.map(product => <OrderItem item={product}/>)
+        }
 
         <span className="self-end font-bold text-md">Összesen: 2400 Ft</span>
         </div>

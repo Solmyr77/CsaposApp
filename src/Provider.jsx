@@ -74,6 +74,7 @@ function Provider({ children }) {
       getLocation(data.locationId);
       getLocationTables(data.locationId);
       getBookingsForLocation(data.locationId);
+      getProductsByLocation(data.locationId);
     }
     catch (error) {
       if (error.response?.status === 401) {

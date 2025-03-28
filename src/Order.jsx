@@ -12,9 +12,10 @@ function Order({ order }) {
       //console.log(order)
       setCurrentProducts(locationProducts.filter(product => {
         const foundItem = order.orderItems.find(item => item.productId === product.id);
-        foundItem ? product.quantity = foundItem.quantity : null
-        console.log(foundItem?.productId === product.id);
-        return foundItem;
+        if (foundItem) {
+          product.quantity = foundItem.quantity;
+          return product;
+        }
       }));
     }
   }, [locationProducts])  

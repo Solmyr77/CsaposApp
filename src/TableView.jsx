@@ -11,6 +11,8 @@ function TableView() {
   const { number } = useParams();
   const [currentTable, setCurrentTable] = useState({});
   const [currentBooking, setCurrentBooking] = useState({});
+  const [currentTotal, setCurrentTotal] = useState(0);
+  const [filteredOrders, setFilteredOrders] = useState();
 
   //find current table and current booking
   useEffect(() => {
@@ -26,6 +28,25 @@ function TableView() {
 
     return () => setSelectedGuest({});
   }, [tables, bookings]);
+
+  //filter orders
+  useEffect(() => {
+    if (selectedGuest.id) {
+      setFilteredOrders(currentTable.orders.filter(order => order.userId === selectedGuest.id));
+    }
+    else {
+      setFilteredOrders(currentTable.orders);
+    }
+  }, [selectedGuest, currentTable]);
+
+  //calculate total
+  useEffect(() => {
+    if (filteredOrders?.length > 0) {
+      let subTotal = 0;
+      filteredOrders.map(order => order.orderItems.map(item => subTotal += item.quantity * item.unitPrice));
+      setCurrentTotal(subTotal);
+    }
+  }, [filteredOrders]);
 
   return (
     <div className="flex flex-col p-4 gap-5">
@@ -55,12 +76,12 @@ function TableView() {
           </div>
           <div className="flex flex-col gap-4 overflow-auto h-full">
             {
-              currentTable?.orders?.length > 0 ?
-              currentTable.orders.map((order) => <Order key={order.id} order={order}/>) :
+              filteredOrders?.length > 0 ?
+              filteredOrders.map((order) => <Order key={order.id} order={order}/>) :
               <span>Nincsenek rendelések</span>
             }
           </div>
-          <span className="text-lg font-bold self-end">Összesen: 2400 Ft</span>
+          <span className="text-lg font-bold self-end">Összesen: {currentTotal} Ft</span>
         </div>
 
       </div>

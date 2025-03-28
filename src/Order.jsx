@@ -5,9 +5,11 @@ import OrderItem from "./OrderItem";
 function Order({ order }) {
   const { locationProducts } = useContext(Context);
   const [currentProducts, setCurrentProducts] = useState([]);
+  const [currentTotal, setCurrentTotal] = useState(0);
 
   useEffect(() => {
     if (locationProducts.length > 0) {
+      let subTotal = 0;
       const orderedProducts = locationProducts
         .filter(product => 
           order.orderItems.some(orderItem => orderItem.productId === product.id)
@@ -16,9 +18,10 @@ function Order({ order }) {
           const foundItem = order.orderItems.find(orderItem => 
             orderItem.productId === product.id
           );
+          subTotal += product.price * foundItem.quantity;
           return { ...product, quantity: foundItem.quantity };
         });
-
+        setCurrentTotal(subTotal);
         setCurrentProducts(orderedProducts);
     }
   }, [locationProducts, order.orderItems]);
@@ -35,7 +38,7 @@ function Order({ order }) {
             currentProducts.length > 0 &&
             currentProducts.map(product => <OrderItem key={product.id} item={product}/>)
           }
-          <span className="self-end font-bold text-md">Összesen: 2400 Ft</span>
+          <span className="self-end font-bold text-md">Összesen: {currentTotal} Ft</span>
         </div>
         <button className="btn bg-success border-0 shadow-none mt-4 text-md h-12">Teljesítés!</button>
     </div>

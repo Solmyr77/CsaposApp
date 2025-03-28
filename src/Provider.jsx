@@ -75,6 +75,7 @@ function Provider({ children }) {
       getLocationTables(data.locationId);
       getBookingsForLocation(data.locationId);
       getProductsByLocation(data.locationId);
+      getOrdersByLocation(data.locationId);
     }
     catch (error) {
       if (error.response?.status === 401) {
@@ -266,7 +267,7 @@ function Provider({ children }) {
       }
       const response = await axios.get(`https://backend.csaposapp.hu/api/orders/orders-by-table/${id}`, config);
       if (response.status === 200) {
-        setOrders(response.data);
+        //setOrders(response.data);
         return response.data;
       }
     }

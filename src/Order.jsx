@@ -7,18 +7,22 @@ function Order({ order }) {
   const [currentProducts, setCurrentProducts] = useState([]);
 
   useEffect(() => {
-    if (locationProducts.length > 0) {
-      //console.log("UJ ORDER");
-      //console.log(order)
-      setCurrentProducts(locationProducts.filter(product => {
-        const foundItem = order.orderItems.find(item => item.productId === product.id);
-        if (foundItem) {
-          product.quantity = foundItem.quantity;
-          return product;
-        }
-      }));
+    if (locationProducts.length > 0) {
+      const orderedProducts = locationProducts
+        .filter(product => 
+          order.orderItems.some(orderItem => orderItem.productId === product.id)
+        )
+        .map(product => {
+          const foundItem = order.orderItems.find(orderItem => 
+            orderItem.productId === product.id
+          );
+          return { ...product, quantity: foundItem.quantity };
+        });
+
+        setCurrentProducts(orderedProducts);
     }
-  }, [locationProducts])  
+  }, [locationProducts, order.orderItems]);
+  
   return (
     <div className="flex flex-col bg-sky-200/75 p-2 rounded-md">
         {

@@ -1,8 +1,9 @@
-import { React, useState, useEffect} from "react";
+import { React, useState, useEffect, useRef, useCallback} from "react";
 import Context from "./Context";
 import axios from "axios";
 import getAccessToken from "./refreshToken";
 import { Navigate } from "react-router-dom";
+import bookingConnection from "./signalRBookingCoonection";
 
 function Provider({ children }) {
   //basic states
@@ -15,7 +16,6 @@ function Provider({ children }) {
   const [managerLocation, setManagerLocation] = useState(null);
   //table states 
   const [tables, setTables] = useState([]);
-  const [selectedTable, setSelectedTable] = useState({});
   const [bookings, setBookings] = useState([]);
   //order states
   const [locationProducts, setLocationProducts] = useState([]);
@@ -308,6 +308,7 @@ function Provider({ children }) {
     }
   }
 
+  //logout function
   const logout = async () => {
     const response = await axios.post("https://backend.csaposapp.hu/api/auth/logout", {refreshToken : localStorage.getItem("refreshToken")});
     if (response.status === 204) {
@@ -320,6 +321,7 @@ function Provider({ children }) {
     }
   }
 
+  //main useeffect to fetch data
   useEffect(() => {
     if (localStorage.getItem("accessToken")) {
       setUserId(decodeJWT(localStorage.getItem("accessToken")).sub);
@@ -339,6 +341,110 @@ function Provider({ children }) {
     return JSON.parse(decodedPayload);
   }
 
+  //define listeners
+  const handleNotifyBookingDeleted = useCallback((message) => {
+    setBookings(state => state.filter(booking => booking.id !== message.bookingId));
+    console.log("Booking removed:", message);
+    bookingConnection.invoke("LeaveBookingGroup", message.bookingId);
+  }, []);
+
+  const handleNotifyOrderCreated = useCallback((message) => {
+    console.log("New order created", message);
+    setTableOrders(state => {
+      if (!state.some(tableOrder => tableOrder.id === message.order.id)) return [...state, message.order];
+      return state;
+    })
+  }, []);
+
+  //register user in signalr hub
+  function registerUser() {
+    bookingConnection.invoke("RegisterUser", localStorage.getItem("accessToken").replaceAll(`"`, ""))
+    .then(() => console.log("Successfully registered user"));
+  }
+
+  //join booking group in signalr
+  function joinBookingGroup(bookingId) {
+    bookingConnection.invoke("JoinBookingGroup", bookingId)
+    .then(() => {
+      console.log(`✅ Joined group: bookings`, bookingId);
+    })
+    .catch(err => console.error("❌ Failed to join group:", err));
+  }
+
+  //clear then re-apply listeners
+  function registerBookingListeners() {
+    bookingConnection.off("notifybookingdeleted", handleNotifyBookingDeleted);
+    bookingConnection.off("notifyordercreated", handleNotifyOrderCreated);
+    console.log("CLEARED BOOKING DELETED LISTENER");
+
+    bookingConnection.on("notifybookingdeleted", handleNotifyBookingDeleted);
+    bookingConnection.on("notifyordercreated", handleNotifyOrderCreated);
+    console.log("ADDED BOOKING DELETED LISTENER");
+  }
+
+  //function to make sure that connection state is connected before trying to invoke any other function
+  const ensureConnected = async (connection) => {
+    if (connection.state === "Disconnected") {
+      try {
+        await connection.start();
+        console.log("✅ Connection started successfully.");
+      } catch (err) {
+        console.error("❌ Failed to start connection:", err);
+        return false;
+      }
+    }
+    // Wait until the state is "Connected"
+    const maxAttempts = 10;
+    let attempts = 0;
+    while (connection.state !== "Connected" && attempts < maxAttempts) {
+      await new Promise((resolve) => setTimeout(resolve, 100)); // Wait 100ms
+      attempts++;
+    }
+    if (connection.state === "Connected") {
+      return true;
+    } else {
+      console.error("❌ Connection failed to reach 'Connected' state:", connection.state);
+      return false;
+    }
+  };
+
+  //ref for flagging reconnection
+  const isBookingOnReconnectedFired = useRef(false);
+
+  //BookingHub connection
+  useEffect(() => {
+    registerBookingListeners();
+    if (localStorage.getItem("accessToken") !== null && bookingConnection.state === "Disconnected" && bookings.length > 0) {
+      const startConnection = async () => {
+        if (await ensureConnected(bookingConnection)) {
+          registerUser();
+          bookings.map((booking) => booking?.id && joinBookingGroup(booking.id));
+        }
+      }
+      startConnection();
+    }
+    //reconnect only once to the connection
+    if ((!isBookingOnReconnectedFired.current) && bookings.length > 0) {
+      bookingConnection.onreconnected(async () => {
+        console.log("Reconnected successfully.");
+        if (await ensureConnected(bookingConnection)) {
+          setTimeout(() => {
+            registerUser();
+            bookings.map((booking) => joinBookingGroup(booking.id));
+          }, 500);
+        }
+      });
+      isBookingOnReconnectedFired.current = true;
+    }
+
+    //cleanup function for listeners
+    return () => {
+      bookingConnection.off("notifybookingdeleted", handleNotifyBookingDeleted);
+      bookingConnection.off("notifyordercreated", handleNotifyOrderCreated);
+    };
+  }, [bookings]);
+
+
   return (
     <Context.Provider value={{ 
       menuState, 
@@ -354,8 +460,6 @@ function Provider({ children }) {
       locations, 
       setLocations, 
       tables, 
-      selectedTable,
-      setSelectedTable,
       bookings,
       setBookings,
       locationProducts,

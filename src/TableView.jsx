@@ -36,12 +36,14 @@ function TableView() {
 
       setIsLoading(false);
       setIsSuccessful(true);
-      setBookings(state => {
-        return state.filter(booking => booking.id !== currentBooking.id);
-      });
       setTimeout(() => {
         modalRef.current.close();
         setIsSuccessful(false);
+        setBookings(state => {
+          return [...state.filter(booking => booking.id !== currentBooking.id)];
+        });
+        setCurrentBooking({});
+        setIsActive(false);
       }, 1000);
     }
     catch (error) {

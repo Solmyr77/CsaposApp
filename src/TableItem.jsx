@@ -38,6 +38,7 @@ export default function TableItem({ table }) {
                 else setIsActiveTimeout(foundBooking);
             }
         }
+        else setCurrentBooking({});
     }, [bookings]);
 
 

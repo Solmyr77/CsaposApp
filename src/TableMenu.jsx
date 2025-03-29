@@ -3,7 +3,7 @@ import Context from "./Context";
 import TableItem from './TableItem';
 
 export default function TableMenu() {
-    const { setMenuState, tables, bookings } = useContext(Context);
+    const { setMenuState, tables } = useContext(Context);
     const [isFinished, setIsFinished] = useState(false);
     
     function calculateTotal() {
@@ -13,7 +13,6 @@ export default function TableMenu() {
                 order.orderItems.map(orderItem => subTotal += (orderItem.quantity * orderItem.unitPrice));
             })  
             table.total = subTotal;
-            if (bookings?.length > 0) table.bookings = bookings.filter(booking => booking.tableId === table.id);
         });
         setIsFinished(true);
     }
@@ -24,7 +23,7 @@ export default function TableMenu() {
         if (tables.length > 0) {
             calculateTotal()
         }
-    }, [tables, bookings]);
+    }, [tables]);
 
     return (
         <div className='grid lg:grid-cols-4 grid-cols-3 gap-4 overflow-auto p-4'>

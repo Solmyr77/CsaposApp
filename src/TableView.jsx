@@ -8,7 +8,7 @@ import getAccessToken from "./refreshToken";
 import axios from "axios";
 
 function TableView() {
-  const { tables, bookings, logout } = useContext(Context);
+  const { tables, bookings, setBookings, logout } = useContext(Context);
   const { selectedGuest, setSelectedGuest } = useContext(TableContext);
   const { number } = useParams();
   const [currentTable, setCurrentTable] = useState({});
@@ -36,7 +36,9 @@ function TableView() {
 
       setIsLoading(false);
       setIsSuccessful(true);
-
+      setBookings(state => {
+        return state.filter(booking => booking.id !== currentBooking.id);
+      });
       setTimeout(() => {
         modalRef.current.close();
         setIsSuccessful(false);
@@ -68,11 +70,12 @@ function TableView() {
 
   //find current table and current booking
   useEffect(() => {
-    if (tables.length > 0) {
+    if (tables?.length > 0) {
       const foundTable = tables.find(table => table.number === Number(number));
       foundTable && setCurrentTable(foundTable);
-      if (bookings.length > 0) {
+      if (bookings?.length > 0) {
         const foundBooking = bookings.find(booking => booking.tableId === foundTable.id);
+        console.log(foundBooking);
         setCurrentBooking(foundBooking);
         if (foundBooking) {
           if (new Date(foundBooking.bookedFrom).getTime() < new Date().getTime()) {
@@ -80,6 +83,7 @@ function TableView() {
           }
           else setIsActiveTimeout(foundBooking);
         }
+        else setIsActive(false);
       }
     }
 
@@ -111,8 +115,9 @@ function TableView() {
         <div className="flex items-center gap-4">
           <span className="text-5xl font-bold">Asztal {currentTable.number}</span>
           {
-            isActive &&
-            <div className="badge badge-success badge-xl font-bold">Aktív</div>
+            isActive ?
+            <div className="badge badge-success badge-xl font-bold">Aktív</div> :
+            null
           }
         </div>
         {

@@ -1,8 +1,10 @@
-import { React, useEffect, useState } from 'react';
+import { React, useContext, useEffect, useState } from 'react';
 import { LuUsers, LuClock } from "react-icons/lu";
 import { Link } from "react-router-dom";
+import Context from './Context';
 
 export default function TableItem({ table }) {
+    const { bookings } = useContext(Context);
     const [currentBooking, setCurrentBooking] = useState({});
     const [isActive, setIsActive] = useState(false);
     
@@ -28,15 +30,15 @@ export default function TableItem({ table }) {
 
     //find todays booking if there is any
     useEffect(() => {
-        if (table.bookings?.length > 0) {
-            const foundBooking = table.bookings.find(booking => new Date(booking.bookedFrom).getDate() === new Date().getDate());
+        if (bookings?.length > 0) {
+            const foundBooking = bookings.find(booking => new Date(booking.bookedFrom).getDate() === new Date().getDate() && booking.tableId === table.id);
             if (foundBooking) {
                 setCurrentBooking(foundBooking);
                 if (new Date(foundBooking.bookedFrom).getTime() < new Date().getTime()) setIsActive(true);
                 else setIsActiveTimeout(foundBooking);
             }
         }
-    }, []);
+    }, [bookings]);
 
 
     return (
@@ -67,7 +69,7 @@ export default function TableItem({ table }) {
                         <LuUsers className='mr-4' /> {currentBooking?.tableGuests?.length ?? "0"}/{table.capacity}
                     </h2>
 
-                    {table?.bookings ? (
+                    {currentBooking.id ? (
                         <h2 className="flex justify-start items-center text-center text-xxl text-gray-500 w-full ml-4 my-2">
                             <LuClock className='mr-4' /> {formatTime(currentBooking?.bookedFrom)}
                         </h2>

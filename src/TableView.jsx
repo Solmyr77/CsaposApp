@@ -35,9 +35,11 @@ function TableView() {
       const response = await axios.delete(`https://backend.csaposapp.hu/api/bookings/remove-booking`, config);
 
       setIsLoading(false);
+      setIsSuccessful(true);
 
       setTimeout(() => {
-        setIsSuccessful(true)
+        modalRef.current.close();
+        setIsSuccessful(false);
       }, 1000);
     }
     catch (error) {

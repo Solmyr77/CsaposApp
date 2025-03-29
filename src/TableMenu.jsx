@@ -13,7 +13,7 @@ export default function TableMenu() {
                 order.orderItems.map(orderItem => subTotal += (orderItem.quantity * orderItem.unitPrice));
             })  
             table.total = subTotal;
-            table.bookings = bookings.filter(booking => booking.tableId === table.id);
+            if (bookings?.length > 0) table.bookings = bookings.filter(booking => booking.tableId === table.id);
         });
         setIsFinished(true);
     }
@@ -21,7 +21,7 @@ export default function TableMenu() {
     //set menustate, calculate total for each table
     useEffect(() => {
         setMenuState("Tables");
-        if (tables.length > 0 && bookings.length > 0) {
+        if (tables.length > 0) {
             calculateTotal()
         }
     }, [tables, bookings]);
@@ -29,6 +29,7 @@ export default function TableMenu() {
     return (
         <div className='grid lg:grid-cols-4 grid-cols-3 gap-4 overflow-auto p-4'>
             {
+                isFinished &&
                 tables?.map(table => <TableItem key={table.id} table={table} />)
             }
         </div>

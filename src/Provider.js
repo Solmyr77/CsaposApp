@@ -507,7 +507,7 @@ function Provider({ children }) {
 
   const handleNotifyBookingDeleted = useCallback((message) => {
     setBookingsContainingUser(state => state.filter(booking => booking.id !== message.bookingId));
-    console.log(message);
+    console.log("Booking removed:", message);
     bookingConnection.invoke("LeaveBookingGroup", message.bookingId);
   }, []);
 

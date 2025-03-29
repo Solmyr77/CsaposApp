@@ -74,27 +74,3 @@ input[type=date] {
 .w-menuitem {
   width: 12.5%;
 }
-
-::-webkit-scrollbar {
-  width: 0.5rem !important;
-  height: 0.3rem !important;
-}
-
-::-webkit-scrollbar-track {
-  background: #262626 !important;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #1c1c1c !important;
-  color: white !important;
-  border-radius: 5rem !important;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #151515 !important;
-}
-
-::-webkit-inner-spin-button,
-::-webkit-outer-spin-button {
-  -webkit-appearance: none !important;
-}

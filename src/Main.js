@@ -14,7 +14,8 @@ function Main() {
   useEffect(() => {
     setMenuState("Main");
     setPreviousRoutes(Array(location.pathname));
-  }, [])
+    console.log(bookings, bookingsContainingUser)
+  }, [bookings, bookingsContainingUser])
 
   return (
     <div className="bg-grey text-white font-play font-bold">

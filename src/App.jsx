@@ -4,7 +4,6 @@ import { HashRouter, Route, Routes, Navigate } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute'
 import Provider from './Provider';
 import OrdersMenu from './OrdersMenu';
-import ReceiptsMenu from './ReceiptsMenu';
 import StockMenu from './StockMenu';
 import StatisticsMenu from './StatisticsMenu'
 import ExtraMenu from './ExtraMenu';
@@ -12,6 +11,7 @@ import Layout from './Layout';
 import TableView from './TableView';
 import "./index.css";
 import { TableProvider } from './TableProvider';
+import ProductsMenu from './ProductsMenu';
 
 function App() {
   return (
@@ -43,10 +43,10 @@ function App() {
               </ProtectedRoute>}
             />
 
-            <Route path="/receipts" element={
+            <Route path="/products" element={
               <ProtectedRoute isProtected={true}>
                 <Layout>
-                  <ReceiptsMenu />
+                  <ProductsMenu />
                 </Layout>
               </ProtectedRoute>}
             />

@@ -7,6 +7,12 @@ function Order({ order }) {
   const [currentProducts, setCurrentProducts] = useState([]);
   const [currentTotal, setCurrentTotal] = useState(0);
 
+  function formatTime(date) {
+    const formattedTime = new Date(date);
+
+    return formattedTime.toTimeString().slice(0,5);
+  }
+
   useEffect(() => {
     if (locationProducts.length > 0) {
       let subTotal = 0;
@@ -28,6 +34,7 @@ function Order({ order }) {
   
   return (
     <div className="flex flex-col bg-sky-200/75 p-2 rounded-md">
+        <span>Létrehozva: {formatTime(order.createdAt)}</span>
         {
           order.orderStatus == "pending" ?
           <div className="self-end badge badge-warning font-bold">Teljesítendő</div> :
@@ -36,7 +43,7 @@ function Order({ order }) {
         <div className="flex flex-col gap-4">
           {
             currentProducts.length > 0 &&
-            currentProducts.map(product => <OrderItem key={product.id} item={product}/>)
+            currentProducts.map((product, i) => <OrderItem key={i} item={product}/>)
           }
           <span className="self-end font-bold text-md">Összesen: {currentTotal} Ft</span>
         </div>

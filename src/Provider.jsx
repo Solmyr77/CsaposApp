@@ -343,15 +343,19 @@ function Provider({ children }) {
 
   //define listeners
   const handleNotifyBookingDeleted = useCallback((message) => {
-    setBookings(state => state.filter(booking => booking.id !== message.bookingId));
+    setBookings(state => [...state.filter(booking => booking.id !== message.bookingId)]);
     console.log("Booking removed:", message);
     bookingConnection.invoke("LeaveBookingGroup", message.bookingId);
   }, []);
 
   const handleNotifyOrderCreated = useCallback((message) => {
     console.log("New order created", message);
-    setTableOrders(state => {
-      if (!state.some(tableOrder => tableOrder.id === message.order.id)) return [...state, message.order];
+    setTables(state => {
+      const foundTable = state.find(table => table.id === message.order.tableId);
+      if (!foundTable?.orders.some(order => order.id === message.order.id)) {
+        foundTable.orders.push({...message.order, sentAt: message.sentAt});
+        return [...state];
+      }
       return state;
     })
   }, []);

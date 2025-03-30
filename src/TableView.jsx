@@ -75,18 +75,21 @@ function TableView() {
     if (tables?.length > 0) {
       const foundTable = tables.find(table => table.number === Number(number));
       foundTable && setCurrentTable(foundTable);
+      console.log(foundTable)
       if (bookings?.length > 0) {
         const foundBooking = bookings.find(booking => booking.tableId === foundTable.id);
-        console.log(foundBooking);
-        setCurrentBooking(foundBooking);
         if (foundBooking) {
+          setCurrentBooking(foundBooking);
           if (new Date(foundBooking.bookedFrom).getTime() < new Date().getTime()) {
             setIsActive(true);
           }
           else setIsActiveTimeout(foundBooking);
         }
-        else setIsActive(false);
       }
+      else {
+        setIsActive(false);
+        setCurrentBooking({});
+      } 
     }
 
     return () => setSelectedGuest({});
@@ -98,18 +101,21 @@ function TableView() {
       setFilteredOrders(currentTable.orders.filter(order => order.userId === selectedGuest.id));
     }
     else {
+      console.log(currentTable.orders)
       setFilteredOrders(currentTable.orders);
     }
-  }, [selectedGuest, currentTable]);
+  }, [selectedGuest, currentTable.orders]);
 
   //calculate total
   useEffect(() => {
+    console.log(filteredOrders?.length);
     if (filteredOrders?.length > 0) {
       let subTotal = 0;
       filteredOrders.map(order => order.orderItems.map(item => subTotal += item.quantity * item.unitPrice));
       setCurrentTotal(subTotal);
     }
-  }, [filteredOrders]);
+    else setCurrentTotal(0);
+  }, [filteredOrders?.length]);
 
   return (
     <div className="flex flex-col p-4 gap-5">
@@ -154,7 +160,7 @@ function TableView() {
           <div className="flex flex-col gap-4 overflow-auto h-full">
             {
               filteredOrders?.length > 0 ?
-              filteredOrders.map((order) => <Order key={order.id} order={order}/>) :
+              filteredOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((order, i) => <Order key={i} order={order}/>) :
               <span>Nincsenek rendelések</span>
             }
           </div>

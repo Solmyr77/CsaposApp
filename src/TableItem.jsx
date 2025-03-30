@@ -4,9 +4,19 @@ import { Link } from "react-router-dom";
 import Context from './Context';
 
 export default function TableItem({ table }) {
-    const { bookings } = useContext(Context);
+    const { bookings, tables } = useContext(Context);
     const [currentBooking, setCurrentBooking] = useState({});
     const [isActive, setIsActive] = useState(false);
+    const [total, setTotal] = useState(0);
+
+    //calculate total
+    function calculateTotal() {
+        let subTotal = 0;
+        table.orders.map(order => {
+            order.orderItems.map(orderItem => subTotal += (orderItem.quantity * orderItem.unitPrice));
+        })  
+        setTotal(subTotal);
+    }
     
     // Function to format ISO time to HH:MM
     const formatTime = (isoString) => {
@@ -30,6 +40,7 @@ export default function TableItem({ table }) {
 
     //find todays booking if there is any
     useEffect(() => {
+        calculateTotal()
         if (bookings?.length > 0) {
             const foundBooking = bookings.find(booking => new Date(booking.bookedFrom).getDate() === new Date().getDate() && booking.tableId === table.id);
             if (foundBooking) {
@@ -39,7 +50,7 @@ export default function TableItem({ table }) {
             }
         }
         else setCurrentBooking({});
-    }, [bookings]);
+    }, [bookings, tables]);
 
 
     return (
@@ -87,7 +98,7 @@ export default function TableItem({ table }) {
                         Fogyasztás:
                     </span>
                     <span className="font-bold text-xl">
-                        {table.total} Ft
+                        {total} Ft
                     </span>
                 </div>
             </div>

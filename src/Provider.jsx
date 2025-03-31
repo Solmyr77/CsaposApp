@@ -245,6 +245,7 @@ function Provider({ children }) {
         data.map(record => !foundCategories.includes(record.category) && foundCategories.push(record.category));
         setCategories(foundCategories);
         setLocationProducts(data);
+        console.log(data)
       }
     }
     catch (error) {

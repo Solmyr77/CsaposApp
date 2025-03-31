@@ -5,12 +5,15 @@ export default TableContext;
 
 export function TableProvider({ children }) {
     const [selectedGuest, setSelectedGuest] = useState({});
+    const [selectedProduct, setSelectedProduct] = useState({});
 
     return (
         <TableContext.Provider 
         value={{
         selectedGuest,
-        setSelectedGuest
+        setSelectedGuest,
+        selectedProduct,
+        setSelectedProduct
         }}>
             {children}
         </TableContext.Provider>

@@ -6,9 +6,11 @@ import TableContext from './TableProvider';
 import { LuCheck, LuImagePlus, LuX } from "react-icons/lu";
 import heic2any from "heic2any";
 import imageCompression from "browser-image-compression";
+import getAccessToken from './refreshToken';
+import axios from 'axios';
 
 export default function ProductsMenu() {
-    const { setMenuState, locationProducts } = useContext(Context);
+    const { setMenuState, locationProducts, managerLocation, logout } = useContext(Context);
     const { selectedProduct } = useContext(TableContext);
     const [previewPicture, setPreviewPicture] = useState(null);
     const [isConversionFinished, setIsConversionFinished] = useState(null);
@@ -21,6 +23,45 @@ export default function ProductsMenu() {
     const modifyFormRef = useRef();
     const addFormRef = useRef();
     const responseRef = useRef();
+
+    //function for handling product creation
+    async function handleCreateProduct() {
+        console.log(modifyFormRef.current);
+        try {
+            const config = {
+              headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` },
+            }
+            const response = await axios.post(`https://backend.csaposapp.hu/api/products`,{
+                name: addFormRef.current.name.value,
+                description: addFormRef.current.description.value,
+                category: "Sörök",
+                price: addFormRef.current.price.value,
+                stockQuantity: 0,
+                locationId: managerLocation.id
+              }, config);
+            if (response.status === 201) {
+                console.log(response);
+                responseRef.current.inert = true;
+                responseRef.current.showModal();
+                responseRef.current.inert = false;
+                setTimeout(() => {
+                    responseRef.current.close();
+                    addModalRef.current.close();
+                }, 1000);
+            }
+        }
+          catch (error) {
+            if (error.response?.status === 401) {
+              if (await getAccessToken()) {
+                return await handleCreateProduct();
+              }
+              else {
+                await logout();
+                window.location.reload();
+              }
+            }
+        }
+    }
 
     //function for validating compressed image size
     function isImageSizeValid(file) {
@@ -85,7 +126,7 @@ export default function ProductsMenu() {
             <div className="grid grid-cols-6 justify-items-center gap-4 overflow-auto">
                 {
                     locationProducts?.length > 0 ?
-                    locationProducts.map(product => <ProductItem product={product} ref={modifyModalRef}/>) :
+                    locationProducts.map(product => <ProductItem key={product.id} product={product} ref={modifyModalRef}/>) :
                     <span className='text-lg'>Nincsenek termékek</span>
                 }
             </div>
@@ -176,28 +217,22 @@ export default function ProductsMenu() {
                         <form ref={addFormRef}>
                             <fieldset className='fieldset'>
                                 <legend className='fieldset-legend text-md'>Név</legend>
-                                <input type="text" placeholder='Pl: Pilsner Urquell' className='input input-lg'/>
+                                <input type="text" name='name' placeholder='Pl: Pilsner Urquell' className='input input-lg'/>
                             </fieldset>
                             <fieldset className='fieldset'>
                                 <legend className='fieldset-legend text-md'>Leírás</legend>
-                                <input type="text" placeholder='Pl: 0.45l korsó' className='input input-lg'/>
+                                <input type="text" name='description' placeholder='Pl: 0.45l korsó' className='input input-lg'/>
                             </fieldset>
                             <fieldset className='fieldset'>
                                 <legend className='fieldset-legend text-md'>Ár</legend>
                                 <label className='input input-lg'>
-                                    <input type="number" placeholder='Pl: 1290' min={0} />
+                                    <input type="number" name='price' placeholder='Pl: 1290' min={0} />
                                     <span className='label'>Ft</span>
                                 </label>
                             </fieldset>
-                            <input type='submit' value={"Hozzáadás"} className='btn btn-info btn-lg mt-4 w-full' onClick={(event) => {
+                            <input type='submit' value={"Hozzáadás"} className='btn btn-info btn-lg mt-4 w-full' onClick={async (event) => {
                                 event.preventDefault();
-                                responseRef.current.inert = true;
-                                responseRef.current.showModal();
-                                responseRef.current.inert = false;
-                                setTimeout(() => {
-                                    responseRef.current.close();
-                                    addModalRef.current.close();
-                                }, 1000);
+                                await handleCreateProduct();
                             }}/>
                         </form>
                     </div>

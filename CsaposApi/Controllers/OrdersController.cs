@@ -22,13 +22,15 @@ namespace CsaposApi.Controllers
         private readonly IAuthService _authService;
         private readonly ILogger<OrdersController> _logger;
         private readonly IBookingNotificationService _bookingNotificationService;
+        private readonly IManagerNotificationService _managerNotificationService;
 
-        public OrdersController(CsaposappContext context, IAuthService authService, ILogger<OrdersController> logger, IBookingNotificationService bookingNotificationService)
+        public OrdersController(CsaposappContext context, IAuthService authService, ILogger<OrdersController> logger, IBookingNotificationService bookingNotificationService, IManagerNotificationService managerNotificationService)
         {
             _context = context;
             _authService = authService;
             _logger = logger;
             _bookingNotificationService = bookingNotificationService;
+            _managerNotificationService = managerNotificationService;
         }
 
         [HttpGet]
@@ -277,6 +279,7 @@ namespace CsaposApi.Controllers
             };
             
             await _bookingNotificationService.NotifyOrderCreated(orderCreateDto.BookingId.ToString() ,responseDto);
+            await _managerNotificationService.NotifyOrderCreated(orderCreateDto.BookingId.ToString(), responseDto, responseDto.LocationId.ToString());
 
             return CreatedAtAction(nameof(GetOrder), new { id = order.Id }, responseDto);
         }

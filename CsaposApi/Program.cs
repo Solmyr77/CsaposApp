@@ -73,6 +73,7 @@ namespace CsaposApi
             builder.Services.AddScoped<IFriendshipService, FriendshipService>();
             builder.Services.AddScoped<IBookingNotificationService, BookingNotificationService>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
+            builder.Services.AddScoped<IManagerNotificationService, ManagerNotificationService>();
             builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
 
             // 1. Bind JWT settings
@@ -157,9 +158,10 @@ namespace CsaposApi
 
             app.MapControllers();
 
-            // SignalR Hubs with Correct CORS Policy
+            // SignalR Hubs with CORS Policy
             app.MapHub<NotificationHub>("/hubs/notifications");
             app.MapHub<BookingHub>("/hubs/booking");
+            app.MapHub<ManagerHub>("/hubs/manager");
 
             app.Run();
         }

@@ -123,7 +123,8 @@ namespace CsaposApi.Controllers
                 Rating = createRatingDTO.Rating
             };
 
-            _context.Add(locationRating);
+            _context.LocationRatings.Add(locationRating);
+            await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(CreateRating), locationRating);
         }

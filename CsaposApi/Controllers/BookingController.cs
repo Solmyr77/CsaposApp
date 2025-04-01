@@ -25,14 +25,16 @@ namespace CsaposApi.Controllers
         private readonly ILogger<BookingController> _logger;
         private readonly INotificationService _notificationService;
         private readonly IBookingNotificationService _bookingNotificationService;
+        private readonly IManagerNotificationService _managerNotificationService;
 
-        public BookingController(CsaposappContext context, IAuthService authService, ILogger<BookingController> logger, IBookingNotificationService bookingNotificationService, INotificationService notificationService)
+        public BookingController(CsaposappContext context, IAuthService authService, ILogger<BookingController> logger, IBookingNotificationService bookingNotificationService, INotificationService notificationService, IManagerNotificationService managerNotificationService)
         {
             _context = context;
             _authService = authService;
             _logger = logger;
             _bookingNotificationService = bookingNotificationService;
             _notificationService = notificationService;
+            _managerNotificationService = managerNotificationService;
         }
 
         // Extract user ID from JWT token using AuthService
@@ -288,7 +290,7 @@ namespace CsaposApi.Controllers
                 string userRole = GetUserRoleFromToken();
 
                 // Retrieve the booking once
-                var currentBooking = await _context.TableBookings.FindAsync(deleteBookingDTO.BookingId);
+                var currentBooking = await _context.TableBookings.Include(y => y.Table).FirstOrDefaultAsync(x => x.Id == deleteBookingDTO.BookingId);
 
                 if (currentBooking == null)
                 {
@@ -325,6 +327,7 @@ namespace CsaposApi.Controllers
 
                 await _context.SaveChangesAsync();
 
+                await _managerNotificationService.NotifyBookingDeleted(deleteBookingDTO.BookingId.ToString(), currentBooking.Table.LocationId.ToString());
                 await _bookingNotificationService.NotifyBookingDeleted(deleteBookingDTO.BookingId.ToString());
 
                 return NoContent(); // HTTP 204
@@ -440,6 +443,24 @@ namespace CsaposApi.Controllers
                                 Status = tg.Status
                             }).ToList()
                         }).FirstOrDefaultAsync(x => x.Id == addToTableDTO.bookingId));
+
+                    var tableBooking = await _context.TableBookings
+                        .Include(tb => tb.Table)
+                        .FirstOrDefaultAsync(x => x.Id == addToTableDTO.bookingId);
+
+                    if (tableBooking == null || tableBooking.Table == null)
+                    {
+                        _logger.LogWarning("Table booking or table not found for bookingId: {BookingId}", addToTableDTO.bookingId);
+                        return NotFound();
+                    }
+
+                    var locationId = tableBooking.Table.LocationId;
+
+                    await _managerNotificationService.NotifyUserAddedToTable(
+                        addToTableDTO.bookingId.ToString(),
+                        userId.ToString(),
+                        locationId.ToString()
+                    );
                 }
 
                 return Ok(new
@@ -482,7 +503,7 @@ namespace CsaposApi.Controllers
                 Guid currentUserId = GetUserIdFromToken();
 
                 // Retrieve the booking
-                var booking = await _context.TableBookings.FirstOrDefaultAsync(tb => tb.Id == removeFromTableDTO.BookingId);
+                var booking = await _context.TableBookings.Include(x => x.Table).FirstOrDefaultAsync(tb => tb.Id == removeFromTableDTO.BookingId);
                 if (booking == null)
                 {
                     return NotFound(new { error = "Booking not found." });
@@ -510,6 +531,7 @@ namespace CsaposApi.Controllers
                 await _context.SaveChangesAsync();
 
                 await _bookingNotificationService.NotifyUserRemovedFromTable(removeFromTableDTO.BookingId.ToString(), removeFromTableDTO.UserId.ToString());
+                await _managerNotificationService.NotifyUserRemovedFromTable(removeFromTableDTO.BookingId.ToString(), removeFromTableDTO.UserId.ToString(), booking.Table.LocationId.ToString());
 
                 return Ok(new { message = "Guest removed from the table successfully." });
             }
@@ -553,7 +575,12 @@ namespace CsaposApi.Controllers
                 _context.TableGuests.Update(tableGuest);
                 await _context.SaveChangesAsync();
 
+                var tempTableGuest = await _context.TableGuests.Include(x => x.Booking).ThenInclude(y => y.Table)
+                    .FirstOrDefaultAsync(tg => tg.BookingId == bookingId && tg.UserId == currentUserId);
+
+
                 await _bookingNotificationService.NotifyUserAcceptedInvite(bookingId.ToString(), currentUserId.ToString());
+                await _managerNotificationService.NotifyUserAcceptedInvite(bookingId.ToString(), currentUserId.ToString(), tempTableGuest.Booking.Table.LocationId.ToString());
 
                 return Ok(new { message = "Invite accepted successfully." });
             }
@@ -598,7 +625,11 @@ namespace CsaposApi.Controllers
                 _context.TableGuests.Update(tableGuest);
                 await _context.SaveChangesAsync();
 
+                var tempTableGuest = await _context.TableGuests.Include(x => x.Booking).ThenInclude(y => y.Table)
+                    .FirstOrDefaultAsync(tg => tg.BookingId == bookingId && tg.UserId == currentUserId);
+
                 await _bookingNotificationService.NotifyUserRejectedInvite(bookingId.ToString(), currentUserId.ToString());
+                await _managerNotificationService.NotifyUserRejectedInvite(bookingId.ToString(), currentUserId.ToString(), tempTableGuest.Booking.Table.LocationId.ToString());
 
                 return Ok(new { message = "Invite rejected successfully." });
             }

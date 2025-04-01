@@ -128,6 +128,46 @@ namespace CsaposApi.Controllers
             return CreatedAtAction(nameof(CreateProduct), response);
         }
 
+        [HttpPut("{id}")]
+        [Authorize(Policy = "MustBeManager")]
+        public async Task<IActionResult> UpdateProduct(Guid id, UpdateProductDTO updateProductDTO)
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            product.Name = updateProductDTO.Name;
+            product.Description = updateProductDTO.Description;
+            product.Category = updateProductDTO.Category;
+            product.Price = updateProductDTO.Price;
+            product.DiscountPercentage = updateProductDTO.DiscountPercentage;
+            product.StockQuantity = updateProductDTO.StockQuantity;
+            product.IsActive = updateProductDTO.IsActive;
+            product.ImgUrl = updateProductDTO.ImgUrl;
+
+            _context.Entry(product).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ProductExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
         private bool ProductExists(Guid id)
         {
             return _context.Products.Any(e => e.Id == id);

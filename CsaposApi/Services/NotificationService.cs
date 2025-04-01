@@ -61,7 +61,7 @@ namespace CsaposApi.Services
             await NotifyUserAsync(userId, "NotifyFriendRequestAccepted", friendshipResponse);
         }
 
-        public async Task NotifyUserAddedToTable(string userId, BookingResponseWithGuestsDTO currentBooking)
+        public async Task NotifyUserAddedToTable(string userId, BookingResponseWithGuestsDTO ?currentBooking)
         {
             await NotifyUserAsync(userId, "NotifyAddedToTable", currentBooking);
         }

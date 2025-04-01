@@ -19,14 +19,47 @@ export default function ProductsMenu() {
     const modifyModalRef = useRef();
     const addModalRef = useRef();
     const confirmRef = useRef();
-    const inputRef = useRef();
+    const modifyImageRef = useRef();
     const modifyFormRef = useRef();
     const addFormRef = useRef();
+    const addImageRef = useRef();
     const responseRef = useRef();
+    const [isUploading, setIsUploading] = useState(false);
+
+    //function for uploading image for a product
+    async function handleImageUpload(productId) {
+        console.log(formData.get("file"));
+        try {
+            const config = {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    Authorization: `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}`,
+                    "Cache-Control": "no-cache"
+                }
+            }
+            const response = await axios.post(`https://backend.csaposapp.hu/api/Images/upload/product?locationId=${managerLocation.id}&productId=${productId}`, formData, config);
+            if (response.status === 200) {
+                setFormData(new FormData());
+                setPreviewPicture(null);
+                setIsUploading(false);
+                console.log("sikeres feltöltés");
+                return true;
+            }
+        }
+        catch (error) {
+            if (error.response?.status === 401) {
+                if (await getAccessToken()) await handleImageUpload();
+                else {
+                    await logout();
+                    navigate("/");
+                }
+            }
+        }
+    }
 
     //function for handling product creation
     async function handleCreateProduct() {
-        console.log(modifyFormRef.current);
+        setIsUploading(true);
         try {
             const config = {
               headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` },
@@ -34,20 +67,21 @@ export default function ProductsMenu() {
             const response = await axios.post(`https://backend.csaposapp.hu/api/products`,{
                 name: addFormRef.current.name.value,
                 description: addFormRef.current.description.value,
-                category: "Sörök",
+                category: addFormRef.current.category.value,
                 price: addFormRef.current.price.value,
-                stockQuantity: 0,
+                stockQuantity: 10,
                 locationId: managerLocation.id
               }, config);
             if (response.status === 201) {
-                console.log(response);
-                responseRef.current.inert = true;
-                responseRef.current.showModal();
-                responseRef.current.inert = false;
-                setTimeout(() => {
-                    responseRef.current.close();
-                    addModalRef.current.close();
-                }, 1000);
+                if (await handleImageUpload(response.data.id)){
+                    responseRef.current.inert = true;
+                    responseRef.current.showModal();
+                    responseRef.current.inert = false;
+                    setTimeout(() => {
+                        responseRef.current.close();
+                        addModalRef.current.close();
+                    }, 1000);
+                }
             }
         }
           catch (error) {
@@ -150,11 +184,11 @@ export default function ProductsMenu() {
                         {
                             isConversionFinished === false ?
                             <span className="loading loading-spinner text-sky-400 w-20"></span> :
-                            <div className="flex flex-col max-w-1/2 gap-2">
-                                <div className="relative h-fit select-none hover:cursor-pointer" onClick={() => inputRef.current.click()}>
+                            <div className="flex flex-col w-1/2 gap-2">
+                                <div className="relative h-fit w-full aspect-square select-none hover:cursor-pointer" onClick={() => modifyImageRef.current.click()}>
                                     <img src={previewPicture ?? `https://assets.csaposapp.hu/assets/images${selectedProduct.imgUrl}`} className="object-cover p-2 opacity-50 w-full h-full border-2 rounded"/>
                                     <LuImagePlus className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-12 w-12"/>
-                                    <input ref={inputRef} id="fileInput" type="file" accept='image/*' style={{"display" : "none"}} onChange={(event) => showImagePreview(event)}/>
+                                    <input ref={modifyImageRef} type="file" accept='image/*' style={{"display" : "none"}} onChange={(event) => showImagePreview(event)}/>
                                 </div>
                                 {
                                     errorMessage !== "" &&
@@ -203,10 +237,10 @@ export default function ProductsMenu() {
                             isConversionFinished === false ?
                             <span className="loading loading-spinner text-sky-400 w-20"></span> :
                             <div className="flex flex-col w-1/2 gap-2">
-                                <div className="relative h-fit select-none hover:cursor-pointer w-full aspect-square" onClick={() => inputRef.current.click()}>
+                                <div className="relative h-fit select-none hover:cursor-pointer w-full aspect-square" onClick={() => addImageRef.current.click()}>
                                     <img src={previewPicture} className="object-cover p-2 opacity-50 w-full h-full border-2 rounded"/>
                                     <LuImagePlus className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-12 w-12"/>
-                                    <input ref={inputRef} id="fileInput" type="file" style={{"display" : "none"}} onChange={(event) => showImagePreview(event)}/>
+                                    <input ref={addImageRef} accept='image/*' type="file" style={{"display" : "none"}} onChange={(event) => showImagePreview(event)}/>
                                 </div>
                                 {
                                     errorMessage !== "" &&
@@ -224,16 +258,35 @@ export default function ProductsMenu() {
                                 <input type="text" name='description' placeholder='Pl: 0.45l korsó' className='input input-lg'/>
                             </fieldset>
                             <fieldset className='fieldset'>
+                                <legend className='fieldset-legend text-md'>Kategória</legend>
+                                <select name='category' defaultValue="Válassz egy kategóriát" className="select">
+                                    <option disabled={true}>Válassz egy kategóriát</option>
+                                    <option>Röviditalok</option>
+                                    <option>Sörök</option>
+                                    <option>Borok</option>
+                                    <option>Koktélok</option>
+                                    <option>Üdítők</option>
+                                    <option>Nasik</option>
+                                </select>
+                            </fieldset>
+                            <fieldset className='fieldset'>
                                 <legend className='fieldset-legend text-md'>Ár</legend>
                                 <label className='input input-lg'>
                                     <input type="number" name='price' placeholder='Pl: 1290' min={0} />
                                     <span className='label'>Ft</span>
                                 </label>
                             </fieldset>
-                            <input type='submit' value={"Hozzáadás"} className='btn btn-info btn-lg mt-4 w-full' onClick={async (event) => {
-                                event.preventDefault();
-                                await handleCreateProduct();
-                            }}/>
+                            {
+                                isUploading ? 
+                                <button className='btn btn-info btn-lg mt-4 w-full disabled:!text-info-content disabled:!bg-info' disabled>
+                                    Hozzáadás
+                                    <span className='loading loading-spinner loading-md'></span>
+                                </button> :
+                                <input type='submit' value={"Hozzáadás"} className='btn btn-info btn-lg mt-4 w-full' onClick={async (event) => {
+                                    event.preventDefault();
+                                    await handleCreateProduct();
+                                }}/>
+                            }
                         </form>
                     </div>
                 </div>

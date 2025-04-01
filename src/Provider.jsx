@@ -467,6 +467,7 @@ function Provider({ children }) {
       bookings,
       setBookings,
       locationProducts,
+      setLocationProducts,
       orders,
       categories,
       selectedProduct,

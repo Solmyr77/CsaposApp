@@ -12,9 +12,9 @@ const ProductItem = forwardRef(({ product }, ref) => {
         ref.current.showModal();
         ref.current.inert = false;
       }}>
-          <img src={`https://assets.csaposapp.hu/assets/images/${product.imgUrl}`} alt="kép" className='rounded p-2 bg-white w-full'/>
+          <img src={`https://assets.csaposapp.hu/assets/images/${product.imgUrl}?t=${new Date().getTime()}`} alt="kép" className='rounded p-2 bg-white w-full'/>
           <div className="flex flex-col">
-            <span className='font-bold text-lg'>{product.name}</span>
+            <span className='font-bold text-lg truncate'>{product.name}</span>
             <span className='text-md'>{product.description}</span>
           </div>
       </div>

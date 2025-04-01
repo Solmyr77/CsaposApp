@@ -10,7 +10,7 @@ import getAccessToken from './refreshToken';
 import axios from 'axios';
 
 export default function ProductsMenu() {
-    const { setMenuState, locationProducts, managerLocation, logout } = useContext(Context);
+    const { setMenuState, locationProducts, setLocationProducts, managerLocation, logout } = useContext(Context);
     const { selectedProduct } = useContext(TableContext);
     const [previewPicture, setPreviewPicture] = useState(null);
     const [isConversionFinished, setIsConversionFinished] = useState(null);
@@ -69,6 +69,54 @@ export default function ProductsMenu() {
                 description: addFormRef.current.description.value,
                 category: addFormRef.current.category.value,
                 price: addFormRef.current.price.value,
+                stockQuantity: 10,
+                locationId: managerLocation.id
+              }, config);
+            if (response.status === 201) {
+                if (await handleImageUpload(response.data.id)){
+                    setLocationProducts(state => {
+                        console.log(state.some(product => product.id === response.data.id))
+                        if (!state.some(product => product.id === response.data.id)) {
+                            console.log("beléptem");
+                            return [...state, response.data]
+                        }
+                        return state;
+                    })
+                    responseRef.current.inert = true;
+                    responseRef.current.showModal();
+                    responseRef.current.inert = false;
+                    setTimeout(() => {
+                        responseRef.current.close();
+                        addModalRef.current.close();
+                    }, 1000);
+                }
+            }
+        }
+          catch (error) {
+            if (error.response?.status === 401) {
+              if (await getAccessToken()) {
+                return await handleCreateProduct();
+              }
+              else {
+                await logout();
+                window.location.reload();
+              }
+            }
+        }
+    }
+
+    //function for modyfing a products data
+    async function handleModifyProduct() {
+        setIsUploading(true);
+        try {
+            const config = {
+              headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` },
+            }
+            const response = await axios.put(`https://backend.csaposapp.hu/api/products`,{
+                name: modifyFormRef.current.name.value,
+                description: modifyFormRef.current.description.value,
+                category: modifyFormRef.current.category.value,
+                price: modifyFormRef.current.price.value,
                 stockQuantity: 10,
                 locationId: managerLocation.id
               }, config);
@@ -139,7 +187,7 @@ export default function ProductsMenu() {
             }, 1000)
           }
         }
-      }
+    }
 
     useEffect(() => {
         setMenuState("Products");
@@ -165,7 +213,10 @@ export default function ProductsMenu() {
                 }
             </div>
 
-            <dialog className='modal' ref={modifyModalRef}>
+            <dialog className='modal' ref={modifyModalRef} onSubmit={async (event) => {
+                event.preventDefault();
+                await handleModifyProduct();
+            }}>
                 <div className="modal-box flex flex-col gap-4 max-w-1/2 relative">
                     <LuX className='absolute top-0 left-0 bg-red-500 text-white w-8 h-8 rounded-br cursor-pointer' onClick={() => {
                         modifyModalRef.current.close();
@@ -199,20 +250,31 @@ export default function ProductsMenu() {
                         <form ref={modifyFormRef}>
                             <fieldset className='fieldset'>
                                 <legend className='fieldset-legend text-md'>Név</legend>
-                                <input type="text" defaultValue={selectedProduct.name} className='input input-lg'/>
+                                <input type="text" defaultValue={selectedProduct.name} className='input input-lg' required/>
                             </fieldset>
                             <fieldset className='fieldset'>
                                 <legend className='fieldset-legend text-md'>Leírás</legend>
-                                <input type="text" defaultValue={selectedProduct.description} className='input input-lg'/>
+                                <input type="text" defaultValue={selectedProduct.description} className='input input-lg' required/>
+                            </fieldset>
+                            <fieldset className='fieldset'>
+                                <legend className='fieldset-legend text-md'>Kategória</legend>
+                                <select name='category' className="select" required>
+                                    <option>Röviditalok</option>
+                                    <option>Sörök</option>
+                                    <option>Borok</option>
+                                    <option>Koktélok</option>
+                                    <option>Üdítők</option>
+                                    <option>Nasik</option>
+                                </select>
                             </fieldset>
                             <fieldset className='fieldset'>
                                 <legend className='fieldset-legend text-md'>Ár</legend>
                                 <label className='input input-lg'>
-                                    <input type="number" min={0} defaultValue={selectedProduct.price}/>
+                                    <input type="number" min={0} defaultValue={selectedProduct.price} required/>
                                     <span className='label'>Ft</span>
                                 </label>
                             </fieldset>
-                            <input type='submit' value={"Mentés"} className='btn btn-info btn-lg mt-4 w-full'/>
+                            <input type='submit' value={"Mentés"} className='btn btn-info btn-lg mt-4 w-full' required/>
                         </form>
                     </div>
                 </div>
@@ -248,18 +310,21 @@ export default function ProductsMenu() {
                                 }
                             </div>
                         }
-                        <form ref={addFormRef}>
+                        <form ref={addFormRef} onSubmit={async (event) => {
+                            event.preventDefault();
+                            await handleCreateProduct();
+                        }}>
                             <fieldset className='fieldset'>
                                 <legend className='fieldset-legend text-md'>Név</legend>
-                                <input type="text" name='name' placeholder='Pl: Pilsner Urquell' className='input input-lg'/>
+                                <input type="text" name='name' placeholder='Pl: Pilsner Urquell' className='input input-lg' required/>
                             </fieldset>
                             <fieldset className='fieldset'>
                                 <legend className='fieldset-legend text-md'>Leírás</legend>
-                                <input type="text" name='description' placeholder='Pl: 0.45l korsó' className='input input-lg'/>
+                                <input type="text" name='description' placeholder='Pl: 0.45l korsó' className='input input-lg' required/>
                             </fieldset>
                             <fieldset className='fieldset'>
                                 <legend className='fieldset-legend text-md'>Kategória</legend>
-                                <select name='category' defaultValue="Válassz egy kategóriát" className="select">
+                                <select name='category' defaultValue="Válassz egy kategóriát" className="select" required>
                                     <option disabled={true}>Válassz egy kategóriát</option>
                                     <option>Röviditalok</option>
                                     <option>Sörök</option>
@@ -272,7 +337,7 @@ export default function ProductsMenu() {
                             <fieldset className='fieldset'>
                                 <legend className='fieldset-legend text-md'>Ár</legend>
                                 <label className='input input-lg'>
-                                    <input type="number" name='price' placeholder='Pl: 1290' min={0} />
+                                    <input type="number" name='price' placeholder='Pl: 1290' min={0} required/>
                                     <span className='label'>Ft</span>
                                 </label>
                             </fieldset>
@@ -282,10 +347,7 @@ export default function ProductsMenu() {
                                     Hozzáadás
                                     <span className='loading loading-spinner loading-md'></span>
                                 </button> :
-                                <input type='submit' value={"Hozzáadás"} className='btn btn-info btn-lg mt-4 w-full' onClick={async (event) => {
-                                    event.preventDefault();
-                                    await handleCreateProduct();
-                                }}/>
+                                <input type='submit' value={"Hozzáadás"} className='btn btn-info btn-lg mt-4 w-full'/>
                             }
                         </form>
                     </div>
@@ -316,7 +378,7 @@ export default function ProductsMenu() {
             <dialog className='modal' ref={responseRef}>
                 <div className="modal-box">
                     <div className='flex items-center'>
-                        <span className='font-bold text-lg'>Sikeres hozzáadás</span>
+                        <span className='font-bold text-lg'>Sikeres művelet!</span>
                         <LuCheck className='h-10 w-10'/>
                     </div>
                 </div>

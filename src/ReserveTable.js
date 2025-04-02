@@ -128,7 +128,7 @@ function ReserveTable() {
     try {
       const bookedFromTime = new Date(startDate);
       if (selectedTime === "Most") {
-        bookedFromTime.setHours(bookedFromTime.getHours() + 1);
+        bookedFromTime.setHours(bookedFromTime.getHours() + 2);
         bookedFromTime.setMinutes(bookedFromTime.getMinutes());
       }
       else {

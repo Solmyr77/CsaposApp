@@ -1,6 +1,9 @@
-import React from "react";
+import React, { forwardRef, useContext } from "react";
+import StateContext from "./StateProvider";
 
-function EventItem({ event }) {
+const EventItem = forwardRef(({ event }, ref) => {
+  const { setSelectedEvent } = useContext(StateContext);
+    
   return (
     <div className="card bg-base-100 w-96 shadow-lg h-fit">
         <figure className="max-h-52">
@@ -13,11 +16,16 @@ function EventItem({ event }) {
             <h2 className="card-title">{event.name}</h2>
             <p className="truncate">{event.description}</p>
             <div className="card-actions justify-end">
-                <button className="btn btn-lg btn-info">Módosítás</button>
+                <button className="btn btn-lg btn-info" onClick={() => {
+                    setSelectedEvent(event);
+                    ref.current.inert = true;
+                    ref.current.showModal();
+                    ref.current.inert = false;
+                }}>Módosítás</button>
             </div>
         </div>
     </div>
   )
-}
+})
 
 export default EventItem;

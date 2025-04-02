@@ -6,22 +6,27 @@ import getAccessToken from "./refreshToken";
 import heic2any from "heic2any";
 import imageCompression from "browser-image-compression";
 import EventItem from "./EventItem";
+import StateContext from "./StateProvider";
 
 function EventsMenu() {
     const { setMenuState, events, setEvents, managerLocation } = useContext(Context);
+    const { selectedEvent } = useContext(StateContext);
     const [previewPicture, setPreviewPicture] = useState(null);
     const [isConversionFinished, setIsConversionFinished] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [formData, setFormData] = useState(new FormData());
     const addModalRef = useRef();
+    const modifyModalRef = useRef();
+    const modifyFormRef = useRef();
     const addFormRef = useRef();
     const addImageRef = useRef();
+    const modifyImageRef = useRef();
     const errorRef = useRef();
     const confirmRef = useRef();
     const responseRef = useRef();
 
-    //function for uploading image for a product
+    //function for uploading image for an event
     async function handleImageUpload(locationId, eventId) {
         try {
             const config = {
@@ -85,7 +90,6 @@ function EventsMenu() {
             setIsConversionFinished(true);
           }
           else {
-            console.log("hibe")
             setIsSucceeded(true);
             setErrorMessage("A kép mérete meghaladja a limitet! (4MB)");
             setTimeout(() => {
@@ -93,6 +97,85 @@ function EventsMenu() {
               setErrorMessage("");
             }, 1000)
           }
+        }
+    }
+
+    //function for modyfing an events data
+    async function handleModifyEvent(id) {
+        setIsUploading(true);
+        try {
+            const config = {
+                headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` },
+            }
+            const response = await axios.put(`https://backend.csaposapp.hu/api/events/${id}`,{
+                name: modifyFormRef.current.name.value,
+                description: modifyFormRef.current.description.value,
+                locationId: managerLocation.id,
+                timeFrom: modifyFormRef.current.timeFrom.value,
+                timeTo: modifyFormRef.current.timeFrom.value 
+            }, config);
+            if (response.status === 204) {
+                if (formData.get("file")) {
+                    console.log("van file")
+                    if (await handleImageUpload(id)){
+                        setIsUploading(false);
+                        setFormData(new FormData());
+                        responseRef.current.inert = true;
+                        responseRef.current.showModal();
+                        responseRef.current.inert = false;
+                        setTimeout(() => {
+                            responseRef.current.close();
+                            modifyModalRef.current.close();
+                        }, 1000);
+                        setEvents(state => {
+                            const newArray = state.filter(event => event.id !== selectedEvent.id);
+                            return [...newArray, 
+                            {
+                                id: selectedEvent.id,
+                                name: modifyFormRef.current.name.value,
+                                description: modifyFormRef.current.description.value,
+                                locationId: managerLocation.id,
+                                timeFrom: modifyFormRef.current.timeFrom.value,
+                                timeTo: modifyFormRef.current.timeFrom.value 
+                            }];      
+                        });
+                    }
+                }
+                else {
+                    setIsUploading(false);
+                    setFormData(new FormData());
+                    responseRef.current.inert = true;
+                    responseRef.current.showModal();
+                    responseRef.current.inert = false;
+                    setTimeout(() => {
+                        responseRef.current.close();
+                        modifyModalRef.current.close();
+                    }, 1000);
+                    setEvents(state => {
+                        const newArray = state.filter(event => event.id !== selectedEvent.id);
+                        return [...newArray, 
+                        {
+                            id: selectedEvent.id,
+                            name: modifyFormRef.current.name.value,
+                            description: modifyFormRef.current.description.value,
+                            locationId: managerLocation.id,
+                            timeFrom: modifyFormRef.current.timeFrom.value,
+                            timeTo: modifyFormRef.current.timeFrom.value 
+                        }];      
+                    });
+                }
+            }
+        }
+          catch (error) {
+            if (error.response?.status === 401) {
+              if (await getAccessToken()) {
+                return await handleModifyEvent(id);
+              }
+              else {
+                await logout();
+                window.location.reload();
+              }
+            }
         }
     }
 
@@ -161,10 +244,80 @@ function EventsMenu() {
             <div className="grid grid-cols-3 gap-4 h-full">
                 {
                     events?.length > 0 ?
-                    events.map((event, i) => <EventItem key={i} event={event}/>) :
+                    events.map((event, i) => <EventItem key={i} ref={modifyModalRef} event={event}/>) :
                     <span>Nincsenek események</span>
                 }
             </div>
+
+            <dialog className='modal' ref={modifyModalRef}>
+                <div className="modal-box flex flex-col gap-4 max-w-1/2 relative">
+                    <LuX className='absolute top-0 left-0 bg-red-500 text-white w-8 h-8 rounded-br cursor-pointer' onClick={() => {
+                        modifyModalRef.current.close();
+                        modifyFormRef.current.reset();
+                        setPreviewPicture(null);
+                    }}/>
+                    <div className="flex justify-between items-center">
+                        <span className='text-xl font-bold'>Esemény módosítása</span>
+                        <button className='btn btn-error' onClick={() => {
+                            confirmRef.current.inert = true;
+                            confirmRef.current.showModal();
+                            confirmRef.current.inert = false;
+                        }}>Esemény törlése</button>
+                    </div>
+                    <div className="flex gap-6">
+                        {
+                            isConversionFinished === false ?
+                            <span className="loading loading-spinner text-sky-400 w-20"></span> :
+                            <div className="flex flex-col w-1/2 gap-2">
+                                <div className="relative h-fit w-full aspect-square select-none hover:cursor-pointer" onClick={() => modifyImageRef.current.click()}>
+                                    <img src={previewPicture ?? `https://assets.csaposapp.hu/assets/images${selectedEvent.imgUrl}`} className="object-cover p-2 opacity-50 w-full h-full border-2 rounded"/>
+                                    <LuImagePlus className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-12 w-12"/>
+                                    <input ref={modifyImageRef} type="file" accept='image/*' style={{"display" : "none"}} onChange={(event) => showImagePreview(event)}/>
+                                </div>
+                                {
+                                    errorMessage !== "" &&
+                                    <span className='text-red-500'>Valami hiba van a képpel!</span>
+                                }
+                            </div>
+                        }
+                        <form ref={modifyFormRef} onSubmit={async (event) => {
+                            event.preventDefault();
+                            console.log(selectedEvent);
+                            await handleModifyEvent(selectedEvent.id);
+                            }}>
+                            <fieldset className='fieldset'>
+                                <legend className='fieldset-legend text-md'>Név</legend>
+                                <input name='name' type="text" defaultValue={selectedEvent.name} className='input input-lg' required/>
+                            </fieldset>
+                            <fieldset className='fieldset'>
+                                <legend className='fieldset-legend text-md'>Leírás</legend>
+                                <input name='description' type="text" defaultValue={selectedEvent.description} className='input input-lg' required/>
+                            </fieldset>
+                            <fieldset className='fieldset'>
+                                <legend className='fieldset-legend text-md'>Ettől</legend>
+                                <input type="datetime-local" name='timeFrom' className='input input-lg' defaultValue={selectedEvent.timefrom} required/>
+                            </fieldset>
+                            <fieldset className='fieldset'>
+                                <legend className='fieldset-legend text-md'>Eddig</legend>
+                                <input type="datetime-local" name='timeTo' className='input input-lg' defaultValue={selectedEvent.timeto} required/>
+                            </fieldset>
+                            {
+                                isUploading ? 
+                                <button className='btn btn-info btn-lg mt-4 w-full disabled:!text-info-content disabled:!bg-info' disabled>
+                                    Hozzáadás
+                                    <span className='loading loading-spinner loading-md'></span>
+                                </button> :
+                                <input type='submit' value={"Mentés"} className='btn btn-info btn-lg mt-4 w-full' required/>
+                            }
+                        </form>
+                    </div>
+                </div>
+                <form method='dialog' className='modal-backdrop'><button onClick={() => {
+                    modifyFormRef.current.reset();
+                    modifyFormRef.current.category.value = selectedCategory;
+                    setPreviewPicture(null);
+                }}></button></form>
+            </dialog>
 
             {/* Add modal */}
             <dialog className='modal' ref={addModalRef}>

@@ -15,7 +15,9 @@ export function TableProvider({ children }) {
         selectedGuest,
         setSelectedGuest,
         selectedProduct,
-        setSelectedProduct
+        setSelectedProduct,
+        selectedEvent,
+        setSelectedEvent
         }}>
             {children}
         </StateContext.Provider>

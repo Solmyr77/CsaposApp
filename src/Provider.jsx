@@ -319,6 +319,12 @@ function Provider({ children }) {
       const response = await axios.get(`https://backend.csaposapp.hu/api/events/location/${id}`, config);
       if (response.status === 200) {
         console.log(response.data)
+        const eventAttendances = await getEventAttendances(id);
+        let counter = 0;
+        response.data.map(event => {
+          let counter = 0;
+        });
+        eventAttendances.map(eventattendance => eventattendance.event.status === "accepted" ? counter++ : "")
         setEvents(response.data);
         return response.data;
       }
@@ -327,6 +333,31 @@ function Provider({ children }) {
       if (error.response?.status === 401) {
         if (await getAccessToken()) {
           return await getEventsByLocation(id);
+        }
+        else {
+          await logout();
+          window.location.reload();
+        }
+      } 
+    }
+  }
+
+  async function getEventAttendances(id) {
+    try {
+      const config = {
+        headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` }
+      }
+      const response = await axios.get(`https://backend.csaposapp.hu/api/event-attendances/location/${id}`, config);
+      if (response.status === 200) {
+        console.log(response.data)
+        //setEvents(response.data);
+        return response.data;
+      }
+    }
+    catch (error) {
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) {
+          return await getEventAttendances(id);
         }
         else {
           await logout();
@@ -361,7 +392,7 @@ function Provider({ children }) {
         fetch();
       }
     }
-  }, [localStorage.getItem("accessToken"), userId, userRole]);
+  }, [localStorage.getItem("accessToken"), userId]);
 
   function decodeJWT(token) {
     const payload = token.split('.')[1]; 

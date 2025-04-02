@@ -22,6 +22,8 @@ function Provider({ children }) {
   const [selectedProduct, setSelectedProduct] = useState({});
   const [categories, setCategories] = useState([]);
   const [orders, setOrders] = useState([]);
+  //events
+  const [events, setEvents] = useState([]);
   
   async function getProfile(id, profile) {
     try {
@@ -76,6 +78,7 @@ function Provider({ children }) {
       getBookingsForLocation(data.locationId);
       getProductsByLocation(data.locationId);
       getOrdersByLocation(data.locationId);
+      getEventsByLocation(data.locationId);
     }
     catch (error) {
       if (error.response?.status === 401) {
@@ -308,6 +311,31 @@ function Provider({ children }) {
     }
   }
 
+  async function getEventsByLocation(id) {
+    try {
+      const config = {
+        headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` }
+      }
+      const response = await axios.get(`https://backend.csaposapp.hu/api/events/location/${id}`, config);
+      if (response.status === 200) {
+        console.log(response.data)
+        setEvents(response.data);
+        return response.data;
+      }
+    }
+    catch (error) {
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) {
+          return await getEventsByLocation(id);
+        }
+        else {
+          await logout();
+          window.location.reload();
+        }
+      } 
+    }
+  }
+
   //logout function
   const logout = async () => {
     const response = await axios.post("https://backend.csaposapp.hu/api/auth/logout", {refreshToken : localStorage.getItem("refreshToken")});
@@ -468,6 +496,8 @@ function Provider({ children }) {
       setBookings,
       locationProducts,
       setLocationProducts,
+      events,
+      setEvents,
       orders,
       categories,
       selectedProduct,

@@ -4,14 +4,13 @@ import { HashRouter, Route, Routes, Navigate } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute'
 import Provider from './Provider';
 import OrdersMenu from './OrdersMenu';
-import StockMenu from './StockMenu';
-import StatisticsMenu from './StatisticsMenu'
 import ExtraMenu from './ExtraMenu';
 import Layout from './Layout';
 import TableView from './TableView';
 import "./index.css";
-import { TableProvider } from './TableProvider';
+import { TableProvider } from './StateProvider';
 import ProductsMenu from './ProductsMenu';
+import EventsMenu from './EventsMenu';
 
 function App() {
   return (
@@ -51,18 +50,10 @@ function App() {
               </ProtectedRoute>}
             />
 
-            <Route path="/stock" element={
+            <Route path="/events" element={
               <ProtectedRoute isProtected={true}>
                 <Layout>
-                  <StockMenu />
-                </Layout>
-              </ProtectedRoute>}
-            />
-
-            <Route path="/statistics" element={
-              <ProtectedRoute isProtected={true}>
-                <Layout>
-                  <StatisticsMenu />
+                  <EventsMenu />
                 </Layout>
               </ProtectedRoute>}
             />

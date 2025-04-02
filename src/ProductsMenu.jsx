@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import Context from "./Context";
 import ProductItem from './ProductItem';
 import { useRef } from 'react';
-import TableContext from './TableProvider';
+import StateContext from './StateProvider';
 import { LuCheck, LuImagePlus, LuX } from "react-icons/lu";
 import heic2any from "heic2any";
 import imageCompression from "browser-image-compression";
@@ -11,7 +11,7 @@ import axios from 'axios';
 
 export default function ProductsMenu() {
     const { setMenuState, locationProducts, setLocationProducts, managerLocation, logout } = useContext(Context);
-    const { selectedProduct } = useContext(TableContext);
+    const { selectedProduct } = useContext(StateContext);
     const [previewPicture, setPreviewPicture] = useState(null);
     const [isConversionFinished, setIsConversionFinished] = useState(null);
     const [formData, setFormData] = useState(new FormData());
@@ -24,11 +24,12 @@ export default function ProductsMenu() {
     const addFormRef = useRef();
     const addImageRef = useRef();
     const responseRef = useRef();
+    const errorRef = useRef();
     const [isUploading, setIsUploading] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState("");
 
     //function for uploading image for a product
     async function handleImageUpload(productId) {
-        console.log(formData.get("file"));
         try {
             const config = {
                 headers: {
@@ -106,36 +107,83 @@ export default function ProductsMenu() {
     }
 
     //function for modyfing a products data
-    async function handleModifyProduct() {
+    async function handleModifyProduct(id) {
         setIsUploading(true);
         try {
             const config = {
-              headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` },
+                headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` },
             }
-            const response = await axios.put(`https://backend.csaposapp.hu/api/products`,{
+            const response = await axios.put(`https://backend.csaposapp.hu/api/products/${id}`,{
                 name: modifyFormRef.current.name.value,
                 description: modifyFormRef.current.description.value,
                 category: modifyFormRef.current.category.value,
                 price: modifyFormRef.current.price.value,
                 stockQuantity: 10,
-                locationId: managerLocation.id
-              }, config);
-            if (response.status === 201) {
-                if (await handleImageUpload(response.data.id)){
+                locationId: managerLocation.id,
+                imgUrl: selectedProduct.imgUrl
+            }, config);
+            if (response.status === 204) {
+                console.log(formData.get("file"))
+                if (formData.get("file")) {
+                    console.log("van file")
+                    if (await handleImageUpload(id)){
+                        setIsUploading(false);
+                        setFormData(new FormData());
+                        responseRef.current.inert = true;
+                        responseRef.current.showModal();
+                        responseRef.current.inert = false;
+                        setTimeout(() => {
+                            responseRef.current.close();
+                            modifyModalRef.current.close();
+                        }, 1000);
+                        setLocationProducts(state => {
+                            const newArray = state.filter(product => product.id !== selectedProduct.id);
+                            return [...newArray, 
+                            {
+                                id: selectedProduct.id,
+                                name: modifyFormRef.current.name.value,
+                                description: modifyFormRef.current.description.value,
+                                category: modifyFormRef.current.category.value,
+                                price: modifyFormRef.current.price.value,
+                                stockQuantity: 10,
+                                locationId: managerLocation.id,
+                                imgUrl: selectedProduct.imgUrl
+                            }];      
+                        });
+                    }
+                }
+                else {
+                    setIsUploading(false);
+                    setFormData(new FormData());
                     responseRef.current.inert = true;
                     responseRef.current.showModal();
                     responseRef.current.inert = false;
                     setTimeout(() => {
                         responseRef.current.close();
-                        addModalRef.current.close();
+                        modifyModalRef.current.close();
                     }, 1000);
+                    setLocationProducts(state => {
+                        const newArray = state.filter(product => product.id !== selectedProduct.id);
+                        console.log([...newArray]);
+                        return [...newArray, 
+                        {
+                            id: selectedProduct.id,
+                            name: modifyFormRef.current.name.value,
+                            description: modifyFormRef.current.description.value,
+                            category: modifyFormRef.current.category.value,
+                            price: modifyFormRef.current.price.value,
+                            stockQuantity: 10,
+                            locationId: managerLocation.id,
+                            imgUrl: selectedProduct.imgUrl
+                        }];      
+                    });
                 }
             }
         }
           catch (error) {
             if (error.response?.status === 401) {
               if (await getAccessToken()) {
-                return await handleCreateProduct();
+                return await handleModifyProduct(id);
               }
               else {
                 await logout();
@@ -193,6 +241,15 @@ export default function ProductsMenu() {
         setMenuState("Products");
     }, []);
 
+    //set selected category for select tag
+    useEffect(() => {
+        console.log(selectedProduct);
+        if (selectedProduct?.category) {
+            setSelectedCategory(selectedProduct.category);
+        }
+
+    }, [selectedProduct]);
+
     return (
         <div className='w-full grow flex flex-col p-4 gap-8' style={{height: "calc(100vh - 6rem)"}}>
 
@@ -213,10 +270,7 @@ export default function ProductsMenu() {
                 }
             </div>
 
-            <dialog className='modal' ref={modifyModalRef} onSubmit={async (event) => {
-                event.preventDefault();
-                await handleModifyProduct();
-            }}>
+            <dialog className='modal' ref={modifyModalRef}>
                 <div className="modal-box flex flex-col gap-4 max-w-1/2 relative">
                     <LuX className='absolute top-0 left-0 bg-red-500 text-white w-8 h-8 rounded-br cursor-pointer' onClick={() => {
                         modifyModalRef.current.close();
@@ -247,44 +301,54 @@ export default function ProductsMenu() {
                                 }
                             </div>
                         }
-                        <form ref={modifyFormRef}>
+                        <form ref={modifyFormRef} onSubmit={async (event) => {
+                            event.preventDefault();
+                            console.log(selectedProduct);
+                            await handleModifyProduct(selectedProduct.id);
+                            }}>
                             <fieldset className='fieldset'>
                                 <legend className='fieldset-legend text-md'>Név</legend>
-                                <input type="text" defaultValue={selectedProduct.name} className='input input-lg' required/>
+                                <input name='name' type="text" defaultValue={selectedProduct.name} className='input input-lg' required/>
                             </fieldset>
                             <fieldset className='fieldset'>
                                 <legend className='fieldset-legend text-md'>Leírás</legend>
-                                <input type="text" defaultValue={selectedProduct.description} className='input input-lg' required/>
+                                <input name='description' type="text" defaultValue={selectedProduct.description} className='input input-lg' required/>
                             </fieldset>
                             <fieldset className='fieldset'>
                                 <legend className='fieldset-legend text-md'>Kategória</legend>
-                                <select name='category' className="select" required>
-                                    <option>Röviditalok</option>
-                                    <option>Sörök</option>
-                                    <option>Borok</option>
-                                    <option>Koktélok</option>
-                                    <option>Üdítők</option>
-                                    <option>Nasik</option>
+                                <select name='category' className="select" required value={selectedCategory} onChange={(e) => setSelectedCategory(e.currentTarget.value)}>
+                                    <option value={"Röviditalok"}>Röviditalok</option>
+                                    <option value={"Sörök"}>Sörök</option>
+                                    <option value={"Borok"}>Borok</option>
+                                    <option value={"Koktélok"}>Koktélok</option>
+                                    <option value={"Üdítők"}>Üdítők</option>
+                                    <option value={"Nasik"}>Nasik</option>
                                 </select>
                             </fieldset>
                             <fieldset className='fieldset'>
                                 <legend className='fieldset-legend text-md'>Ár</legend>
                                 <label className='input input-lg'>
-                                    <input type="number" min={0} defaultValue={selectedProduct.price} required/>
+                                    <input name='price' type="number" min={0} defaultValue={selectedProduct.price} required/>
                                     <span className='label'>Ft</span>
                                 </label>
                             </fieldset>
-                            <input type='submit' value={"Mentés"} className='btn btn-info btn-lg mt-4 w-full' required/>
+                            {
+                                isUploading ? 
+                                <button className='btn btn-info btn-lg mt-4 w-full disabled:!text-info-content disabled:!bg-info' disabled>
+                                    Hozzáadás
+                                    <span className='loading loading-spinner loading-md'></span>
+                                </button> :
+                                <input type='submit' value={"Mentés"} className='btn btn-info btn-lg mt-4 w-full' required/>
+                            }
                         </form>
                     </div>
                 </div>
                 <form method='dialog' className='modal-backdrop'><button onClick={() => {
                     modifyFormRef.current.reset();
+                    modifyFormRef.current.category.value = selectedCategory;
                     setPreviewPicture(null);
                 }}></button></form>
             </dialog>
-
-            
 
             <dialog className='modal' ref={addModalRef}>
                 <div className="modal-box flex flex-col gap-4 max-w-1/2 relative">
@@ -312,7 +376,17 @@ export default function ProductsMenu() {
                         }
                         <form ref={addFormRef} onSubmit={async (event) => {
                             event.preventDefault();
-                            await handleCreateProduct();
+                            if (formData.get("file")) {
+                                await handleCreateProduct();
+                            }
+                            else {
+                                errorRef.current.inert = true;
+                                errorRef.current.showModal();
+                                errorRef.current.inert = false;
+                                setTimeout(() => {
+                                    errorRef.current.close();
+                                }, 1000);
+                            }
                         }}>
                             <fieldset className='fieldset'>
                                 <legend className='fieldset-legend text-md'>Név</legend>
@@ -380,6 +454,15 @@ export default function ProductsMenu() {
                     <div className='flex items-center'>
                         <span className='font-bold text-lg'>Sikeres művelet!</span>
                         <LuCheck className='h-10 w-10'/>
+                    </div>
+                </div>
+                <form method="dialog" className='modal-backdrop'><button></button></form>
+            </dialog>
+
+            <dialog className='modal' ref={errorRef}>
+                <div className="modal-box">
+                    <div className='flex items-center'>
+                        <span className='font-bold text-lg text-red-500'>Kötelező képet feltölteni!</span>
                     </div>
                 </div>
                 <form method="dialog" className='modal-backdrop'><button></button></form>

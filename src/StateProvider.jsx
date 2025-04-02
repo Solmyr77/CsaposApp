@@ -1,14 +1,16 @@
 import { createContext, useState } from "react";
 
-const TableContext = createContext();
-export default TableContext;
+const StateContext = createContext();
+export default StateContext;
 
 export function TableProvider({ children }) {
     const [selectedGuest, setSelectedGuest] = useState({});
     const [selectedProduct, setSelectedProduct] = useState({});
+    const [selectedEvent, setSelectedEvent] = useState({});
 
+    
     return (
-        <TableContext.Provider 
+        <StateContext.Provider 
         value={{
         selectedGuest,
         setSelectedGuest,
@@ -16,6 +18,6 @@ export function TableProvider({ children }) {
         setSelectedProduct
         }}>
             {children}
-        </TableContext.Provider>
+        </StateContext.Provider>
     )
 }

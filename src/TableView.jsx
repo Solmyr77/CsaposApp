@@ -2,14 +2,14 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import GuestItem from "./GuestItem";
 import Context from "./Context";
-import TableContext from "./TableProvider";
+import StateContext from "./StateProvider";
 import Order from "./Order";
 import getAccessToken from "./refreshToken";
 import axios from "axios";
 
 function TableView() {
   const { tables, bookings, setBookings, logout } = useContext(Context);
-  const { selectedGuest, setSelectedGuest } = useContext(TableContext);
+  const { selectedGuest, setSelectedGuest } = useContext(StateContext);
   const { number } = useParams();
   const [currentTable, setCurrentTable] = useState({});
   const [currentBooking, setCurrentBooking] = useState({});

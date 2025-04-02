@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
-import TableContext from "./TableProvider";
+import StateContext from "./StateProvider";
 
 function GuestItem({ guest }) {
-  const { selectedGuest, setSelectedGuest } = useContext(TableContext);
+  const { selectedGuest, setSelectedGuest } = useContext(StateContext);
 
   return (
     <div className={`flex w-full justify-between items-center p-2 rounded-md ${selectedGuest?.id === guest?.id ? "bg-sky-200/75" : "bg-white"} cursor-pointer`} onClick={() => setSelectedGuest(guest)}>

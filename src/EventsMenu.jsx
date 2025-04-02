@@ -183,6 +183,7 @@ function EventsMenu() {
     async function handleCreateEvent() {
         setIsUploading(true);
         try {
+
             const config = {
               headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` },
             }
@@ -191,10 +192,9 @@ function EventsMenu() {
                 description: addFormRef.current.description.value,
                 locationId: managerLocation.id,
                 timeFrom: addFormRef.current.timeFrom.value,
-                timeTo: addFormRef.current.timeFrom.value 
+                timeTo: addFormRef.current.timeTo.value 
               }, config);
             if (response.status === 201) {
-                console.log("ittvok")
                 if (await handleImageUpload(response.data.locationId, response.data.id)){
                     setEvents(state => {
                         if (!state.some(event => event.id === response.data.id)) {

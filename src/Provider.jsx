@@ -318,13 +318,17 @@ function Provider({ children }) {
       }
       const response = await axios.get(`https://backend.csaposapp.hu/api/events/location/${id}`, config);
       if (response.status === 200) {
-        console.log(response.data)
         const eventAttendances = await getEventAttendances(id);
-        let counter = 0;
-        response.data.map(event => {
-          let counter = 0;
-        });
-        eventAttendances.map(eventattendance => eventattendance.event.status === "accepted" ? counter++ : "")
+        if (eventAttendances?.length > 0) {
+          response.data.map(event => {
+            let counter = 0;
+            const filteredArray = eventAttendances.filter(eventattendance => eventattendance.event.id === event.id);
+            if (filteredArray) {
+              filteredArray.map(eventattendance => eventattendance.status === "accepted" ? counter++ : eventattendance);
+            }
+            event.attendees = counter;
+          });
+        }
         setEvents(response.data);
         return response.data;
       }

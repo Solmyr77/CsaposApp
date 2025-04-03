@@ -8,9 +8,7 @@ import axios from "axios";
 import getAccessToken from "./refreshToken";
 import img1 from "./img/pilsner.png";
 import { MdOutlineTableRestaurant } from "react-icons/md";
-import AvatarGroupItem from "./AvatarGroupItem";
 import UserImage from "./UserImage";
-
 
 function PubMenu() {
   const { order, setOrder, locationProducts, categories, tableOrders, selectedProduct, setSelectedProduct, logout, allBookings, getProductsByLocation, getOrdersByTable, user, friends } = useContext(Context);
@@ -78,8 +76,6 @@ function PubMenu() {
     if (allBookings?.length > 0) {
       const foundBooking = allBookings.find(booking => booking.id === id);
       if (foundBooking) {
-        console.log(foundBooking);
-        console.log(categories);
         setCurrentBooking(foundBooking);
         const run = async () => {
           await getOrdersByTable(foundBooking.tableId);
@@ -112,11 +108,11 @@ function PubMenu() {
                   )
                 }
                 {
-                  currentBooking?.tableGuests?.map((friend, i) => i < 3 ? friend.status === "accepted" && <UserImage key={friend.id} width={"w-7"} record={friend} border/> : (
+                  currentBooking?.tableGuests?.filter(guest => guest.status === "accepted")?.map((friend, i) => i < 3 ? friend.status === "accepted" && <UserImage key={friend.id} width={"w-7"} record={friend} border/> : (
                     i === currentBooking.tableGuests.length - 1 && 
-                    <div className="avatar placeholder h-7 aspect-square border-2" key={friend.id}>
+                    <div className="avatar placeholder h-8 aspect-square border-2" key={friend.id}>
                       <div className="bg-neutral text-neutral-content w-12">
-                        <span className="">+{currentBooking?.tableGuests?.length - i}</span>
+                        <span className="">+{currentBooking?.tableGuests?.length - 1}</span>
                       </div>
                     </div>
                   ))

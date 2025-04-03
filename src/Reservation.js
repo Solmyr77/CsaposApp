@@ -192,7 +192,7 @@ function Reservation() {
                                 if (friend.status === "pending") {
                                     return (
                                         <div className="relative" key={friend.id}>
-                                            <div className="h-4 w-4 bg-yellow-500 -right-1 top-0 absolute z-50 rounded-full flex justify-center items-center"><span className="text-sm font-bold">?</span></div>
+                                            <div className="h-4 w-4 bg-yellow-500 -right-1 text-black top-0 absolute z-50 rounded-full flex justify-center items-center"><span className="text-sm font-bold">?</span></div>
                                             <UserImage record={friend} width={"w-10"} border/>
                                         </div>
                                     )   

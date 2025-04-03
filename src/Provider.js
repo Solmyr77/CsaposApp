@@ -143,8 +143,11 @@ function Provider({ children }) {
         else if (foundOpeningHours) locations.push({...location, businessHours: foundOpeningHours});
         else locations.push({...location});
       })
-      setLocations(locations);
-      setEvents(events);
+      Promise.all(data.map((location) => getRatings(location.id))).then((res) => {
+        data.map((location, i) => location.rating = res[i]);
+        setLocations(locations);
+        setEvents(events);
+      })
       return true;
     }
     catch (error) {
@@ -399,6 +402,22 @@ function Provider({ children }) {
       }
       const response = await axios.get(`https://backend.csaposapp.hu/api/events/`, config);
       if (response.status === 200) {
+
+        Promise.all(response.data.map(event => getEventAttendances(event.locationId))).then((res) => {
+          const userAttendances = res.flat().filter(attendance => attendance.userId === tempUser.current.id && attendance.status === "accepted");
+          if (userAttendances.length > 0) {
+            response.data.map(event => {
+              const foundAttendance = userAttendances.find(attendance => attendance.event.id === event.id);
+              if (foundAttendance) {
+                event.userAttending = true;
+              }
+              else {
+                event.userAttending = false;
+              } 
+            });
+          }
+        });
+
         return response.data;
       }
     }
@@ -406,6 +425,52 @@ function Provider({ children }) {
       if (error.response?.status === 401) {
         if (await getAccessToken()) {
           await getEvents();
+        }
+        else {
+          await logout();
+          window.location.reload();
+        }
+      } 
+    }
+  }
+
+  async function getEventAttendances(id) {
+    try {
+      const config = {
+        headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` }
+      }
+      const response = await axios.get(`https://backend.csaposapp.hu/api/event-attendances/location/${id}`, config);
+      if (response.status === 200) {
+        return response.data;
+      }
+    }
+    catch (error) {
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) {
+          return await getEventAttendances(id);
+        }
+        else {
+          await logout();
+          window.location.reload();
+        }
+      } 
+    }
+  }
+
+  async function getRatings(id) {
+    try {
+      const config = {
+        headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` }
+      }
+      const response = await axios.get(`https://backend.csaposapp.hu/api/ratings?locationId=${id}`, config);
+      if (response.status === 200) {
+        return response.data;
+      }
+    }
+    catch (error) {
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) {
+          return await getRatings(id);
         }
         else {
           await logout();

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import Navbar from "./Navbar";
 import TitleDivider from "./TitleDivider";
 import StyledSwiper from "./StyledSwiper";
@@ -14,7 +14,6 @@ function Main() {
   useEffect(() => {
     setMenuState("Main");
     setPreviousRoutes(Array(location.pathname));
-    console.log(bookings, bookingsContainingUser)
   }, [bookings, bookingsContainingUser])
 
   return (

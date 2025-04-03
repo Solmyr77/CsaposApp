@@ -16,7 +16,10 @@ function HighlightedCard({ record }) {
               <span className="badge bg-gradient-to-tr from-blue to-sky-400 text-white border-0 text-xs">Nyitva</span>:
               <span className="badge border-2 bg-transparent text-red-500 border-red-500 text-xs">Zárva</span>
             }
-            <Rating name="half-rating-read" defaultValue={5} precision={0.5} readOnly/>
+            {
+              record.rating > 0 &&
+              <Rating name="half-rating-read" value={record.rating} precision={0.5} readOnly/>
+            }
           </div>
           <p className="absolute top-1/2 -translate-y-1/2 text-lg pl-5">{record.name}</p>
         </div>

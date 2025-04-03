@@ -21,7 +21,9 @@ function Event() {
   const { id } = useParams();
   const navigate = useNavigate();
 
+  //function that accepts a users attendance to an event
   async function handleAcceptEvent() {
+    setIsAttending(true);
     try {
       const config = {
         headers: { 
@@ -30,10 +32,8 @@ function Event() {
         }
       }
       const response = await axios.put(`https://backend.csaposapp.hu/api/event-attendances/accept/${id}`, {}, config);
-      const data = response.data;
       if (response.status === 201) {
-        console.log(data);
-        setIsAttending(true);
+        events.find(event => event.id === id).userAttending = true;
       } 
     }
     catch (error) {
@@ -49,7 +49,9 @@ function Event() {
     }
   }
 
+  //function that rejects a users attendance to an event
   async function handleRejectEvent() {
+    setIsAttending(false);
     try {
       const config = {
         headers: { 
@@ -58,10 +60,8 @@ function Event() {
         }
       }
       const response = await axios.put(`https://backend.csaposapp.hu/api/event-attendances/reject/${id}`, {}, config);
-      const data = response.data;
       if (response.status === 201) {
-        console.log(data);
-        setIsAttending(false);
+        events.find(event => event.id === id).userAttending = false;
       } 
     }
     catch (error) {
@@ -77,6 +77,7 @@ function Event() {
     }
   }
   
+  //function for checking if description area is clamped or not
   const checkIfClamped = () => {
     const element = textRef.current;
     if (element) {
@@ -87,6 +88,7 @@ function Event() {
     }
   };
 
+  //function for formatting time
   function formatTime(timefrom, timeto) {
     const currentTimeFrom = new Date(timefrom);
     const currentTimeTo = new Date(timeto);
@@ -105,6 +107,7 @@ function Event() {
       const foundEvent = events.find(event => event.id === id);
       const foundLocation = locations.find(location => location.id === foundEvent?.locationId);
       if (foundEvent && foundLocation) {
+        setIsAttending(foundEvent.userAttending === true ? true : false);
         setCurrentEvent(foundEvent);
         setCurrentLocation(foundLocation);
         setFormattedTime(formatTime(foundEvent.timefrom, foundEvent.timeto));
@@ -117,7 +120,7 @@ function Event() {
       window.addEventListener('resize', checkIfClamped);
     }
     return () => window.removeEventListener('resize', checkIfClamped);
-  }, [events, id]);
+  }, [events, locations, id]);
 
   return (
     <div className="min-h-screen bg-grey pb-8 text-white">

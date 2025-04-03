@@ -118,9 +118,8 @@ function Pub() {
             {
               Number(currentLocation?.rating) > 0 ?
               (
-                <div className="flex flex-row justify-between w-full">
+                <div className="flex flex-row w-full">
                   <Rating readOnly precision={0.5} value={Number(currentLocation?.rating)}/>
-                  <p>1 értékelés</p>
                 </div>
               ) :
               (

@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from "react";
-import AvatarGroupItem from "./AvatarGroupItem";
 import Context from "./Context";
 import { Link } from "react-router-dom";
 import { LuCalendar, LuClock, LuMapPin, LuUsers } from "react-icons/lu";
@@ -56,13 +55,13 @@ function ReservationItem({ booking, isGuest }) {
                             <p className="">{booking.bookedFrom.split("T")[1].substring(0, 5)}</p>
                         </div>
                     </div>
-                    <div className="avatar-group -space-x-4 rtl:space-x-reverse justify-end">
+                    <div className="avatar-group -space-x-5 rtl:space-x-reverse justify-end">
                         {
                             tableGuests.length > 0 && Array.from(tableGuests).map((tableGuest, i) => {
-                                if (i < 4) return <UserImage key={i} width={"w-10"} record={tableGuest} border/>
+                                if (i < 4) return <UserImage key={tableGuest.id} width={"w-10"} record={tableGuest} border/>
                                 else if (i === 4) return (
-                                    <div className="avatar h-10 aspect-square border-2 placeholder">
-                                        <div className="bg-neutral text-neutral-content w-12">
+                                    <div key={i} className="avatar h-full aspect-square border-2 rounded-full placeholder">
+                                        <div className="bg-neutral text-neutral-content w-10 aspect-square">
                                             <span>+{Number(tableGuests?.length) - 4}</span>
                                         </div>
                                     </div>

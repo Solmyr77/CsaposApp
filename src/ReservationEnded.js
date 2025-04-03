@@ -10,6 +10,7 @@ function ReservationEnded() {
   const { locations, allBookings, logout } = useContext(Context);
   const [currentLocation, setCurrentLocation] = useState({});
   const [rating, setRating] = useState(0);
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
   const { id } = useParams();
   const modalRef = useRef();
@@ -75,7 +76,7 @@ function ReservationEnded() {
       </div>
       <div className="flex flex-col items-center gap-4">
         <Rating sx={{"& .MuiSvgIcon-root" : { width: "2.5rem", height: "2.5rem" }}} onChange={(event) => setRating(event.target.value)}/>
-        <button className="btn bg-gradient-to-tr from-blue to-sky-400 border-0 text-xl text-white w-56 h-20" onClick={() => handleRateLocation()}>Értékelem</button>
+        <button className="btn bg-gradient-to-tr from-blue to-sky-400 border-0 text-xl text-white w-56 h-20 disabled:text-white disabled:opacity-50" disabled={rating === 0} onClick={() => handleRateLocation()}>Értékelem</button>
         <button className="btn border-0 text-white w-fit text-md min-h-0 h-12 bg-dark-grey hover:bg-dark-grey" onClick={() => navigate("/")}><span className="bg-gradient-to-tr leading-normal from-blue opacity-85 to-sky-400 bg-clip-text text-transparent">Értékelés kihagyása</span></button>
       </div>
       <dialog className="modal" ref={modalRef}>

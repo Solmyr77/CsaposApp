@@ -57,7 +57,7 @@ function ReservationItem({ booking, isGuest }) {
                     </div>
                     <div className="avatar-group -space-x-5 rtl:space-x-reverse justify-end">
                         {
-                            tableGuests.length > 0 && Array.from(tableGuests).map((tableGuest, i) => {
+                            tableGuests.length > 0 && tableGuests.map((tableGuest, i) => {
                                 if (i < 4) return <UserImage key={tableGuest.id} width={"w-10"} record={tableGuest} border/>
                                 else if (i === 4) return (
                                     <div key={i} className="avatar h-full aspect-square border-2 rounded-full placeholder">

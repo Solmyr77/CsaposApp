@@ -3,14 +3,13 @@ import BackButton from "./BackButton";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { MdOutlineTableRestaurant } from "react-icons/md";
 import { LuCalendar, LuCheck, LuClock, LuMapPin, LuX } from "react-icons/lu";
-import AvatarGroupItem from "./AvatarGroupItem";
 import Context from "./Context";
 import getAccessToken from "./refreshToken";
 import axios from "axios";
 import UserImage from "./UserImage";
 
 function Reservation() {
-    const { bookings, bookingsContainingUser, getBookingsContainingUser, logout, getLocationTables, removeBooking, user, friends, locations } = useContext(Context); 
+    const { bookings, bookingsContainingUser, getBookingsContainingUser, logout, getLocationTables, removeBooking, user, friends, locations, tableOrders, getOrdersByTable } = useContext(Context); 
     const { id } = useParams();
     const navigate = useNavigate();
     const confirmModal = useRef();
@@ -24,6 +23,7 @@ function Reservation() {
     const [isAccepted, setIsAccepted] = useState(null);
     const [waiting, setWaiting] = useState(false);
     
+    //function for accepting a reservation invite
     async function handleAcceptInvite(id) {
         try {
             const config = {
@@ -48,6 +48,7 @@ function Reservation() {
         }
     }
 
+    //function for rejecting a reservation invite
     async function handleRejectInvite(id) {
         try {
             const config = {
@@ -73,11 +74,10 @@ function Reservation() {
         }
     }
 
+    //function for setting active state based on current time
     function setActiveTimeout(foundBooking) {
         const bookedFrom = new Date(foundBooking.bookedFrom);
         bookedFrom.setSeconds(0);
-        const expiryTime = new Date(bookedFrom);
-        expiryTime.setMinutes(bookedFrom.getMinutes() + 20, 0);
         if (new Date().getTime() < bookedFrom.getTime()) {
             const timeout = setTimeout(() => {
                 setIsActive(true);
@@ -87,6 +87,7 @@ function Reservation() {
         else setIsActive(true);
     }
 
+    //function for setting table guest current status
     function getUserOfTable(tableUser) {
         switch (tableUser?.status) {
         case "pending":
@@ -123,7 +124,11 @@ function Reservation() {
                 if (friends.length > 0) setBookerProfile(friends.find(friend => friend.id === foundBooking.bookerId));
                 const run = async () => {
                     (user  && foundUser) && getUserOfTable(foundUser);
-                    setCurrentTable((await getLocationTables(foundBooking.locationId))?.find(table => table.id === foundBooking.tableId));
+                    const foundTable = (await getLocationTables(foundBooking.locationId))?.find(table => table.id === foundBooking.tableId)
+                    if (foundTable) {
+                        setCurrentTable(foundTable);
+                        await getOrdersByTable(foundTable.id);
+                    }
                 }
                 run();
                 setActiveTimeout(foundBooking);
@@ -152,7 +157,6 @@ function Reservation() {
                                     <div className="avatar border-2 rounded-full border-white">
                                         <div className="w-6 rounded-full">
                                             <UserImage record={bookerProfile}/>
-                                            {/* <img src={`https://assets.csaposapp.hu/assets/images/${bookerProfile?.imageUrl}`} alt="kép" /> */}
                                         </div>
                                     </div>
                                     <p className="line-clamp-1 font-bold">{bookerProfile?.displayName || "N/A"}</p>
@@ -225,7 +229,7 @@ function Reservation() {
                         (
                             !isGuest ? 
                             <div className="flex justify-between mt-2 gap-2 w-full">
-                                <button className="btn bg-black border-2 bg-opacity-40 border-red-500 text-red-500 hover:bg-black hover:bg-opacity-40 hover:border-red-500 gap-0 basis-1/2 text-md" onClick={async () => confirmModal.current.showModal()}>Lemondás</button>
+                                <button className="btn bg-black border-2 bg-opacity-40 border-red-500 text-red-500 hover:bg-black hover:bg-opacity-40 hover:border-red-500 gap-0 basis-1/2 text-md" disabled={tableOrders.length > 0} onClick={async () => confirmModal.current.showModal()}>Lemondás</button>
                                 <button className="btn bg-dark-grey hover:bg-dark-grey disabled:bg-dark-grey border-none gap-0 basis-1/2 disabled:opacity-50 text-md" disabled={!isActive} onClick={() => navigate(`/pubmenu/${currentLocation.name}/${currentBooking.id}`)}><span className="bg-gradient-to-t from-blue to-sky-400 bg-clip-text leading-relaxed text-transparent">Kezdés</span></button>
                             </div> :
                             <div className="flex justify-between mt-2 gap-2 w-full">

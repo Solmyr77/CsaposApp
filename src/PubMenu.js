@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import MenuItem from "./MenuItem";
 import Context from "./Context";
 import OrderItem from "./OrderItem";
-import { LuMinus, LuPlus, LuX, LuShoppingBag, LuLogOut, LuCheck } from "react-icons/lu";
+import { LuMinus, LuPlus, LuX, LuShoppingBag, LuLogOut, LuCheck, LuArrowLeft, LuArrowRight } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import getAccessToken from "./refreshToken";
@@ -22,6 +22,7 @@ function PubMenu() {
   const [orderTotal, setOrderTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
+  //function for creating an order
   async function handleCreateOrder() {
     setIsLoading(true);
     const orderItems = Array.from(order.map(item => ({
@@ -61,6 +62,7 @@ function PubMenu() {
     }
   }
 
+  //useeffect for setting order total price and order quantity
   useEffect(() => {
     let quantity = 0;
     let total = 0; 
@@ -72,6 +74,7 @@ function PubMenu() {
     setOrderTotal(total);
   }, [order]);
   
+  //useeffect for fetching orders for current table and products for current location
   useEffect(() => {
     if (allBookings?.length > 0) {
       const foundBooking = allBookings.find(booking => booking.id === id);
@@ -90,9 +93,9 @@ function PubMenu() {
   return (
     <div className="flex flex-col max-h-screen h-screen overflow-y-hidden bg-grey text-white font-bold">
       <div className="flex flex-col mb-3 px-4 pt-4 pb-0 shadow-lg">
-        <button className="btn min-h-0 h-8 w-fit text-red-500 bg-dark-grey border-0 hover:bg-dark-grey" onClick={()=> navigate(`/sessionended/${id}`)}>
-          <LuLogOut className="rotate-180"/>
-          <span>Kilépés</span>
+        <button className="btn min-h-0 h-8 w-fit text-sky-400 bg-dark-grey border-0 hover:bg-dark-grey" onClick={()=> navigate(`/`)}>
+          <LuArrowRight className="rotate-180"/>
+          <span>Vissza</span>
         </button>
         <div className="flex flex-row justify-between items-end mb-2">
           <p className="text-center text-xl">{name}</p>

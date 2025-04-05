@@ -4,6 +4,7 @@ using CsaposApi.Models.DTOs;
 using CsaposApi.Services.IService;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
+using Mysqlx.Crud;
 using System;
 using System.Threading.Tasks;
 using static CsaposApi.Models.DTOs.OrderDTO;
@@ -57,6 +58,12 @@ namespace CsaposApi.Services
         {
             _logger.LogInformation($"Order has been created for booking {bookingId}.");
             await _hubContext.Clients.Group(locationId).SendAsync("NotifyOrderCreated", new { order = order, bookingId = bookingId, sentAt = DateTime.Now });
+        }
+
+        public async Task NotifyBookingCreated(string locationId, BookingDTO.BookingResponseWithGuestsDTO? currentBooking)
+        {
+            _logger.LogInformation($"Booking has been created at location {locationId}.");
+            await _hubContext.Clients.Group(locationId).SendAsync("NotifyBookingCreated", new { booking = currentBooking, sentAt = DateTime.Now });
         }
     }
 }

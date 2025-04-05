@@ -234,6 +234,108 @@ namespace CsaposApi.Controllers
             }
         }
 
+        [HttpPut("{id}")]
+        [Authorize(Policy = "MustBeGuest")]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> UpdateEvent(Guid id, UpdateEventDTO updateEventDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    error = "invalid_request",
+                    message = "Request body is missing, malformed, or incomplete."
+                });
+            }
+
+            var currentEvent = await _context.Events.FindAsync(id);
+            if (currentEvent == null)
+            {
+                return NotFound(new
+                {
+                    error = "not_found",
+                    message = "Event not found."
+                });
+            }
+
+            currentEvent.Name = updateEventDTO.Name;
+            currentEvent.Description = updateEventDTO.Description;
+            currentEvent.Timefrom = updateEventDTO.Timefrom;
+            currentEvent.Timeto = updateEventDTO.Timeto;
+            currentEvent.ImgUrl = updateEventDTO.ImgUrl;
+            currentEvent.UpdatedAt = DateTime.Now;
+
+            try
+            {
+                _context.Entry(currentEvent).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!EventExists(id))
+                {
+                    return NotFound(new
+                    {
+                        error = "not_found",
+                        message = "Event not found."
+                    });
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return Ok(new EventResponseDTO
+            {
+                Id = currentEvent.Id,
+                LocationId = (Guid)currentEvent.LocationId,
+                Name = currentEvent.Name,
+                Description = currentEvent.Description,
+                Timefrom = currentEvent.Timefrom,
+                Timeto = currentEvent.Timeto,
+                ImgUrl = currentEvent.ImgUrl
+            });
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Policy = "MustBeGuest")]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.NoContent)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> DeleteEvent(Guid id)
+        {
+            var currentEvent = await _context.Events.FindAsync(id);
+            if (currentEvent == null)
+            {
+                return NotFound(new
+                {
+                    error = "not_found",
+                    message = "Event not found."
+                });
+            }
+
+            try
+            {
+                _context.Events.Remove(currentEvent);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, new
+                {
+                    error = "server_error",
+                });
+            }
+
+            return NoContent();
+        }
+
         private bool EventExists(Guid id)
         {
             return _context.Events.Any(e => e.Id == id);

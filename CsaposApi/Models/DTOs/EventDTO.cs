@@ -21,5 +21,14 @@
             public DateTime Timefrom { get; set; }
             public DateTime Timeto { get; set; }
         }
+
+        public class UpdateEventDTO
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public DateTime Timefrom { get; set; }
+            public DateTime Timeto { get; set; }
+            public string ImgUrl { get; set; }
+        }
     }
 }

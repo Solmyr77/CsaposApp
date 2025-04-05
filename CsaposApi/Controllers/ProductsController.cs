@@ -168,6 +168,22 @@ namespace CsaposApi.Controllers
             return NoContent();
         }
 
+        [HttpDelete("{id}")]
+        [Authorize(Policy = "MustBeManager")]
+        public async Task<IActionResult> DeleteProduct(Guid id)
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            _context.Products.Remove(product);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
         private bool ProductExists(Guid id)
         {
             return _context.Products.Any(e => e.Id == id);

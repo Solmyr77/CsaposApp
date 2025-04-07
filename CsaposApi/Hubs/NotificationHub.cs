@@ -63,6 +63,5 @@ namespace CsaposApi.Hubs
 
             await base.OnDisconnectedAsync(exception);
         }
-
     }
 }

@@ -17,13 +17,28 @@ namespace CsaposApi.Hubs
             _authService = authService;
         }
 
-        public async Task RegisterUser(string token)
+        public async Task<bool> RegisterUser(string token)
         {
-            var userId = Guid.Parse(_authService.GetUserId(token));
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                _logger.LogWarning("Registration failed: Token is empty or null.");
+                return false;
+            }
 
-            _logger.LogInformation($"Registering user with userId: {userId} and connectionId: {Context.ConnectionId}");
+            string? userIdString = _authService.GetUserId(token);
+            if (!Guid.TryParse(userIdString, out Guid userId))
+            {
+                _logger.LogWarning($"Registration failed: Invalid token received. Token: {token}");
+                return false;
+            }
+
+            _logger.LogInformation($"Registering user {userId} with connection {Context.ConnectionId}");
 
             _connectionManager.AddConnection(userId, Context.ConnectionId);
+
+            await Task.Delay(500);
+
+            return true;
         }
 
         public async Task JoinBookingGroup(string bookingId)
@@ -38,6 +53,15 @@ namespace CsaposApi.Hubs
             _logger.LogInformation($"User with connectionId: {Context.ConnectionId} left the booking group");
 
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, bookingId);
+        }
+
+        public override async Task OnDisconnectedAsync(Exception? exception)
+        {
+            _logger.LogWarning($"User disconnected. Connection ID: {Context.ConnectionId}, Exception: {exception?.Message}");
+
+            _connectionManager.RemoveConnection(Context.ConnectionId);
+
+            await base.OnDisconnectedAsync(exception);
         }
     }
 }

@@ -11,6 +11,8 @@ using static CsaposApi.Models.DTOs.OrderDTO;
 using CsaposApi.Services.IService;
 using static CsaposApi.Models.DTOs.OrderItemDTO;
 using CsaposApi.Models.DTOs;
+using System.Net;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace CsaposApi.Controllers
 {
@@ -318,6 +320,99 @@ namespace CsaposApi.Controllers
         private bool OrderExists(Guid id)
         {
             return _context.Orders.Any(e => e.Id == id);
+        }
+
+        [HttpPut("{id}/status")]
+        [Authorize(Policy = "MustBeGuest")]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> UpdateOrderStatus(Guid id, OrderStatusUpdateDTO orderStatusUpdateDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    error = "invalid_request",
+                    message = "Request body is missing, malformed, or incomplete."
+                });
+            }
+
+            if (orderStatusUpdateDTO.OrderStatus != "pending" && orderStatusUpdateDTO.OrderStatus != "completed" && orderStatusUpdateDTO.OrderStatus != "accepted" && orderStatusUpdateDTO.OrderStatus != "paid")
+            {
+                return BadRequest(new
+                {
+                    error = "invalid_request",
+                    message = "Order status must be either 'pending', 'completed', 'paid' or 'accepted'."
+                });
+            }
+
+            var order = await _context.Orders.FindAsync(id);
+            if (order == null)
+            {
+                return NotFound(new
+                {
+                    error = "not_found",
+                    message = "Order not found."
+                });
+            }
+
+            order.OrderStatus = orderStatusUpdateDTO.OrderStatus;
+            order.UpdatedAt = DateTime.UtcNow;
+
+            try
+            {
+                _context.Entry(order).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!OrderExists(id))
+                {
+                    return NotFound(new
+                    {
+                        error = "not_found",
+                        message = "Order not found."
+                    });
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            var currentOrder = await _context.Orders.Include(y => y.OrderItems).FirstOrDefaultAsync(x => x.Id == id);
+
+            // Map the order to a response DTO.
+            var responseDto = new OrderResponseDTO
+            {
+                Id = currentOrder.Id,
+                UserId = currentOrder.UserId,
+                TableId = currentOrder.TableId,
+                LocationId = currentOrder.LocationId,
+                OrderStatus = currentOrder.OrderStatus,
+                CreatedAt = currentOrder.CreatedAt,
+                UpdatedAt = currentOrder.UpdatedAt,
+                OrderItems = currentOrder.OrderItems.Select(oi => new OrderItemResponseDTO
+                {
+                    Id = oi.Id,
+                    OrderId = oi.OrderId,
+                    ProductId = oi.ProductId,
+                    UnitPrice = oi.UnitPrice,
+                    Quantity = oi.Quantity,
+                    CreatedAt = oi.CreatedAt,
+                    UpdatedAt = oi.UpdatedAt
+                }).ToList()
+            };
+
+            await _bookingNotificationService.NotifyOrderStatusUpdated(currentOrder.BookingId.ToString(), responseDto);
+
+            return Ok(new
+            {
+                message = "Order status updated successfully."
+            });
         }
     }
 }

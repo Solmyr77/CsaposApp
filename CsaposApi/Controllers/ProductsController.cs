@@ -165,7 +165,21 @@ namespace CsaposApi.Controllers
                 }
             }
 
-            return NoContent();
+            var response = new ProductResponseDTO
+            {
+                Id = product.Id,
+                LocationId = product.LocationId,
+                Name = product.Name,
+                Description = product.Description,
+                Category = product.Category,
+                Price = product.Price,
+                DiscountPercentage = product.DiscountPercentage,
+                StockQuantity = product.StockQuantity,
+                IsActive = product.IsActive,
+                ImgUrl = product.ImgUrl
+            };
+
+            return Ok(response);
         }
 
         [HttpDelete("{id}")]

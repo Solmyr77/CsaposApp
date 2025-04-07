@@ -52,5 +52,11 @@ namespace CsaposApi.Services
             _logger.LogInformation($"Order has been created for booking {bookingId}.");
             await _hubContext.Clients.Group(bookingId).SendAsync("NotifyOrderCreated", new { order = order, bookingId = bookingId, sentAt = DateTime.Now });
         }
+
+        public async Task NotifyOrderStatusUpdated(string bookingId, OrderResponseDTO order)
+        {
+            _logger.LogInformation($"Order status has been updated in booking {bookingId}.");
+            await _hubContext.Clients.Group(bookingId).SendAsync("NotifyOrderStatusUpdated", new { order = order, bookingId = bookingId, sentAt = DateTime.Now });
+        }
     }
 }

@@ -21,7 +21,6 @@
             public int DiscountPercentage { get; set; }
             public int? StockQuantity { get; set; }
             public bool? IsActive { get; set; }
-            public string ImgUrl { get; set; }
         }
 
         public class ProductResponseDTO

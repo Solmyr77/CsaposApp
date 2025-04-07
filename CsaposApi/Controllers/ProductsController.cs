@@ -145,7 +145,6 @@ namespace CsaposApi.Controllers
             product.DiscountPercentage = updateProductDTO.DiscountPercentage;
             product.StockQuantity = updateProductDTO.StockQuantity;
             product.IsActive = updateProductDTO.IsActive;
-            product.ImgUrl = updateProductDTO.ImgUrl;
 
             _context.Entry(product).State = EntityState.Modified;
 
@@ -176,7 +175,6 @@ namespace CsaposApi.Controllers
                 DiscountPercentage = product.DiscountPercentage,
                 StockQuantity = product.StockQuantity,
                 IsActive = product.IsActive,
-                ImgUrl = product.ImgUrl
             };
 
             return Ok(response);

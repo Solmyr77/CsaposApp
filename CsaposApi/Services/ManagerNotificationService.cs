@@ -13,11 +13,11 @@ namespace CsaposApi.Services
 {
     public class ManagerNotificationService : IManagerNotificationService
     {
-        private readonly IHubContext<BookingHub> _hubContext;
+        private readonly IHubContext<ManagerHub> _hubContext;
         private readonly IConnectionManager _connectionManager;
         private readonly ILogger<ManagerNotificationService> _logger;
 
-        public ManagerNotificationService(IHubContext<BookingHub> hubContext, IConnectionManager connectionManager, ILogger<ManagerNotificationService> logger)
+        public ManagerNotificationService(IHubContext<ManagerHub> hubContext, IConnectionManager connectionManager, ILogger<ManagerNotificationService> logger)
         {
             _hubContext = hubContext;
             _connectionManager = connectionManager;

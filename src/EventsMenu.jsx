@@ -107,69 +107,40 @@ function EventsMenu() {
             const config = {
                 headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` },
             }
+            if (formData.get("file")) {
+                await handleImageUpload(id, selectedEvent.id);
+                console.log("van file felment");
+            }
             const response = await axios.put(`https://backend.csaposapp.hu/api/events/${id}`,{
                 name: modifyFormRef.current.name.value,
                 description: modifyFormRef.current.description.value,
-                imgUrl: selectedEvent.imgUrl,
                 timeFrom: modifyFormRef.current.timeFrom.value,
                 timeTo: modifyFormRef.current.timeTo.value 
             }, config);
             if (response.status === 200) {
-                if (formData.get("file")) {
-                    console.log("van file")
-                    const imgResponse = await handleImageUpload(id, selectedEvent.id);
-                    console.log(imgResponse);
-                    if (imgResponse){
-                        setIsUploading(false);
-                        setFormData(new FormData());
-                        responseRef.current.inert = true;
-                        responseRef.current.showModal();
-                        responseRef.current.inert = false;
-                        setTimeout(() => {
-                            responseRef.current.close();
-                            modifyModalRef.current.close();
-                        }, 1000);
-                        setEvents(state => {
-                            const newArray = state.filter(event => event.id !== selectedEvent.id);
-                            console.log(response.data);
-                            return [...newArray, 
-                            {
-                                id: response.data.id,
-                                name: response.data.name,
-                                description: response.data.description,
-                                imgUrl: imgResponse.url,
-                                locationId: response.data.locationId,
-                                timeFrom: response.data.timeFrom,
-                                timeTo: response.data.timeTo
-                            }];      
-                        });
-                    }
-                }
-                else {
-                    setIsUploading(false);
-                    setFormData(new FormData());
-                    responseRef.current.inert = true;
-                    responseRef.current.showModal();
-                    responseRef.current.inert = false;
-                    setTimeout(() => {
-                        responseRef.current.close();
-                        modifyModalRef.current.close();
-                    }, 1000);
-                    setEvents(state => {
-                        const newArray = state.filter(event => event.id !== selectedEvent.id);
-                        console.log(modifyFormRef.current.timeFrom.value)
-                        return [...newArray, 
-                        {
-                            id: response.data.id,
-                            name: response.data.name,
-                            description: response.data.description,
-                            imgUrl: response.data.imgUrl,
-                            locationId: response.data.locationId,
-                            timeFrom: response.data.timeFrom,
-                            timeTo: response.data.timeTo
-                        }];      
-                    });
-                }
+                setIsUploading(false);
+                setFormData(new FormData());
+                responseRef.current.inert = true;
+                responseRef.current.showModal();
+                responseRef.current.inert = false;
+                setTimeout(() => {
+                    responseRef.current.close();
+                    modifyModalRef.current.close();
+                }, 1000);
+                setEvents(state => {
+                    const newArray = state.filter(event => event.id !== selectedEvent.id);
+                    console.log(response.data);
+                    return [...newArray, 
+                    {
+                        id: response.data.id,
+                        name: response.data.name,
+                        description: response.data.description,
+                        imgUrl: response.data.imgUrl,
+                        locationId: response.data.locationId,
+                        timeFrom: response.data.timeFrom,
+                        timeTo: response.data.timeTo
+                    }];      
+                });
             }
         }
           catch (error) {
@@ -187,9 +158,9 @@ function EventsMenu() {
 
     //function for handling event creation
     async function handleCreateEvent() {
+        
         setIsUploading(true);
         try {
-
             const config = {
               headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` },
             }
@@ -201,10 +172,11 @@ function EventsMenu() {
                 timeTo: addFormRef.current.timeTo.value 
               }, config);
             if (response.status === 201) {
-                if (await handleImageUpload(response.data.locationId, response.data.id)){
+                const updatedImageUrl = await handleImageUpload(response.data.locationId, response.data.id);
+                if (updatedImageUrl){
                     setEvents(state => {
                         if (!state.some(event => event.id === response.data.id)) {
-                            return [...state, response.data]
+                            return [...state, {...response.data, imgUrl: updatedImageUrl.url.split("images/")[1]}]
                         }
                         return state;
                     })
@@ -245,6 +217,7 @@ function EventsMenu() {
                 responseRef.current.showModal();
                 responseRef.current.inert = false;
                 setTimeout(() => {
+                    console.log("TIMEOUT")
                     responseRef.current.close();
                     addModalRef.current.close();
                 }, 1000);
@@ -386,6 +359,7 @@ function EventsMenu() {
                             event.preventDefault();
                             if (formData.get("file")) {
                                 await handleCreateEvent();
+                                addFormRef.current.reset();
                             }
                             else {
                                 errorRef.current.inert = true;

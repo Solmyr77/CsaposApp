@@ -3,7 +3,7 @@ import Context from "./Context";
 import axios from "axios";
 import getAccessToken from "./refreshToken";
 import { Navigate } from "react-router-dom";
-import bookingConnection from "./signalRBookingConnection";
+import managerConnection from "./signalRManagerNotificationConnection";
 
 function Provider({ children }) {
   //basic states
@@ -408,7 +408,7 @@ function Provider({ children }) {
   const handleNotifyBookingDeleted = useCallback((message) => {
     setBookings(state => [...state.filter(booking => booking.id !== message.bookingId)]);
     console.log("Booking removed:", message);
-    bookingConnection.invoke("LeaveBookingGroup", message.bookingId);
+    managerConnection.invoke("LeaveBookingGroup", message.bookingId);
   }, []);
 
   const handleNotifyOrderCreated = useCallback((message) => {
@@ -425,28 +425,28 @@ function Provider({ children }) {
 
   //register user in signalr hub
   function registerUser() {
-    bookingConnection.invoke("RegisterUser", localStorage.getItem("accessToken").replaceAll(`"`, ""))
+    managerConnection.invoke("RegisterUser", localStorage.getItem("accessToken").replaceAll(`"`, ""))
     .then(() => console.log("Successfully registered user"));
   }
 
   //join booking group in signalr
-  function joinBookingGroup(bookingId) {
-    bookingConnection.invoke("JoinBookingGroup", bookingId)
+  function joinManagerGroup(locationId) {
+    managerConnection.invoke("JoinManagerGroup", locationId)
     .then(() => {
-      console.log(`✅ Joined group: bookings`, bookingId);
+      console.log(`✅ Joined group: manager`, locationId);
     })
     .catch(err => console.error("❌ Failed to join group:", err));
   }
 
   //clear then re-apply listeners
-  function registerBookingListeners() {
-    bookingConnection.off("notifybookingdeleted", handleNotifyBookingDeleted);
-    bookingConnection.off("notifyordercreated", handleNotifyOrderCreated);
-    console.log("CLEARED BOOKING DELETED LISTENER");
+  function registerManagerListeners() {
+    managerConnection.off("notifybookingdeleted", handleNotifyBookingDeleted);
+    managerConnection.off("notifyordercreated", handleNotifyOrderCreated);
+    console.log("CLEARED MANAGER LISTENERS");
 
-    bookingConnection.on("notifybookingdeleted", handleNotifyBookingDeleted);
-    bookingConnection.on("notifyordercreated", handleNotifyOrderCreated);
-    console.log("ADDED BOOKING DELETED LISTENER");
+    managerConnection.on("notifybookingdeleted", handleNotifyBookingDeleted);
+    managerConnection.on("notifyordercreated", handleNotifyOrderCreated);
+    console.log("ADDED MANAGER LISTENERS");
   }
 
   //function to make sure that connection state is connected before trying to invoke any other function
@@ -476,40 +476,40 @@ function Provider({ children }) {
   };
 
   //ref for flagging reconnection
-  const isBookingOnReconnectedFired = useRef(false);
+  const isManagerReconnectionFired = useRef(false);
 
-  //BookingHub connection
+  //ManagerHub connection
   useEffect(() => {
-    registerBookingListeners();
-    if (localStorage.getItem("accessToken") !== null && bookingConnection.state === "Disconnected" && bookings.length > 0) {
+    registerManagerListeners();
+    if (localStorage.getItem("accessToken") !== null && managerConnection.state === "Disconnected" && managerLocation?.id) {
       const startConnection = async () => {
-        if (await ensureConnected(bookingConnection)) {
+        if (await ensureConnected(managerConnection)) {
           registerUser();
-          bookings.map((booking) => booking?.id && joinBookingGroup(booking.id));
+          joinManagerGroup(managerLocation.id);
         }
       }
       startConnection();
     }
     //reconnect only once to the connection
-    if ((!isBookingOnReconnectedFired.current) && bookings.length > 0) {
-      bookingConnection.onreconnected(async () => {
+    if (!isManagerReconnectionFired.current) {
+      managerConnection.onreconnected(async () => {
         console.log("Reconnected successfully.");
-        if (await ensureConnected(bookingConnection)) {
+        if (await ensureConnected(managerConnection)) {
           setTimeout(() => {
             registerUser();
-            bookings.map((booking) => joinBookingGroup(booking.id));
+            joinManagerGroup(managerLocation.id);
           }, 500);
         }
       });
-      isBookingOnReconnectedFired.current = true;
+      isManagerReconnectionFired.current = true;
     }
 
     //cleanup function for listeners
     return () => {
-      bookingConnection.off("notifybookingdeleted", handleNotifyBookingDeleted);
-      bookingConnection.off("notifyordercreated", handleNotifyOrderCreated);
+      managerConnection.off("notifybookingdeleted", handleNotifyBookingDeleted);
+      managerConnection.off("notifyordercreated", handleNotifyOrderCreated);
     };
-  }, [bookings]);
+  }, [managerLocation]);
 
 
   return (

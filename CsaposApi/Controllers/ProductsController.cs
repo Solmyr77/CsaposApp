@@ -175,6 +175,7 @@ namespace CsaposApi.Controllers
                 DiscountPercentage = product.DiscountPercentage,
                 StockQuantity = product.StockQuantity,
                 IsActive = product.IsActive,
+                ImgUrl = product.ImgUrl
             };
 
             return Ok(response);

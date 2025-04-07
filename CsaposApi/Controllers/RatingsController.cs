@@ -92,7 +92,18 @@ namespace CsaposApi.Controllers
         [Authorize(Policy = "MustBeGuest")]
         public async Task<IActionResult> GetById(Guid locationId)
         {
-            var ratingAverage = await _context.LocationRatings.Where(x => x.LocationId == locationId).AverageAsync(x => x.Rating);
+            var query = _context.LocationRatings.Where(x => x.LocationId == locationId);
+
+            if (!await query.AnyAsync())
+            {
+                return NotFound(new
+                {
+                    error = "not_found",
+                    message = "No ratings found for this location."
+                });
+            }
+
+            var ratingAverage = await query.AverageAsync(x => x.Rating);
 
             return Ok(new { Rating = ratingAverage });
         }

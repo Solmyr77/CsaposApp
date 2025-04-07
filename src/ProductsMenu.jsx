@@ -11,7 +11,7 @@ import axios from 'axios';
 
 export default function ProductsMenu() {
     const { setMenuState, locationProducts, setLocationProducts, managerLocation, logout } = useContext(Context);
-    const { selectedProduct, setSelectedProduct } = useContext(StateContext);
+    const { selectedProduct } = useContext(StateContext);
     const [previewPicture, setPreviewPicture] = useState(null);
     const [isConversionFinished, setIsConversionFinished] = useState(null);
     const [formData, setFormData] = useState(new FormData());
@@ -76,13 +76,13 @@ export default function ProductsMenu() {
             if (response.status === 201) {
                 if (await handleImageUpload(response.data.id)){
                     setLocationProducts(state => {
-                        console.log(state.some(product => product.id === response.data.id))
                         if (!state.some(product => product.id === response.data.id)) {
                             console.log("beléptem");
                             return [...state, response.data]
                         }
                         return state;
                     })
+                    setIsUploading(false);
                     responseRef.current.inert = true;
                     responseRef.current.showModal();
                     responseRef.current.inert = false;
@@ -113,6 +113,10 @@ export default function ProductsMenu() {
             const config = {
                 headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` },
             }
+            if (formData.get("file")) {
+                await handleImageUpload(id);
+                console.log("van file");
+            }
             const response = await axios.put(`https://backend.csaposapp.hu/api/products/${id}`,{
                 name: modifyFormRef.current.name.value,
                 description: modifyFormRef.current.description.value,
@@ -122,62 +126,30 @@ export default function ProductsMenu() {
                 locationId: managerLocation.id,
                 imgUrl: selectedProduct.imgUrl
             }, config);
-            if (response.status === 204) {
-                console.log(formData.get("file"))
-                if (formData.get("file")) {
-                    console.log("van file")
-                    if (await handleImageUpload(id)){
-                        setIsUploading(false);
-                        setFormData(new FormData());
-                        responseRef.current.inert = true;
-                        responseRef.current.showModal();
-                        responseRef.current.inert = false;
-                        setTimeout(() => {
-                            responseRef.current.close();
-                            modifyModalRef.current.close();
-                        }, 1000);
-                        setLocationProducts(state => {
-                            const newArray = state.filter(product => product.id !== selectedProduct.id);
-                            return [...newArray, 
-                            {
-                                id: selectedProduct.id,
-                                name: modifyFormRef.current.name.value,
-                                description: modifyFormRef.current.description.value,
-                                category: modifyFormRef.current.category.value,
-                                price: modifyFormRef.current.price.value,
-                                stockQuantity: 10,
-                                locationId: managerLocation.id,
-                                imgUrl: selectedProduct.imgUrl
-                            }];      
-                        });
-                    }
-                }
-                else {
-                    setIsUploading(false);
-                    setFormData(new FormData());
-                    responseRef.current.inert = true;
-                    responseRef.current.showModal();
-                    responseRef.current.inert = false;
-                    setTimeout(() => {
-                        responseRef.current.close();
-                        modifyModalRef.current.close();
-                    }, 1000);
-                    setLocationProducts(state => {
-                        const newArray = state.filter(product => product.id !== selectedProduct.id);
-                        console.log([...newArray]);
-                        return [...newArray, 
-                        {
-                            id: selectedProduct.id,
-                            name: modifyFormRef.current.name.value,
-                            description: modifyFormRef.current.description.value,
-                            category: modifyFormRef.current.category.value,
-                            price: modifyFormRef.current.price.value,
-                            stockQuantity: 10,
-                            locationId: managerLocation.id,
-                            imgUrl: selectedProduct.imgUrl
-                        }];      
-                    });
-                }
+            if (response.status === 200) {
+                setIsUploading(false);
+                setFormData(new FormData());
+                responseRef.current.inert = true;
+                responseRef.current.showModal();
+                responseRef.current.inert = false;
+                setTimeout(() => {
+                    responseRef.current.close();
+                    modifyModalRef.current.close();
+                }, 1000);
+                setLocationProducts(state => {
+                    const newArray = state.filter(product => product.id !== id);
+                    return [...newArray, 
+                    {
+                        id: response.data.id,
+                        name: response.data.name,
+                        description: response.data.description,
+                        category: response.data.category,
+                        price: response.data.price,
+                        stockQuantity: 10,
+                        locationId: managerLocation.id,
+                        imgUrl: response.data.imgUrl
+                    }];      
+                });
             }
         }
           catch (error) {
@@ -194,28 +166,30 @@ export default function ProductsMenu() {
     }
 
     //function for handling product deletion
-    async function handleDeleteEvent(id) {
+    async function handleDeleteProduct(id) {
+        setIsUploading(true);
         try {
-
             const config = {
                 headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` },
             }
             const response = await axios.delete(`https://backend.csaposapp.hu/api/products/${id}`, config);
             if (response.status === 204) {
-                setSelectedProduct(state => state.filter(event => product.id !== id));
+                setLocationProducts(state => state.filter(product => product.id !== id));
                 responseRef.current.inert = true;
                 responseRef.current.showModal();
                 responseRef.current.inert = false;
+                setIsUploading(false);
                 setTimeout(() => {
+                    confirmRef.current.close();
                     responseRef.current.close();
-                    addModalRef.current.close();
+                    modifyModalRef.current.close();
                 }, 1000);
             }
         }
             catch (error) {
             if (error.response?.status === 401) {
                 if (await getAccessToken()) {
-                return await handleDeleteEvent(id);
+                return await handleDeleteProduct(id);
                 }
                 else {
                 await logout();
@@ -469,12 +443,16 @@ export default function ProductsMenu() {
                     <div className="flex flex-col gap-4">
                         <span className="font-bold text-lg">Biztosan törölni szeretnéd?</span>
                         <div className="flex gap-4 items-center justify-center">
-                            <button className="btn btn-error basis-1/2 text-md disabled:!text-error-content disabled:!bg-error disabled:opacity-50" onClick={() => {
-                                handleDeleteEvent(selectedProduct.id)
-                            }}>
-                                Igen
-                            </button>
-                            <button className="btn border-2 shadow basis-1/2 text-md" onClick={() => confirmRef.current.close()}>Mégsem</button>
+                        <button className="btn btn-error basis-1/2 text-md disabled:!text-error-content disabled:!bg-error disabled:opacity-50" disabled={isUploading} onClick={() => {
+                            handleDeleteProduct(selectedProduct.id);
+                        }}>
+                            Igen
+                            {
+                                isUploading &&
+                                <span className='loading loading-spinner loading-md'></span>
+                            }
+                        </button>
+                            <button className="btn border-2 shadow basis-1/2 text-md" disabled={isUploading} onClick={() => confirmRef.current.close()}>Mégsem</button>
                         </div>
                     </div>
                 </div>

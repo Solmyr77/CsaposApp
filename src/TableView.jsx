@@ -108,7 +108,6 @@ function TableView() {
 
   //calculate total
   useEffect(() => {
-    console.log(filteredOrders?.length);
     if (filteredOrders?.length > 0) {
       let subTotal = 0;
       filteredOrders.map(order => order.orderItems.map(item => subTotal += item.quantity * item.unitPrice));

@@ -9,7 +9,7 @@ const EventItem = forwardRef(({ event }, ref) => {
     <div className="card bg-base-100 w-96 shadow-lg h-fit">
         <figure className="max-h-52 relative">
             <img
-            src={`https://assets.csaposapp.hu/assets/images/${event.imgUrl}?t=${new Date().getTime()}`}
+            src={`https://assets.csaposapp.hu/assets/images/${event.imgUrl}`}
             alt="kép" 
             className="object-cover"/>
             <span className="badge badge-lg badge-neutral absolute top-2 right-2">

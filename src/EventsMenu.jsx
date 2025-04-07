@@ -205,8 +205,8 @@ function EventsMenu() {
 
     //function for handling event deletion
     async function handleDeleteEvent(id) {
+        setIsUploading(true);
         try {
-
             const config = {
               headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` },
             }
@@ -216,10 +216,12 @@ function EventsMenu() {
                 responseRef.current.inert = true;
                 responseRef.current.showModal();
                 responseRef.current.inert = false;
+                setIsUploading(false);
                 setTimeout(() => {
                     console.log("TIMEOUT")
                     responseRef.current.close();
-                    addModalRef.current.close();
+                    confirmRef.current.close();
+                    modifyModalRef.current.close();
                 }, 1000);
             }
         }
@@ -407,12 +409,16 @@ function EventsMenu() {
                     <div className="flex flex-col gap-4">
                         <span className="font-bold text-lg">Biztosan törölni szeretnéd?</span>
                         <div className="flex gap-4 items-center justify-center">
-                            <button className="btn btn-error basis-1/2 text-md disabled:!text-error-content disabled:!bg-error disabled:opacity-50" onClick={() => {
-                                handleDeleteEvent(selectedEvent.id);
-                            }}>
-                                Igen
-                            </button>
-                            <button className="btn border-2 shadow basis-1/2 text-md" onClick={() => confirmRef.current.close()}>Mégsem</button>
+                                <button className="btn btn-error basis-1/2 text-md disabled:!text-error-content disabled:!bg-error disabled:opacity-50" disabled={isUploading} onClick={() => {
+                                    handleDeleteEvent(selectedEvent.id);
+                                }}>
+                                    Igen
+                                    {
+                                        isUploading &&
+                                        <span className='loading loading-spinner loading-md'></span>
+                                    }
+                                </button>
+                            <button className="btn border-2 shadow basis-1/2 text-md" disabled={isUploading} onClick={() => confirmRef.current.close()}>Mégsem</button>
                         </div>
                     </div>
                 </div>

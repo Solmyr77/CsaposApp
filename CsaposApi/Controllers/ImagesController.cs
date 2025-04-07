@@ -91,6 +91,7 @@ namespace CsaposApi.Controllers
 
                 currentUser.ImgUrl = fileName;
 
+                _context.Users.Update(currentUser);
                 await _context.SaveChangesAsync();
 
                 // Return the saved file's relative URL
@@ -104,7 +105,7 @@ namespace CsaposApi.Controllers
         }
 
         [HttpPost("upload/location")]
-        //[Authorize(Policy = "MustBeManager")]
+        [Authorize(Policy = "MustBeManager")]
         public async Task<IActionResult> UploadLocation(IFormFile file, Guid locationId)
         {
             if (file == null || file.Length == 0)
@@ -151,6 +152,7 @@ namespace CsaposApi.Controllers
 
                 currentLocation.ImgUrl = fileName;
 
+                _context.Locations.Update(currentLocation);
                 await _context.SaveChangesAsync();
 
                 // Return the saved file's relative URL
@@ -211,6 +213,7 @@ namespace CsaposApi.Controllers
 
                 currentProduct.ImgUrl = fileName;
 
+                _context.Products.Update(currentProduct);
                 await _context.SaveChangesAsync();
 
                 // Return the saved file's relative URL
@@ -271,6 +274,7 @@ namespace CsaposApi.Controllers
 
                 currentEvent.ImgUrl = fileName;
 
+                _context.Events.Update(currentEvent);
                 await _context.SaveChangesAsync();
 
                 // Return the saved file's relative URL

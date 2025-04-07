@@ -266,7 +266,6 @@ namespace CsaposApi.Controllers
             currentEvent.Description = updateEventDTO.Description;
             currentEvent.Timefrom = updateEventDTO.Timefrom;
             currentEvent.Timeto = updateEventDTO.Timeto;
-            currentEvent.ImgUrl = updateEventDTO.ImgUrl;
             currentEvent.UpdatedAt = DateTime.Now;
 
             try

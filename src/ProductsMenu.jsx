@@ -11,7 +11,7 @@ import axios from 'axios';
 
 export default function ProductsMenu() {
     const { setMenuState, locationProducts, setLocationProducts, managerLocation, logout } = useContext(Context);
-    const { selectedProduct } = useContext(StateContext);
+    const { selectedProduct, setSelectedProduct } = useContext(StateContext);
     const [previewPicture, setPreviewPicture] = useState(null);
     const [isConversionFinished, setIsConversionFinished] = useState(null);
     const [formData, setFormData] = useState(new FormData());
@@ -193,6 +193,38 @@ export default function ProductsMenu() {
         }
     }
 
+    //function for handling product deletion
+    async function handleDeleteEvent(id) {
+        try {
+
+            const config = {
+                headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` },
+            }
+            const response = await axios.delete(`https://backend.csaposapp.hu/api/products/${id}`, config);
+            if (response.status === 204) {
+                setSelectedProduct(state => state.filter(event => product.id !== id));
+                responseRef.current.inert = true;
+                responseRef.current.showModal();
+                responseRef.current.inert = false;
+                setTimeout(() => {
+                    responseRef.current.close();
+                    addModalRef.current.close();
+                }, 1000);
+            }
+        }
+            catch (error) {
+            if (error.response?.status === 401) {
+                if (await getAccessToken()) {
+                return await handleDeleteEvent(id);
+                }
+                else {
+                await logout();
+                window.location.reload();
+                }
+            }
+        }
+    }
+
     //function for validating compressed image size
     function isImageSizeValid(file) {
         const byteLimit = 4 * 1000 * 1000;
@@ -275,6 +307,7 @@ export default function ProductsMenu() {
                     <LuX className='absolute top-0 left-0 bg-red-500 text-white w-8 h-8 rounded-br cursor-pointer' onClick={() => {
                         modifyModalRef.current.close();
                         modifyFormRef.current.reset();
+                        modifyFormRef.current.category.value = selectedCategory;
                         setPreviewPicture(null);
                     }}/>
                     <div className="flex justify-between items-center">
@@ -436,7 +469,9 @@ export default function ProductsMenu() {
                     <div className="flex flex-col gap-4">
                         <span className="font-bold text-lg">Biztosan törölni szeretnéd?</span>
                         <div className="flex gap-4 items-center justify-center">
-                            <button className="btn btn-error basis-1/2 text-md disabled:!text-error-content disabled:!bg-error disabled:opacity-50">
+                            <button className="btn btn-error basis-1/2 text-md disabled:!text-error-content disabled:!bg-error disabled:opacity-50" onClick={() => {
+                                handleDeleteEvent(selectedProduct.id)
+                            }}>
                                 Igen
                             </button>
                             <button className="btn border-2 shadow basis-1/2 text-md" onClick={() => confirmRef.current.close()}>Mégsem</button>

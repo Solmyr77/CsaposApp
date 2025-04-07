@@ -3,7 +3,7 @@ import Context from "./Context";
 import axios from "axios";
 import getAccessToken from "./refreshToken";
 import { Navigate } from "react-router-dom";
-import bookingConnection from "./signalRBookingCoonection";
+import bookingConnection from "./signalRBookingConnection";
 
 function Provider({ children }) {
   //basic states

@@ -42,7 +42,7 @@ function EventsMenu() {
                 setPreviewPicture(null);
                 setIsUploading(false);
                 console.log("sikeres feltöltés");
-                return true;
+                return response.data;
             }
         }
         catch (error) {
@@ -110,14 +110,16 @@ function EventsMenu() {
             const response = await axios.put(`https://backend.csaposapp.hu/api/events/${id}`,{
                 name: modifyFormRef.current.name.value,
                 description: modifyFormRef.current.description.value,
-                locationId: managerLocation.id,
+                imgUrl: selectedEvent.imgUrl,
                 timeFrom: modifyFormRef.current.timeFrom.value,
-                timeTo: modifyFormRef.current.timeFrom.value 
+                timeTo: modifyFormRef.current.timeTo.value 
             }, config);
-            if (response.status === 204) {
+            if (response.status === 200) {
                 if (formData.get("file")) {
                     console.log("van file")
-                    if (await handleImageUpload(id)){
+                    const imgResponse = await handleImageUpload(id, selectedEvent.id);
+                    console.log(imgResponse);
+                    if (imgResponse){
                         setIsUploading(false);
                         setFormData(new FormData());
                         responseRef.current.inert = true;
@@ -129,14 +131,16 @@ function EventsMenu() {
                         }, 1000);
                         setEvents(state => {
                             const newArray = state.filter(event => event.id !== selectedEvent.id);
+                            console.log(response.data);
                             return [...newArray, 
                             {
-                                id: selectedEvent.id,
-                                name: modifyFormRef.current.name.value,
-                                description: modifyFormRef.current.description.value,
-                                locationId: managerLocation.id,
-                                timeFrom: modifyFormRef.current.timeFrom.value,
-                                timeTo: modifyFormRef.current.timeFrom.value 
+                                id: response.data.id,
+                                name: response.data.name,
+                                description: response.data.description,
+                                imgUrl: imgResponse.url,
+                                locationId: response.data.locationId,
+                                timeFrom: response.data.timeFrom,
+                                timeTo: response.data.timeTo
                             }];      
                         });
                     }
@@ -153,14 +157,16 @@ function EventsMenu() {
                     }, 1000);
                     setEvents(state => {
                         const newArray = state.filter(event => event.id !== selectedEvent.id);
+                        console.log(modifyFormRef.current.timeFrom.value)
                         return [...newArray, 
                         {
-                            id: selectedEvent.id,
-                            name: modifyFormRef.current.name.value,
-                            description: modifyFormRef.current.description.value,
-                            locationId: managerLocation.id,
-                            timeFrom: modifyFormRef.current.timeFrom.value,
-                            timeTo: modifyFormRef.current.timeFrom.value 
+                            id: response.data.id,
+                            name: response.data.name,
+                            description: response.data.description,
+                            imgUrl: response.data.imgUrl,
+                            locationId: response.data.locationId,
+                            timeFrom: response.data.timeFrom,
+                            timeTo: response.data.timeTo
                         }];      
                     });
                 }
@@ -179,7 +185,7 @@ function EventsMenu() {
         }
     }
 
-    //function for handling product creation
+    //function for handling event creation
     async function handleCreateEvent() {
         setIsUploading(true);
         try {
@@ -216,6 +222,38 @@ function EventsMenu() {
             if (error.response?.status === 401) {
               if (await getAccessToken()) {
                 return await handleCreateEvent();
+              }
+              else {
+                await logout();
+                window.location.reload();
+              }
+            }
+        }
+    }
+
+    //function for handling event deletion
+    async function handleDeleteEvent(id) {
+        try {
+
+            const config = {
+              headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` },
+            }
+            const response = await axios.delete(`https://backend.csaposapp.hu/api/events/${id}`, config);
+            if (response.status === 204) {
+                setEvents(state => state.filter(event => event.id !== id));
+                responseRef.current.inert = true;
+                responseRef.current.showModal();
+                responseRef.current.inert = false;
+                setTimeout(() => {
+                    responseRef.current.close();
+                    addModalRef.current.close();
+                }, 1000);
+            }
+        }
+          catch (error) {
+            if (error.response?.status === 401) {
+              if (await getAccessToken()) {
+                return await handleDeleteEvent(id);
               }
               else {
                 await logout();
@@ -395,7 +433,9 @@ function EventsMenu() {
                     <div className="flex flex-col gap-4">
                         <span className="font-bold text-lg">Biztosan törölni szeretnéd?</span>
                         <div className="flex gap-4 items-center justify-center">
-                            <button className="btn btn-error basis-1/2 text-md disabled:!text-error-content disabled:!bg-error disabled:opacity-50">
+                            <button className="btn btn-error basis-1/2 text-md disabled:!text-error-content disabled:!bg-error disabled:opacity-50" onClick={() => {
+                                handleDeleteEvent(selectedEvent.id);
+                            }}>
                                 Igen
                             </button>
                             <button className="btn border-2 shadow basis-1/2 text-md" onClick={() => confirmRef.current.close()}>Mégsem</button>

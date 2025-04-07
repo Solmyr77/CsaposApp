@@ -10,7 +10,7 @@ const EventItem = forwardRef(({ event }, ref) => {
         <figure className="max-h-52 relative">
             <img
             src={`https://assets.csaposapp.hu/assets/images/${event.imgUrl}?t=${new Date().getTime()}`}
-            alt="Shoes" 
+            alt="kép" 
             className="object-cover"/>
             <span className="badge badge-lg badge-neutral absolute top-2 right-2">
                 <LuUsers />

@@ -56,7 +56,7 @@ namespace CsaposApi.Services
 
         public async Task NotifyOrderCreated(string bookingId, OrderResponseDTO order, string locationId)
         {
-            _logger.LogInformation($"Order has been created for booking {bookingId}.");
+            _logger.LogInformation($"Order has been created for booking {bookingId} at location {locationId}.");
             await _hubContext.Clients.Group(locationId).SendAsync("NotifyOrderCreated", new { order = order, bookingId = bookingId, sentAt = DateTime.Now });
         }
 

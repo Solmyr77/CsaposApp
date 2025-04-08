@@ -10,9 +10,6 @@
     "@mui/material": "^6.1.8",
     "@stripe/react-stripe-js": "^3.4.0",
     "@stripe/stripe-js": "^6.0.0",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
     "axios": "^1.7.9",
     "browser-image-compression": "^2.0.2",
     "heic2any": "^0.0.4",
@@ -21,7 +18,7 @@
     "react-dom": "^18.3.1",
     "react-fast-compare": "^3.2.2",
     "react-icons": "^5.5.0",
-    "react-router-dom": "^7.0.1",
+    "react-router-dom": "^7.5.0",
     "react-scripts": "^5.0.1",
     "styled-components": "^6.1.13",
     "swiper": "^11.1.15",
@@ -52,7 +49,13 @@
     ]
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^29.5.14",
+    "@types/testing-library__jest-dom": "^5.14.9",
     "daisyui": "^4.12.23",
+    "jest-axios-mock": "^1.0.0",
     "tailwindcss": "^3.4.15"
   }
 }

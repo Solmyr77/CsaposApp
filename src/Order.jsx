@@ -1,12 +1,41 @@
 import React, { useContext, useEffect, useState } from "react";
 import Context from "./Context";
 import OrderItem from "./OrderItem";
+import axios from "axios";
+import getAccessToken from "./refreshToken";
 
 function Order({ order, orderMenu }) {
   const { locationProducts, tables } = useContext(Context);
   const [currentProducts, setCurrentProducts] = useState([]);
   const [currentTotal, setCurrentTotal] = useState(0);
   const [tableNumber, setTableNumber] = useState(0);
+  const [isCompleted, setIsCompleted] = useState(false);
+
+  async function handleUpdateStatus(id) {
+    try {
+      const config = {
+        headers: { Authorization : `Bearer ${JSON.parse(localStorage.getItem("accessToken"))}` }
+      }
+      const response = await axios.put(`https://backend.csaposapp.hu/api/orders/${id}/status`, {
+        orderStatus: "completed"
+      } , config);
+      if (response.status === 200) {
+        console.log(response.data);
+        setIsCompleted(true);
+      }
+    }
+    catch (error) {
+      if (error.response?.status === 401) {
+        if (await getAccessToken()) {
+          return await handleUpdateStatus(id);
+        }
+        else {
+          await logout();
+          window.location.reload();
+        }
+      } 
+    }
+  }
 
   //format time to HH:MM
   function formatTime(date) {
@@ -40,13 +69,19 @@ function Order({ order, orderMenu }) {
       setTableNumber(tables.find((table) => table.id === order.tableId).number);
     } 
   }, [tables]) 
+
+  //set iscompleted state for an orders status
+  useEffect(() => {
+    if (order.orderStatus === "completed") setIsCompleted(true);
+  }, [order]);
+  
   
   return (
     !orderMenu ? (
       <div className={`flex flex-col bg-sky-200/75 p-2 rounded-md`}>
           <span>Létrehozva: {formatTime(order.createdAt)}</span>
           {
-            order.orderStatus == "pending" ?
+            !isCompleted ?
             <div className="self-end badge badge-warning font-bold">Teljesítendő</div> :
             <div className="self-end badge badge-success font-bold">Teljesítve</div>
           }
@@ -57,7 +92,14 @@ function Order({ order, orderMenu }) {
             }
             <span className="self-end font-bold text-md">Összesen: {currentTotal} Ft</span>
           </div>
-          <button className="btn bg-success border-0 shadow-none mt-4 text-md h-12">Teljesítés!</button>
+          <button className="btn bg-success border-0 shadow-none mt-4 text-md h-12" disabled={isCompleted} onClick={async () => {
+            await handleUpdateStatus(order.id);
+          }}> 
+          {
+            !isCompleted ? 
+            "Teljesítés!" : 
+            "Teljesítve"
+          }</button>
       </div>
 
     ) : (
@@ -65,7 +107,7 @@ function Order({ order, orderMenu }) {
         <div className="flex justify-between items-center">
           <span className="text-lg font-bold">Asztal {tableNumber}</span>
           {
-            order.orderStatus == "pending" ?
+            !isCompleted ?
             <div className="self-end badge badge-warning font-bold">Teljesítendő</div> :
             <div className="self-end badge badge-success font-bold">Teljesítve</div>
           }
@@ -78,7 +120,14 @@ function Order({ order, orderMenu }) {
           }
           <span className="self-end font-bold text-md">Összesen: {currentTotal} Ft</span>
         </div>
-        <button className="btn bg-success border-0 shadow-none mt-4 text-md h-12">Teljesítés!</button>
+        <button className="btn bg-success border-0 shadow-none mt-4 text-md h-12" disabled={isCompleted} onClick={async () => {
+          await handleUpdateStatus(order.id);
+        }}>
+        {
+          !isCompleted ? 
+          "Teljesítés!" : 
+          "Teljesítve"
+        }</button>
     </div>
     )
   )

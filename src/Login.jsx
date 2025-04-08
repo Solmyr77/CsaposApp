@@ -59,21 +59,37 @@ function Login() {
 
       <form className="flex flex-col mt-8 justify-evenly items-center" onSubmit={(event) => validateLogin(event)}>
 
-        <label className="text-left w-full">Felhasználónév</label>
+        <label htmlFor="username" className="text-left w-full">Felhasználónév</label>
         <div className="relative mt-0.5 mb-4">
-          <input name="username" type="text" value={username} className="w-full text-black rounded border shadow pl-5 pr-10 py-2 font-normal focus:outline-hidden" required onChange={(event) => {
-            setErrorMessage("");
-            setUsername(event.target.value);
-          }} />
+          <input
+            id="username"
+            name="username"
+            type="text"
+            value={username}
+            className="w-full text-black rounded border shadow pl-5 pr-10 py-2 font-normal focus:outline-hidden"
+            required
+            onChange={(event) => {
+              setErrorMessage("");
+              setUsername(event.target.value);
+            }}
+          />
         </div>
 
-        <label className="text-left w-full">Jelszó</label>
+        <label htmlFor="password" className="text-left w-full">Jelszó</label>
         <div className="relative mt-0.5 mb-4">
-          <input name="password" type={`${isPasswordVisible ? "text" : "password"}`} value={password} className="w-full text-black rounded border shadow pl-5 pr-10 py-2 font-normal focus:outline-hidden" required onChange={(event) => {
-            setErrorMessage("");
-            password === "" && setIsPasswordVisible(false);
-            setPassword(event.target.value);
-          }} />
+          <input
+            id="password"
+            name="password"
+            type={`${isPasswordVisible ? "text" : "password"}`}
+            value={password}
+            className="w-full text-black rounded border shadow pl-5 pr-10 py-2 font-normal focus:outline-hidden"
+            required
+            onChange={(event) => {
+              setErrorMessage("");
+              password === "" && setIsPasswordVisible(false);
+              setPassword(event.target.value);
+            }}
+          />
         </div>
 
         <p id="errorText" className={`text-center text-red-500 text-wrap max-w-40 ${errorMessage !== "" ? "visible" : "invisible"}`}>{errorMessage}</p>

@@ -1,8 +1,7 @@
 import React, { useContext, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Context from "./Context";
 import axios from "axios";
-import { LuCircleUser, LuKeyRound, LuEyeClosed, LuEye } from "react-icons/lu";
 
 function Login() {
   const navigate = useNavigate();
@@ -54,23 +53,23 @@ function Login() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-grey text-white px-4 pt-24 flex flex-col items-center">
+    <div className="min-h-screen w-full px-4 pt-24 flex flex-col items-center">
 
-      <h1 className="font-bold text-6xl text-yellow tracking-widest">Csapos</h1>
+      <h1 className="font-bold text-6xl tracking-widest">Csapos</h1>
 
       <form className="flex flex-col mt-8 justify-evenly items-center" onSubmit={(event) => validateLogin(event)}>
 
-        <label className="text-left w-full text-field">Felhasználónév</label>
+        <label className="text-left w-full">Felhasználónév</label>
         <div className="relative mt-0.5 mb-4">
-          <input name="username" type="text" value={username} className="w-full text-black bg-field pl-5 pr-10 py-2 font-normal focus:outline-hidden" required onChange={(event) => {
+          <input name="username" type="text" value={username} className="w-full text-black rounded border shadow pl-5 pr-10 py-2 font-normal focus:outline-hidden" required onChange={(event) => {
             setErrorMessage("");
             setUsername(event.target.value);
           }} />
         </div>
 
-        <label className="text-left w-full text-field">Jelszó</label>
+        <label className="text-left w-full">Jelszó</label>
         <div className="relative mt-0.5 mb-4">
-          <input name="password" type={`${isPasswordVisible ? "text" : "password"}`} value={password} className="w-full text-black bg-field pl-5 pr-10 py-2 font-normal focus:outline-hidden" required onChange={(event) => {
+          <input name="password" type={`${isPasswordVisible ? "text" : "password"}`} value={password} className="w-full text-black rounded border shadow pl-5 pr-10 py-2 font-normal focus:outline-hidden" required onChange={(event) => {
             setErrorMessage("");
             password === "" && setIsPasswordVisible(false);
             setPassword(event.target.value);
@@ -79,7 +78,7 @@ function Login() {
 
         <p id="errorText" className={`text-center text-red-500 text-wrap max-w-40 ${errorMessage !== "" ? "visible" : "invisible"}`}>{errorMessage}</p>
 
-        <button type="submit" className="btn bg-yellow border-0 text-black text-lg h-16 w-44 mt-4 disabled:bg-yellow! disabled:opacity-50" disabled={errorMessage}>Bejelentkezés</button>
+        <button type="submit" className="btn btn-info border-0 text-black text-lg h-16 w-44 mt-4 disabled:!bg-info disabled:opacity-50" disabled={errorMessage}>Bejelentkezés</button>
       </form>
     </div>
   );

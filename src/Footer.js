@@ -15,7 +15,7 @@ function Footer() {
           </div>
         </Link>
         <Link to="/search" className="basis-1/3">
-          <div className={`flex flex-col justify-center items-center basis-1/3 ${menuState === "Search" ? "" : "text-white"}`}>
+          <div id="search" className={`flex flex-col justify-center items-center basis-1/3 ${menuState === "Search" ? "" : "text-white"}`}>
             <LuSearch className={`h-6 w-6 ${menuState === "Search" ? "fill-none stroke-[url(#gradient)]" : ""}`}/>
             <p className={`${menuState === "Search" ? "bg-gradient-to-t from-blue to-sky-400 text-transparent inline-block bg-clip-text" : ""}`}>Keresés</p>
           </div>

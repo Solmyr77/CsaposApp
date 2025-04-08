@@ -271,7 +271,7 @@ namespace CsaposApi.Controllers
                                 ImageUrl = tg.User.ImgUrl,
                                 Status = tg.Status
                             }).ToList()
-                        }).FirstOrDefaultAsync(x => x.Id == createBookingDTO.TableId);
+                        }).FirstOrDefaultAsync(x => x.Id == currentBooking.Id);
 
                 _managerNotificationService.NotifyBookingCreated(currentTable.LocationId.ToString(), signalRresponse);
 

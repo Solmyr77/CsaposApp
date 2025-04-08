@@ -35,7 +35,6 @@ namespace CsaposApi.Controllers
                     var transactionId = intent.Id;
                     var amountReceived = intent.AmountReceived / 100m;
 
-                    // Assume you set the PaymentId or OrderId in Metadata when creating the payment
                     var paymentId = intent.Metadata["payment_id"];
 
                     var payment = await _context.Payments.FindAsync(paymentId);
@@ -58,5 +57,4 @@ namespace CsaposApi.Controllers
             }
         }
     }
-
 }

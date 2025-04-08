@@ -11,7 +11,7 @@ export default function Sidebar() {
             <Link to="/orders" className={`btn ${menuState == "Orders" ? "brightness-100 text-black" : "brightness-50 text-field"} bg-blue border-0 h-1/5 flex justify-center items-center rounded-none text-xl text-center`}>Rendelések</Link>
             <Link to="/products" className={`btn ${menuState == "Products" ? "brightness-100 text-black" : "brightness-50 text-field"} bg-green-500 border-0 h-1/5 flex justify-center items-center rounded-none text-xl text-center`}>Termékek</Link>
             <Link to="/events" className={`btn ${menuState == "Events" ? "brightness-100 text-black" : "brightness-50 text-field"} bg-pink-500 border-0 h-1/5 flex justify-center items-center rounded-none text-xl text-center`}>Események</Link>
-            <Link to="/extra" className={`btn ${menuState == "Extra" ? "brightness-100 text-black" : "brightness-50 text-field"} bg-amber-500 border-0 h-1/5 flex justify-center items-center rounded-none text-xl text-center`}>Extra</Link>
+            <Link to="/logout" className={`btn ${menuState == "Logout" ? "brightness-100 text-black" : "brightness-50 text-field"} bg-amber-500 border-0 h-1/5 flex justify-center items-center rounded-none text-xl text-center`}>Kijelentkezés</Link>
         </div>
     )
 }

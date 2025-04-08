@@ -379,6 +379,9 @@ function Provider({ children }) {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("user");
+      managerConnection.off("notifybookingdeleted", handleNotifyBookingDeleted);
+      managerConnection.off("notifyordercreated", handleNotifyOrderCreated);
+      managerConnection.off("notifybookingcreated", handleNotifyBookingCreated);
       setUserId("");
       setBookings([]);
     }
@@ -421,6 +424,15 @@ function Provider({ children }) {
       }
       return state;
     })
+    setOrders(state => {
+      const foundOrder = state.find(order => order.id === message.order.id);
+      if (!foundOrder) return [...state, {...message.order, sentAt: message.sentAt}];
+      return state;
+    })
+  }, []);
+
+  const handleNotifyBookingCreated = useCallback((message) => {
+    console.log("New booking created", message);
   }, []);
 
   //register user in signalr hub
@@ -442,10 +454,12 @@ function Provider({ children }) {
   function registerManagerListeners() {
     managerConnection.off("notifybookingdeleted", handleNotifyBookingDeleted);
     managerConnection.off("notifyordercreated", handleNotifyOrderCreated);
+    managerConnection.off("notifybookingcreated", handleNotifyBookingCreated);
     console.log("CLEARED MANAGER LISTENERS");
 
     managerConnection.on("notifybookingdeleted", handleNotifyBookingDeleted);
     managerConnection.on("notifyordercreated", handleNotifyOrderCreated);
+    managerConnection.on("notifybookingcreated", handleNotifyBookingCreated);
     console.log("ADDED MANAGER LISTENERS");
   }
 

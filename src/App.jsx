@@ -4,7 +4,7 @@ import { HashRouter, Route, Routes, Navigate } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute'
 import Provider from './Provider';
 import OrdersMenu from './OrdersMenu';
-import ExtraMenu from './ExtraMenu';
+import LogoutMenu from './LogoutMenu';
 import Layout from './Layout';
 import TableView from './TableView';
 import "./index.css";
@@ -58,10 +58,10 @@ function App() {
               </ProtectedRoute>}
             />
 
-            <Route path="/extra" element={
+            <Route path="/logout" element={
               <ProtectedRoute isProtected={true}>
                 <Layout>
-                  <ExtraMenu />
+                  <LogoutMenu />
                 </Layout>
               </ProtectedRoute>}
             />

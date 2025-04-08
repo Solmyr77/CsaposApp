@@ -433,6 +433,11 @@ function Provider({ children }) {
 
   const handleNotifyBookingCreated = useCallback((message) => {
     console.log("New booking created", message);
+    setBookings(state => {
+      const foundBooking = state.find(booking => booking.id === message.booking.id);
+      if (!foundBooking) return [...state, message.booking];
+      return state;
+    })
   }, []);
 
   //register user in signalr hub

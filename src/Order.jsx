@@ -75,7 +75,6 @@ function Order({ order, orderMenu }) {
     if (order.orderStatus === "completed") setIsCompleted(true);
   }, [order]);
   
-  
   return (
     !orderMenu ? (
       <div className={`flex flex-col bg-sky-200/75 p-2 rounded-md`}>

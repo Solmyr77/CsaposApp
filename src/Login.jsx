@@ -92,7 +92,9 @@ function Login() {
           />
         </div>
 
-        <p id="errorText" className={`text-center text-red-500 text-wrap max-w-40 ${errorMessage !== "" ? "visible" : "invisible"}`}>{errorMessage}</p>
+        <p id="errorText" data-testid="error-message" className={`text-center text-red-500 text-wrap max-w-40 ${errorMessage !== "" ? "visible" : "invisible"}`}>
+          {errorMessage}
+        </p>
 
         <button type="submit" className="btn btn-info border-0 text-black text-lg h-16 w-44 mt-4 disabled:!bg-info disabled:opacity-50" disabled={errorMessage}>Bejelentkezés</button>
       </form>

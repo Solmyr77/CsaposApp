@@ -13,7 +13,6 @@ function GuestItem({ guest }) {
           <span className="text-md">{guest.displayName}</span>
         </div>
       </div>
-      <div className="badge badge-success text-nowrap font-bold">Fizetett</div>
     </div>
   )
 }

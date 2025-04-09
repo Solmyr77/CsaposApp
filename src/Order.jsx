@@ -5,7 +5,7 @@ import axios from "axios";
 import getAccessToken from "./refreshToken";
 
 function Order({ order, orderMenu }) {
-  const { locationProducts, tables } = useContext(Context);
+  const { locationProducts, tables, setOrders } = useContext(Context);
   const [currentProducts, setCurrentProducts] = useState([]);
   const [currentTotal, setCurrentTotal] = useState(0);
   const [tableNumber, setTableNumber] = useState(0);
@@ -21,8 +21,12 @@ function Order({ order, orderMenu }) {
       } , config);
       if (response.status === 200) {
         console.log(response.data);
-        order.orderStatus = "completed";
         setIsCompleted(true);
+        setOrders(state => {
+          const foundOrder = state.find(item => item.id === order.id);
+          if (foundOrder) foundOrder.orderStatus = "completed";
+          return [...state];
+        })
       }
     }
     catch (error) {

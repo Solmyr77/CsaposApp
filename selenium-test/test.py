@@ -4,9 +4,9 @@ import time
 
 driver = webdriver.Chrome()
 
-driver.get("http://localhost:3000")
+driver.get("https://csaposapp.hu")
 
-time.sleep(1)
+time.sleep(3)
 
 driver.save_screenshot("./Frontend/selenium-test/login.png")
 
@@ -19,23 +19,24 @@ password.send_keys("Vizsga01")
 button = driver.find_element(By.TAG_NAME, "button")
 button.click()
 
-time.sleep(5)
+time.sleep(8)
 
 driver.save_screenshot("./Frontend/selenium-test/main.png")
 
 navigation_button = driver.find_element(By.ID, "search")
 navigation_button.click()
 
-time.sleep(1)
+time.sleep(3)
 
 searchbar = driver.find_element(By.TAG_NAME, "input")
 searchbar.send_keys("p")
 
-time.sleep(1)
+time.sleep(3)
 
+print("Sikeres keresés ✅")
 driver.save_screenshot("./Frontend/selenium-test/search result.png")
 
 
-print("sikeres bejelentkezés")
+print("Sikeres bejelentkezés ✅")
 
 driver.quit()

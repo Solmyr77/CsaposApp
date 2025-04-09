@@ -19,7 +19,7 @@ function CardContainer({ records, cardsToShow }) {
   recordsToDisplay.sort((a, b) => b.isOpen - a.isOpen === 0 ? a.name.localeCompare(b.name) : b.isOpen - a.isOpen);
   
   return (
-    <div className={`grid grid-cols-3 gap-4`}>
+    <div className={`grid grid-cols-3 gap-4 lg:grid-cols-5`}>
       {recordsToDisplay.map(record => <Card key={record.id} record={record}/>)}
       {
         recordsToDisplay.length % 2 == 0 && recordsToDisplay.length % 3 != 0 ? 

@@ -132,7 +132,7 @@ function ReserveTable() {
         bookedFromTime.setMinutes(bookedFromTime.getMinutes());
       }
       else {
-        bookedFromTime.setHours(Number(selectedTime.slice(0,2)) + 1);
+        bookedFromTime.setHours(Number(selectedTime.slice(0,2)) + 2);
         bookedFromTime.setMinutes(Number(selectedTime.slice(3)));
       }
       const config = {
@@ -336,7 +336,7 @@ function ReserveTable() {
   }, [startDate, currentLocation]);
 
   return (
-    <div className="min-h-screen w-full bg-grey text-white overflow-y-auto flex flex-col py-8 px-4 font-bold gap-8">
+    <div className="min-h-screen w-full bg-grey text-white overflow-y-auto flex flex-col py-8 px-4 lg:px-24 font-bold gap-8">
       <div className="">
         <Link to={previousRoutes[previousRoutes.length - 1]} className="flex w-fit">
           <BackButton/>
@@ -388,7 +388,7 @@ function ReserveTable() {
       </div>
       <div className={`flex flex-col gap-3 ${!selectedTime && "opacity-50"}`}>
         <p className="text-lg">Asztal választása</p>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
           {
             locationTables?.length > 0 &&
             locationTables?.sort((a, b) => {

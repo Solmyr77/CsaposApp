@@ -18,24 +18,22 @@ function Search() {
   }, [locations]);
 
   return (
-    <div className="bg-grey font-play font-bold text-white">
-      <div className="px-4">
-        <SearchBar displayTitle={true} setRecordsToDisplay={setRecordsToDisplay} locationSearch/>
-        <TitleDivider title={"Legutóbbi"}/>
-        {
-          recordsToDisplay.length !== 0 ? 
-          (
-            <div>
-              <CardContainer records={recordsToDisplay} cardsToShow={"Összes"}/>
-            </div>
-          ) :
-          (
-            <div className="font-normal text-center">
-              Nincs találat
-            </div>
-          )
-        }
-      </div>
+    <div className="bg-grey font-play font-bold text-white px-4 lg:px-24">
+      <SearchBar displayTitle={true} setRecordsToDisplay={setRecordsToDisplay} locationSearch/>
+      <TitleDivider title={"Legutóbbi"}/>
+      {
+        recordsToDisplay.length !== 0 ? 
+        (
+          <div>
+            <CardContainer records={recordsToDisplay} cardsToShow={"Összes"}/>
+          </div>
+        ) :
+        (
+          <div className="font-normal text-center">
+            Nincs találat
+          </div>
+        )
+      }
     </div>
   )
 }

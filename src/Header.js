@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import Context from './Context';
 import { Link } from 'react-router-dom';
 import { LuMail } from "react-icons/lu";
@@ -8,10 +8,9 @@ function Header() {
   const { user, newNotification } = useContext(Context);
 
   return (
-    <div className="w-full flex flex-row justify-between items-center pt-8 font-play font-bold px-4">
+    <div className="w-full flex flex-row justify-between items-center pt-8 font-play font-bold px-4 lg:px-24">
       <div className="flex flex-row items-center">
           <Link to={"/profile"}>
-            {/* <img src={userImage || img1} alt="avatar" className="w-12 object-cover aspect-square rounded-full"/> */}
             <UserImage record={user} width="w-12"/>
           </Link>
           <p className="ml-3 text-lg text-white">Szia {user.displayName}!</p>

@@ -1,9 +1,43 @@
-import React from "react";
+import React, { useState, useEffect, useContext } from "react";
 import img1 from "./img/pub.webp";
-import StatusIndicator from "./StatusIndicator";
 import { Link } from "react-router-dom";
+import Context from "./Context";
 
 function Card({ record }) {
+  const { getDayOfTheWeek } = useContext(Context);
+  const [isOpen, setIsOpen] = useState({});
+
+  //timeouts for closing/opening pub
+  function handleBusinessHours() {
+    const foundDay = getDayOfTheWeek(record);
+    if (foundDay.open) {
+      const closeDate = new Date();
+      closeDate.setHours(Number(foundDay.close.split(":")[0]), Number(foundDay.close.split(":")[1]), 0);
+      const openDate = new Date();
+      openDate.setHours(Number(foundDay.open.split(":")[0]), Number(foundDay.open.split(":")[1]), 0);
+  
+      if (closeDate.getTime() < new Date().getTime() || openDate.getTime() > new Date().getTime()) {
+        setIsOpen(false);
+        const timeout = setTimeout(() => {
+            setIsOpen(true);
+        }, openDate.getTime() - new Date().getTime());
+        return () => clearTimeout(timeout);
+      }
+      else {
+        setIsOpen(true);
+        const timeout = setTimeout(() => {
+            setIsOpen(false);
+        }, closeDate.getTime() - new Date().getTime());
+        return () => clearTimeout(timeout);
+      }
+    }
+  }
+
+  useEffect(() => {
+    handleBusinessHours()
+  }, [record]);
+  
+
   return (
     <div className="basis-[30%] select-none">
       <Link to={`/pub/${record.name}`}>
@@ -12,7 +46,7 @@ function Card({ record }) {
             <div className={`w-full h-full bg-black absolute inset-0 ${record.isOpen ? "bg-opacity-70" : "bg-opacity-85"} flex flex-col rounded-md text-wrap`}>
                 <div className="h-1/4 flex items-center px-1">
                     {
-                      record.isOpen ?
+                      isOpen ?
                       <span className="badge bg-gradient-to-tr from-blue to-sky-400 text-white border-0 text-[10px]">Nyitva</span>:
                       <span className="badge border-2 bg-transparent text-red-500 border-red-500 text-[10px]">Zárva</span>
                     }

@@ -92,7 +92,7 @@ function PubMenu() {
 
   return (
     <div className="flex flex-col max-h-screen h-screen overflow-y-hidden bg-grey text-white font-bold">
-      <div className="flex flex-col mb-3 px-4 pt-4 pb-0 shadow-lg">
+      <div className="flex flex-col mb-3 px-4 lg:px-24 pt-4 pb-0 shadow-lg">
         <button className="btn min-h-0 h-8 w-fit text-sky-400 bg-dark-grey border-0 hover:bg-dark-grey" onClick={()=> navigate(`/`)}>
           <LuArrowRight className="rotate-180"/>
           <span>Vissza</span>
@@ -136,9 +136,9 @@ function PubMenu() {
         {
           categories.length > 0 ? 
           categories.map(category => (
-            <div className="flex flex-col" key={category}>
-              <p className="text-lg w-full py-2 sticky top-0 px-4 bg-grey">{category}</p>
-              <div className="flex flex-col px-4 gap-y-2">
+            <div className="flex flex-col px-4 lg:px-24" key={category}>
+              <p className="text-lg w-full py-2 sticky top-0 bg-grey">{category}</p>
+              <div className="flex flex-col gap-y-2">
                 {
                   locationProducts.length > 0 && 
                   locationProducts.map(product => product.category === category && <MenuItem key={product.id} product={product} ref={productModal}/>) 
@@ -151,7 +151,7 @@ function PubMenu() {
           </div>
         }
       </div>
-      <div className="fixed bg-grey bottom-0 h-[10vh] w-full flex flex-row justify-between items-center rounded-t-lg px-6 shadow-dark-grey shadow-[0px_0px_18px_0px_rgba(0_0_0_0)]">
+      <div className="fixed bg-grey bottom-0 h-[10vh] w-full flex flex-row justify-between items-center rounded-t-lg px-6 lg:px-24 shadow-dark-grey shadow-[0px_0px_18px_0px_rgba(0_0_0_0)]">
         <div className="relative cursor-pointer">
           <LuShoppingBag className="w-8 h-8" onClick={() => {
             bagModal.current.inert = true;
@@ -220,7 +220,7 @@ function PubMenu() {
 
       {/* bag modal */}
       <dialog className="modal modal-bottom" ref={bagModal}>
-        <div className="modal-box bg-dark-grey h-4/5 flex flex-col pt-9">
+        <div className="modal-box lg:w-1/2 lg:absolute lg:left-1/2 lg:-translate-x-1/2 bg-dark-grey h-4/5 flex flex-col pt-9">
           <LuX className="absolute left-0 top-0 w-9 h-9 text-white font-bold bg-red-500 p-1 rounded-tl-md rounded-tr-none rounded-bl-none rounded-br-md hover:cursor-pointer" onClick={() => bagModal.current.close()}/>
           <p className="text-lg mb-5">Rendelésem</p>
           <div className="flex flex-col h-full">

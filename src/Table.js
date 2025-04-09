@@ -62,7 +62,7 @@ function Table() {
   
   return (
     <div className="flex flex-col max-h-screen h-screen overflow-y-hidden bg-grey text-white font-bold">
-      <div className="flex flex-col px-4 shadow-lg pb-2 bg-gradient-to-t pt-4">
+      <div className="flex flex-col px-4 lg:px-24 shadow-lg pb-2 bg-gradient-to-t pt-4">
         <button className="btn min-h-0 h-8 w-fit mb-2 bg-dark-grey text-sky-400 border-0 hover:bg-dark-grey" onClick={() => navigate(`/pubmenu/${name}/${id}`)}><LuArrowLeft/>Rendelés</button>
         <p className="text-xl">Asztalom</p>
         <div className="flex justify-between items-center">
@@ -85,7 +85,7 @@ function Table() {
           Számlám
         </button>
       </div>
-      <div className="flex h-full flex-col gap-3 overflow-auto px-4 py-4">
+      <div className="flex h-full flex-col gap-3 overflow-auto p-4 lg:px-24">
         {
           tableOrders?.length > 0 ?
           tableOrders.sort((a, b) => {
@@ -98,7 +98,7 @@ function Table() {
       </div>
 
       <dialog className="modal modal-bottom" ref={receiptModal}>
-        <div className="modal-box bg-dark-grey pt-9 gap-2 flex flex-col justify-between">
+        <div className="modal-box bg-dark-grey pt-9 gap-2 flex flex-col justify-between lg:absolute lg:w-1/2 lg:-translate-x-1/2 lg:left-1/2">
           <LuX className="absolute left-0 top-0 w-9 h-9 text-white font-bold bg-red-500 p-1 rounded-tl-md rounded-tr-none rounded-bl-none rounded-br-md hover:cursor-pointer" onClick={() => receiptModal.current.close()}/>
           <div className="flex flex-col">
             <p className="text-lg mb-5">Számlám</p>

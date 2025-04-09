@@ -30,7 +30,7 @@ function Profile() {
   }, []);
   
   return (
-    <div className="min-h-screen h-full w-full max-w-full bg-grey flex px-4 text-white font-bold font play flex-col items-center relative">
+    <div className="min-h-screen h-full w-full max-w-full bg-grey flex px-4 lg:px-24 text-white font-bold font play flex-col items-center relative">
       <h1 className="text-center w-full pt-8 text-2xl mb-2">{user.displayName}</h1>
       <UserImage record={user} width={"w-28"} margin={"mb-8"}/>
       <TitleDivider title={"Barátok"}/>
@@ -74,14 +74,6 @@ function Profile() {
         }
         </div>
       </div>
-      <TitleDivider title={"Eredmények"}/>
-      <div className="flex flex-row w-full overflow-x-scroll gap-4 mb-8 cursor-pointer" onClick={() => {
-        badgeModalRef.current.inert = true;
-        badgeModalRef.current.showModal();
-        badgeModalRef.current.inert = false;
-      }}>
-        <Badge image={img1} title={"Nagy ivó"}/>
-      </div>
       <TitleDivider title={"Beállítások"} isNormal={true}/>
       <div className="w-full h-10 font-normal bg-dark-grey rounded-md flex flex-row justify-between items-center px-2 drop-shadow-[0_2px_2px_rgba(0,0,0,.5)] mb-2 select-none hover:cursor-pointer" onClick={() => {
         modifyModalRef.current.inert = true;
@@ -109,60 +101,6 @@ function Profile() {
       <AddFriendModal ref={addfriendModalRef}/>
       <PasswordModal ref={passwordModalRef}/>
       <Footer/>
-
-      <dialog className="modal" ref={badgeModalRef}>
-        <div
-          className="modal-box bg-transparent shadow-none w-fit p-16 overflow-hidden"
-          onClick={(e) => {
-            const box = e.currentTarget;
-            const rect = box.getBoundingClientRect();
-            const styles = window.getComputedStyle(box);
-
-            const paddingTop = parseFloat(styles.paddingTop);
-            const paddingLeft = parseFloat(styles.paddingLeft);
-            const paddingRight = parseFloat(styles.paddingRight);
-            const paddingBottom = parseFloat(styles.paddingBottom);
-
-            const clickX = e.clientX - rect.left;
-            const clickY = e.clientY - rect.top;
-            const contentLeft = paddingLeft;
-            const contentRight = rect.width - paddingRight;
-            const contentTop = paddingTop;
-            const contentBottom = rect.height - paddingBottom;
-
-            const isInPadding =
-              clickX < contentLeft ||
-              clickX > contentRight ||
-              clickY < contentTop ||
-              clickY > contentBottom;
-
-            if (isInPadding) {
-              badgeModalRef.current.close();
-            } else {
-              e.stopPropagation(); // prevent bubbling if needed
-            }
-          }}>
-          <div className="flex justify-center items-center w-fit">
-            <label className="swap swap-flip">
-              <input type="checkbox" />
-              <div className="flex flex-col h-60 aspect-[.7] select-none rounded-lg swap-off">
-                <div className="flex basis-[70%] bg-dark-grey rounded-t-lg">
-                  <img src={img1} alt="kép" />
-                </div>
-                <div className="flex basis-[30%] justify-center items-center bg-white text-black rounded-b-lg">
-                  <p className="text-xl">Nagy ivó</p>
-                </div>
-              </div>
-              <div className="flex flex-col justify-center items-center h-60 aspect-[.7] select-none rounded-lg swap-on bg-grey">
-                <span className="text-md">50 megivott sör</span>
-              </div>
-            </label>
-          </div>
-        </div>
-        <form method="dialog" className="modal-backdrop">
-          <button></button>
-        </form>
-      </dialog>
     </div>
   )
 }

@@ -10,7 +10,7 @@ import EventSwiper from "./EventSwiper";
 import { LuMapPin, LuChevronRight } from "react-icons/lu";
 
 function Pub() {
-  const { locations, previousRoutes, setPreviousRoutes } = useContext(Context);
+  const { locations, previousRoutes, setPreviousRoutes, getDayOfTheWeek } = useContext(Context);
   const { name } = useParams();
   const location = useLocation();
   const [currentLocation, setCurrentLocation] = useState({});
@@ -32,32 +32,6 @@ function Pub() {
       setIsClamped(totalLines > linesVisible);
     }
   };
-
-  //get current days opening and closing time
-  function getDayOfTheWeek(foundLocation) {
-    switch (new Date().getDay()) {
-      case 1:
-        return {open: foundLocation.businessHours.mondayOpen, close: foundLocation.businessHours.mondayClose};
-      
-      case 2:
-        return {open: foundLocation.businessHours.tuesdayOpen, close: foundLocation.businessHours.tuesdayClose};
-        
-      case 3:
-        return {open: foundLocation.businessHours.wednesdayOpen, close: foundLocation.businessHours.wednesdayClose};
-      
-      case 4:
-        return {open: foundLocation.businessHours.thursdayOpen, close: foundLocation.businessHours.thursdayClose};
-      
-      case 5:
-        return {open: foundLocation.businessHours.fridayOpen, close: foundLocation.businessHours.fridayClose};
-
-      case 6:
-        return {open: foundLocation.businessHours.saturdayOpen, close: foundLocation.businessHours.saturdayClose};
-
-      case 0:
-        return {open: foundLocation.businessHours.sundayOpen, close: foundLocation.businessHours.sundayClose};
-    }
-  }
 
   //timeouts for closing/opening pub
   function handleBusinessHours(foundLocation) {

@@ -479,6 +479,32 @@ function Provider({ children }) {
       } 
     }
   }
+
+  //get current days opening and closing time
+  function getDayOfTheWeek(record) {
+    switch (new Date().getDay()) {
+      case 1:
+        return {open: record?.businessHours?.mondayOpen, close: record?.businessHours?.mondayClose};
+      
+      case 2:
+        return {open: record?.businessHours?.tuesdayOpen, close: record?.businessHours?.tuesdayClose};
+        
+      case 3:
+        return {open: record?.businessHours?.wednesdayOpen, close: record?.businessHours?.wednesdayClose};
+      
+      case 4:
+        return {open: record?.businessHours?.thursdayOpen, close: record?.businessHours?.thursdayClose};
+      
+      case 5:
+        return {open: record?.businessHours?.fridayOpen, close: record?.businessHours?.fridayClose};
+
+      case 6:
+        return {open: record?.businessHours?.saturdayOpen, close: record?.businessHours?.saturdayClose};
+
+      case 0:
+        return {open: record?.businessHours?.sundayOpen, close: record?.businessHours?.sundayClose};
+    }
+  }
   
   const logout = async () => {
     const response = await axios.post("https://backend.csaposapp.hu/api/auth/logout", {refreshToken : localStorage.getItem("refreshToken")});
@@ -829,6 +855,7 @@ function Provider({ children }) {
       getProductsByLocation,
       getOrdersByTable,
       getBusinessHours,
+      getDayOfTheWeek,
       logout
       }}>
       {children}

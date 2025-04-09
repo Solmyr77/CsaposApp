@@ -18,7 +18,7 @@ function Main() {
 
   return (
     <div className="bg-grey text-white font-play font-bold">
-      <div className="lg:px-24 overflow-auto pb-[12vh]">
+      <div className="lg:px-24 px-4 overflow-auto pb-[12vh]">
         <Navbar/>
         {
           bookings.concat(bookingsContainingUser?.filter(booking => (booking.userAccepted === true || booking.tableGuests.find(guest => guest.id === user.id)?.status === "accepted"))).length > 0 &&

@@ -19,7 +19,7 @@ function OrderItem({ product, isOrdered }) {
     <div className="flex flex-col">
       <div className="flex items-center justify-between select-none">
         <div className="flex gap-2">
-          <img src={`https://assets.csaposapp.hu/assets/images/${product.id}.webp`} alt="kép" className="h-16 aspect-square bg-white p-1 rounded-md" onError={(event) => event.target.src = img1}/>
+          <img src={`https://assets.csaposapp.hu/assets/images/${product?.imgUrl}`} alt="kép" className="h-16 aspect-square bg-white p-1 rounded-md" onError={(event) => event.target.src = img1}/>
           <div className="flex flex-col">
             <span className="leading-none">{product.name}</span>
             <span className="text-gray-300 font-normal">{product.description}</span>

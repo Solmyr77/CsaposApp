@@ -6,7 +6,7 @@ const EventItem = forwardRef(({ event }, ref) => {
   const { setSelectedEvent } = useContext(StateContext);
 
   return (
-    <div className="card bg-base-100 w-96 shadow-lg h-fit">
+    <div className="card w-96 shadow-lg h-fit bg-white">
         <figure className="max-h-52 relative">
             <img
             src={`https://assets.csaposapp.hu/assets/images/${event.imgUrl}`}

@@ -277,7 +277,7 @@ export default function ProductsMenu() {
             </div>
 
             <dialog className='modal' ref={modifyModalRef}>
-                <div className="modal-box flex flex-col gap-4 max-w-1/2 relative">
+                <div className="modal-box flex flex-col gap-4 max-w-1/2 relative bg-white text-black">
                     <LuX className='absolute top-0 left-0 bg-red-500 text-white w-8 h-8 rounded-br cursor-pointer' onClick={() => {
                         modifyModalRef.current.close();
                         modifyFormRef.current.reset();
@@ -314,16 +314,16 @@ export default function ProductsMenu() {
                             await handleModifyProduct(selectedProduct.id);
                             }}>
                             <fieldset className='fieldset'>
-                                <legend className='fieldset-legend text-md'>Név</legend>
-                                <input name='name' type="text" defaultValue={selectedProduct.name} className='input input-lg' required/>
+                                <legend className='fieldset-legend text-md text-black'>Név</legend>
+                                <input name='name' type="text" defaultValue={selectedProduct.name} className='input input-lg bg-white border-gray-400' required/>
                             </fieldset>
                             <fieldset className='fieldset'>
-                                <legend className='fieldset-legend text-md'>Leírás</legend>
-                                <input name='description' type="text" defaultValue={selectedProduct.description} className='input input-lg' required/>
+                                <legend className='fieldset-legend text-md text-black'>Leírás</legend>
+                                <input name='description' type="text" defaultValue={selectedProduct.description} className='input input-lg bg-white border-gray-400' required/>
                             </fieldset>
                             <fieldset className='fieldset'>
-                                <legend className='fieldset-legend text-md'>Kategória</legend>
-                                <select name='category' className="select" required value={selectedCategory} onChange={(e) => setSelectedCategory(e.currentTarget.value)}>
+                                <legend className='fieldset-legend text-md text-black'>Kategória</legend>
+                                <select name='category' className="select bg-white border-gray-400" required value={selectedCategory} onChange={(e) => setSelectedCategory(e.currentTarget.value)}>
                                     <option value={"Röviditalok"}>Röviditalok</option>
                                     <option value={"Sörök"}>Sörök</option>
                                     <option value={"Borok"}>Borok</option>
@@ -333,9 +333,9 @@ export default function ProductsMenu() {
                                 </select>
                             </fieldset>
                             <fieldset className='fieldset'>
-                                <legend className='fieldset-legend text-md'>Ár</legend>
-                                <label className='input input-lg'>
-                                    <input name='price' type="number" min={0} defaultValue={selectedProduct.price} required/>
+                                <legend className='fieldset-legend text-md text-black'>Ár</legend>
+                                <label className='input input-lg bg-white border-gray-400'>
+                                    <input name='price' type="number" className='bg-white' min={0} defaultValue={selectedProduct.price} required/>
                                     <span className='label'>Ft</span>
                                 </label>
                             </fieldset>
@@ -358,7 +358,7 @@ export default function ProductsMenu() {
             </dialog>
 
             <dialog className='modal' ref={addModalRef}>
-                <div className="modal-box flex flex-col gap-4 max-w-1/2 relative">
+                <div className="modal-box bg-white flex flex-col gap-4 max-w-1/2 relative">
                     <LuX className='absolute top-0 left-0 bg-red-500 text-white w-8 h-8 rounded-br cursor-pointer' onClick={() => {
                         addModalRef.current.close();
                         addFormRef.current.reset();
@@ -396,16 +396,16 @@ export default function ProductsMenu() {
                             }
                         }}>
                             <fieldset className='fieldset'>
-                                <legend className='fieldset-legend text-md'>Név</legend>
-                                <input type="text" name='name' placeholder='Pl: Pilsner Urquell' className='input input-lg' required/>
+                                <legend className='fieldset-legend text-md text-black'>Név</legend>
+                                <input type="text" name='name' placeholder='Pl: Pilsner Urquell' className='input input-lg bg-white border-gray-400' required/>
                             </fieldset>
                             <fieldset className='fieldset'>
-                                <legend className='fieldset-legend text-md'>Leírás</legend>
-                                <input type="text" name='description' placeholder='Pl: 0.45l korsó' className='input input-lg' required/>
+                                <legend className='fieldset-legend text-md text-black'>Leírás</legend>
+                                <input type="text" name='description' placeholder='Pl: 0.45l korsó' className='input input-lg bg-white border-gray-400' required/>
                             </fieldset>
                             <fieldset className='fieldset'>
-                                <legend className='fieldset-legend text-md'>Kategória</legend>
-                                <select name='category' defaultValue="Válassz egy kategóriát" className="select" required>
+                                <legend className='fieldset-legend text-md text-black'>Kategória</legend>
+                                <select name='category' defaultValue="Válassz egy kategóriát" className="select bg-white border-gray-400" required>
                                     <option disabled={true}>Válassz egy kategóriát</option>
                                     <option>Röviditalok</option>
                                     <option>Sörök</option>
@@ -416,9 +416,9 @@ export default function ProductsMenu() {
                                 </select>
                             </fieldset>
                             <fieldset className='fieldset'>
-                                <legend className='fieldset-legend text-md'>Ár</legend>
-                                <label className='input input-lg'>
-                                    <input type="number" name='price' placeholder='Pl: 1290' min={0} required/>
+                                <legend className='fieldset-legend text-md text-black'>Ár</legend>
+                                <label className='input input-lg bg-white border-gray-400'>
+                                    <input type="number" name='price' className='bg-white' placeholder='Pl: 1290' min={0} required/>
                                     <span className='label'>Ft</span>
                                 </label>
                             </fieldset>
@@ -439,7 +439,7 @@ export default function ProductsMenu() {
             </dialog>
 
             <dialog className='modal' ref={confirmRef}>
-                <div className="modal-box">
+                <div className="modal-box bg-white">
                     <div className="flex flex-col gap-4">
                         <span className="font-bold text-lg">Biztosan törölni szeretnéd?</span>
                         <div className="flex gap-4 items-center justify-center">
@@ -463,7 +463,7 @@ export default function ProductsMenu() {
             </dialog>
 
             <dialog className='modal' ref={responseRef}>
-                <div className="modal-box">
+                <div className="modal-box bg-white text-black">
                     <div className='flex items-center'>
                         <span className='font-bold text-lg'>Sikeres művelet!</span>
                         <LuCheck className='h-10 w-10'/>
@@ -473,7 +473,7 @@ export default function ProductsMenu() {
             </dialog>
 
             <dialog className='modal' ref={errorRef}>
-                <div className="modal-box">
+                <div className="modal-box bg-white">
                     <div className='flex items-center'>
                         <span className='font-bold text-lg text-red-500'>Kötelező képet feltölteni!</span>
                     </div>

@@ -168,7 +168,7 @@ function TableView() {
       </div>
 
       <dialog className="modal" ref={modalRef}>
-        <div className="modal-box">
+        <div className="modal-box bg-white">
             {
               isSuccessful ? 
               <span className="text-lg text-center font-bold">Sikeres törlés!</span> :

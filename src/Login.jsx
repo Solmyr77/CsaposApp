@@ -53,7 +53,7 @@ function Login() {
   }
 
   return (
-    <div className="min-h-screen w-full px-4 pt-24 flex flex-col items-center">
+    <div className="min-h-screen w-full px-4 pt-24 flex flex-col items-center bg-white text-black">
 
       <h1 className="font-bold text-6xl tracking-widest">Csapos</h1>
 

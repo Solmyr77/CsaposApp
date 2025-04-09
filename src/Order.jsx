@@ -21,6 +21,7 @@ function Order({ order, orderMenu }) {
       } , config);
       if (response.status === 200) {
         console.log(response.data);
+        order.orderStatus = "completed";
         setIsCompleted(true);
       }
     }
@@ -91,7 +92,7 @@ function Order({ order, orderMenu }) {
             }
             <span className="self-end font-bold text-md">Összesen: {currentTotal} Ft</span>
           </div>
-          <button className="btn bg-success border-0 shadow-none mt-4 text-md h-12" disabled={isCompleted} onClick={async () => {
+          <button className="btn bg-success border-0 shadow-none mt-4 text-md h-12 disabled:!bg-success disabled:!opacity-50" disabled={isCompleted} onClick={async () => {
             await handleUpdateStatus(order.id);
           }}> 
           {
@@ -119,7 +120,7 @@ function Order({ order, orderMenu }) {
           }
           <span className="self-end font-bold text-md">Összesen: {currentTotal} Ft</span>
         </div>
-        <button className="btn bg-success border-0 shadow-none mt-4 text-md h-12" disabled={isCompleted} onClick={async () => {
+        <button className="btn bg-success border-0 shadow-none mt-4 text-md h-12 disabled:!bg-success disabled:!opacity-50" disabled={isCompleted} onClick={async () => {
           await handleUpdateStatus(order.id);
         }}>
         {

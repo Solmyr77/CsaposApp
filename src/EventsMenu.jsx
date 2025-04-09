@@ -263,7 +263,7 @@ function EventsMenu() {
             </div>
 
             <dialog className='modal' ref={modifyModalRef}>
-                <div className="modal-box flex flex-col gap-4 max-w-1/2 relative">
+                <div className="modal-box flex flex-col gap-4 max-w-1/2 relative bg-white">
                     <LuX className='absolute top-0 left-0 bg-red-500 text-white w-8 h-8 rounded-br cursor-pointer' onClick={() => {
                         modifyModalRef.current.close();
                         modifyFormRef.current.reset();
@@ -299,20 +299,20 @@ function EventsMenu() {
                             await handleModifyEvent(selectedEvent.id);
                             }}>
                             <fieldset className='fieldset'>
-                                <legend className='fieldset-legend text-md'>Név</legend>
-                                <input name='name' type="text" defaultValue={selectedEvent.name} className='input input-lg' required/>
+                                <legend className='fieldset-legend text-md text-black'>Név</legend>
+                                <input name='name' type="text" defaultValue={selectedEvent.name} className='input input-lg bg-white border-gray-400' required/>
                             </fieldset>
                             <fieldset className='fieldset'>
-                                <legend className='fieldset-legend text-md'>Leírás</legend>
-                                <input name='description' type="text" defaultValue={selectedEvent.description} className='input input-lg' required/>
+                                <legend className='fieldset-legend text-md text-black'>Leírás</legend>
+                                <input name='description' type="text" defaultValue={selectedEvent.description} className='input input-lg bg-white border-gray-400' required/>
                             </fieldset>
                             <fieldset className='fieldset'>
-                                <legend className='fieldset-legend text-md'>Ettől</legend>
-                                <input type="datetime-local" name='timeFrom' className='input input-lg' defaultValue={selectedEvent.timefrom} required/>
+                                <legend className='fieldset-legend text-md text-black'>Ettől</legend>
+                                <input type="datetime-local" name='timeFrom' className='input input-lg bg-white border-gray-400' defaultValue={selectedEvent.timefrom} required/>
                             </fieldset>
                             <fieldset className='fieldset'>
-                                <legend className='fieldset-legend text-md'>Eddig</legend>
-                                <input type="datetime-local" name='timeTo' className='input input-lg' defaultValue={selectedEvent.timeto} required/>
+                                <legend className='fieldset-legend text-md text-black'>Eddig</legend>
+                                <input type="datetime-local" name='timeTo' className='input input-lg bg-white border-gray-400' defaultValue={selectedEvent.timeto} required/>
                             </fieldset>
                             {
                                 isUploading ? 
@@ -334,7 +334,7 @@ function EventsMenu() {
 
             {/* Add modal */}
             <dialog className='modal' ref={addModalRef}>
-                <div className="modal-box flex flex-col gap-4 max-w-1/2 relative">
+                <div className="modal-box flex flex-col gap-4 max-w-1/2 relative bg-white">
                     <LuX className='absolute top-0 left-0 bg-red-500 text-white w-8 h-8 rounded-br cursor-pointer' onClick={() => {
                         addModalRef.current.close();
                         addFormRef.current.reset();
@@ -373,20 +373,20 @@ function EventsMenu() {
                             }
                         }}>
                             <fieldset className='fieldset'>
-                                <legend className='fieldset-legend text-md'>Név</legend>
-                                <input type="text" name='name' placeholder='Pl: Azahriah a Félidőben' className='input input-lg' required/>
+                                <legend className='fieldset-legend text-md text-black'>Név</legend>
+                                <input type="text" name='name' placeholder='Pl: Azahriah a Félidőben' className='input input-lg bg-white border-gray-400' required/>
                             </fieldset>
                             <fieldset className='fieldset'>
-                                <legend className='fieldset-legend text-md'>Leírás</legend>
-                                <textarea name="description" placeholder="Pl: Legkomolyabb kocsmakoncertek" className="textarea"></textarea>
+                                <legend className='fieldset-legend text-md text-black'>Leírás</legend>
+                                <textarea name="description" placeholder="Pl: Legkomolyabb kocsmakoncertek" className="textarea bg-white border-gray-400"></textarea>
                             </fieldset>
                             <fieldset className='fieldset'>
-                                <legend className='fieldset-legend text-md'>Ettől</legend>
-                                <input type="datetime-local" name='timeFrom' className='input input-lg' required/>
+                                <legend className='fieldset-legend text-md text-black'>Ettől</legend>
+                                <input type="datetime-local" name='timeFrom' className='input input-lg bg-white border-gray-400' required/>
                             </fieldset>
                             <fieldset className='fieldset'>
-                                <legend className='fieldset-legend text-md'>Eddig</legend>
-                                <input type="datetime-local" name='timeTo' className='input input-lg' required/>
+                                <legend className='fieldset-legend text-md text-black'>Eddig</legend>
+                                <input type="datetime-local" name='timeTo' className='input input-lg bg-white border-gray-400' required/>
                             </fieldset>
                             {
                                 isUploading ? 
@@ -405,7 +405,7 @@ function EventsMenu() {
             </dialog>
 
             <dialog className='modal' ref={confirmRef}>
-                <div className="modal-box">
+                <div className="modal-box bg-white">
                     <div className="flex flex-col gap-4">
                         <span className="font-bold text-lg">Biztosan törölni szeretnéd?</span>
                         <div className="flex gap-4 items-center justify-center">
@@ -429,7 +429,7 @@ function EventsMenu() {
             </dialog>
 
             <dialog className='modal' ref={responseRef}>
-                <div className="modal-box">
+                <div className="modal-box bg-white">
                     <div className='flex items-center'>
                         <span className='font-bold text-lg'>Sikeres művelet!</span>
                         <LuCheck className='h-10 w-10'/>
@@ -439,7 +439,7 @@ function EventsMenu() {
             </dialog>
 
             <dialog className='modal' ref={errorRef}>
-                <div className="modal-box">
+                <div className="modal-box bg-white">
                     <div className='flex items-center'>
                         <span className='font-bold text-lg text-red-500'>Kötelező képet feltölteni!</span>
                     </div>

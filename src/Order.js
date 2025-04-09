@@ -36,13 +36,10 @@ function Order({ record, num }) {
           record.orderStatus === "pending" && <span className="badge bg-yellow-500 text-dark-grey border-0 h-fit">Teljesítésre vár</span>
         }
         {
-          record.orderStatus === "rejected" && <span className="badge bg-red-500 border-0 h-fit">Elutasítva</span>
-        }
-        {
-          record.orderStatus === "completed" && <span className="badge bg-gradient-to-tr from-blue to-sky-400 border-0 h-fit">Elutasítva</span>
+          record.orderStatus === "completed" && <span className="badge bg-gradient-to-tr from-blue to-sky-400 border-0 h-fit">Teljesítve</span>
         }
       </div>
-      </div>
+    </div>
       <div className="flex flex-col mt-3">
         {
           record.orderItems.map(product => (
